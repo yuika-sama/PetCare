@@ -63,6 +63,12 @@ const TestPage = () => {
         >
           Doctor Medicine Selector
         </Link>
+        <Link 
+          to="/doctors/notifications" 
+          style={{ padding: '10px 15px', backgroundColor: '#f0f4f8', borderRadius: '8px', textDecoration: 'none', color: '#1e40af', fontWeight: '500', border: '1px solid #d1d5db' }}
+        >
+          Doctor Notifications
+        </Link>
       </div>
     </div>
   );

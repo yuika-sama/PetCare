@@ -9,6 +9,7 @@ import DoctorTicketDetails from './pages/doctors/TicketDetails';
 import ServiceOrder from './pages/doctors/ServiceOrder';
 import RecordResult from './pages/doctors/RecordResult';
 import MedicineSelector from './pages/doctors/MedicineSelector';
+import Notifications from './pages/doctors/Notifications';
 
 function App() {
   return (
@@ -22,6 +23,7 @@ function App() {
       <Route path="/doctors/service-order/:id" element={<ServiceOrder />} />
       <Route path="/doctors/record-result/:id" element={<RecordResult />} />
       <Route path="/doctors/medicine-selector" element={<MedicineSelector />} />
+      <Route path="/doctors/notifications" element={<Notifications />} />
     </Routes>
   );
 }
