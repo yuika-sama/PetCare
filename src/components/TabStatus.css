@@ -1,0 +1,85 @@
+/* TabStatus.css */
+.tab-status-wrapper {
+    width: 100%;
+    margin-bottom: 24px;
+    /* allow horizontal scrolling if needed, hiding the scrollbar */
+    overflow-x: auto;
+    -ms-overflow-style: none;
+    /* IE and Edge */
+    scrollbar-width: none;
+    /* Firefox */
+}
+
+/* Hide scrollbar for Chrome, Safari and Opera */
+.tab-status-wrapper::-webkit-scrollbar {
+    display: none;
+}
+
+.tab-status-container {
+    display: inline-flex;
+    align-items: center;
+    background-color: #ecf8f5;
+    /* Light teal background */
+    border-radius: 40px;
+    padding: 6px;
+    gap: 8px;
+    min-width: max-content;
+    /* Ensure container expands to hold all children */
+}
+
+.tab-status-item {
+    display: flex;
+    align-items: center;
+    padding: 8px 12px;
+    border-radius: 40px;
+    cursor: pointer;
+    transition: background-color 0.2s, color 0.2s;
+    user-select: none;
+}
+
+.tab-label {
+    font-size: 15px;
+    font-weight: 500;
+    color: #4b5563;
+    /* Dark gray */
+    margin-right: 8px;
+    white-space: nowrap;
+}
+
+.tab-badge {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 24px;
+    height: 24px;
+    padding: 0 6px;
+    border-radius: 12px;
+    background-color: #ffffff;
+    /* White by default */
+    color: #374151;
+    /* Darker gray */
+    font-size: 13px;
+    font-weight: 600;
+}
+
+/* Active State */
+.tab-status-item.active {
+    background-color: #ffffff;
+    /* White pill background */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    /* very subtle drop shadow */
+}
+
+.tab-status-item.active .tab-label {
+    color: #209D80;
+    /* Teal active text */
+    font-weight: 600;
+    /* Bold active text */
+}
+
+.tab-status-item.active .tab-badge {
+    background-color: #dcf2ec;
+    /* Light teal badge background */
+    color: #209D80;
+    /* Teal badge text */
+}
