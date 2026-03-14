@@ -1,0 +1,89 @@
+.staff-page {
+    min-height: 100vh;
+    background: linear-gradient(180deg, #ffffff 0%, #f4faf9 45%, #f1f7f8 100%);
+    padding-bottom: 110px;
+    font-family: 'Segoe UI', sans-serif;
+    color: #1f2a2e;
+}
+
+.staff-content {
+    width: min(480px, calc(100% - 32px));
+    margin: 0 auto;
+    padding: 26px 0 40px;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+}
+
+.staff-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.staff-header h1 {
+    margin: 0;
+    font-size: 24px;
+    font-weight: 700;
+}
+
+.staff-header p {
+    margin: 6px 0 0 0;
+    color: #76848f;
+    font-size: 14px;
+}
+
+.staff-avatar {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: url('https://randomuser.me/api/portraits/men/32.jpg') center/cover no-repeat;
+    border: 2px solid #ffffff;
+    box-shadow: 0 10px 18px rgba(16, 24, 40, 0.12);
+}
+
+.staff-search-row {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 12px;
+    align-items: center;
+}
+
+.staff-search.ui.input > input {
+    border-radius: 999px !important;
+    border: 1px solid #e5ebef !important;
+    padding: 12px 18px 12px 44px !important;
+    box-shadow: none !important;
+}
+
+.staff-search.ui.input {
+    position: relative;
+}
+
+.staff-search.ui.input .staff-search-icon {
+    position: absolute;
+    left: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #1f9a82;
+    pointer-events: none;
+}
+
+.staff-filter.ui.button {
+    width: 48px;
+    height: 48px;
+    border-radius: 16px;
+    background: #ffffff;
+    border: 1px solid #e5ebef;
+    box-shadow: 0 8px 16px rgba(15, 34, 44, 0.08);
+}
+
+.staff-tabs-wrap {
+    padding: 8px 0 4px;
+}
+
+.staff-cards {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}

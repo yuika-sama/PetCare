@@ -12,6 +12,9 @@ import MedicineSelector from './pages/doctors/MedicineSelector';
 import Notifications from './pages/doctors/Notifications';
 import TodayOrders from './pages/receptionists/TodayOrders';
 import NewReception from './pages/receptionists/NewReception';
+import StaffReceptionList from './pages/staffs/ReceptionList';
+import StaffNotifications from './pages/staffs/Notifications';
+import StaffPayment from './pages/staffs/Payment';
 
 function App() {
   return (
@@ -28,6 +31,9 @@ function App() {
       <Route path="/doctors/notifications" element={<Notifications />} />
       <Route path="/receptionists/today-orders" element={<TodayOrders />} />
       <Route path="/receptionists/new-reception" element={<NewReception />} />
+      <Route path="/staffs/receptions" element={<StaffReceptionList />} />
+      <Route path="/staffs/notifications" element={<StaffNotifications />} />
+      <Route path="/staffs/payment" element={<StaffPayment />} />
     </Routes>
   );
 }

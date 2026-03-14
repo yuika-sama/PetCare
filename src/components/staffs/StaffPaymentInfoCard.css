@@ -1,0 +1,125 @@
+.staff-payment-info-card {
+    background: #ffffff;
+    border: 1px solid #e4eeec;
+    border-radius: 24px;
+    box-shadow: 0 8px 20px rgba(14, 32, 41, 0.05);
+    padding: 16px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+}
+
+.staff-payment-qr-box {
+    border: 1px solid #d7dddd;
+    border-radius: 14px;
+    padding: 14px 12px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+}
+
+.qr-title {
+    margin: 0;
+    font-size: 14px;
+    color: #626f77;
+    font-weight: 500;
+}
+
+.qr-circle {
+    width: 84px;
+    height: 84px;
+    border-radius: 50%;
+    border: 1px solid #e0e6e5;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin: 12px 0;
+    color: #707a83;
+}
+
+.qr-note {
+    margin: 0;
+    color: #646f77;
+    font-size: 13px;
+    line-height: 1.35;
+}
+
+.print-btn {
+    margin-top: 12px;
+    border: none;
+    background: transparent;
+    color: #179a82;
+    font-weight: 700;
+    font-size: 17px;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+}
+
+.print-btn:active {
+    transform: scale(0.97);
+}
+
+.staff-payment-order-info {
+    min-width: 0;
+}
+
+.created-time {
+    margin: 2px 0 8px;
+    color: #90979d;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.status-pill {
+    display: inline-flex;
+    align-items: center;
+    border-radius: 999px;
+    background: #e7f0ff;
+    color: #2f6ce3;
+    padding: 4px 10px;
+    font-size: 14px;
+    font-weight: 700;
+}
+
+.staff-payment-order-info h2 {
+    margin: 10px 0 12px;
+    font-size: 42px;
+    line-height: 1;
+    color: #1f2328;
+}
+
+.info-group {
+    margin-top: 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.info-group span {
+    color: #5f6a73;
+    font-size: 16px;
+}
+
+.info-group strong {
+    color: #2c3137;
+    font-size: 20px;
+    line-height: 1.2;
+}
+
+.info-group small {
+    color: #5f6a73;
+    font-size: 16px;
+}
+
+@media (max-width: 640px) {
+    .staff-payment-info-card {
+        grid-template-columns: 1fr;
+    }
+
+    .staff-payment-order-info h2 {
+        font-size: 38px;
+    }
+}

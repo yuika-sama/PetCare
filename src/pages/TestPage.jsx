@@ -83,6 +83,26 @@ const TestPage = () => {
         >
           Receptionist New Reception
         </Link>
+
+        <h2 style={{ color: '#333', marginTop: '16px', borderTop: '1px solid #d1d5db', paddingTop: '16px' }}>Staff Pages</h2>
+        <Link 
+          to="/staffs/receptions" 
+          style={{ padding: '10px 15px', backgroundColor: '#f0f4f8', borderRadius: '8px', textDecoration: 'none', color: '#1e40af', fontWeight: '500', border: '1px solid #d1d5db' }}
+        >
+          Staff Reception List
+        </Link>
+        <Link 
+          to="/staffs/notifications" 
+          style={{ padding: '10px 15px', backgroundColor: '#f0f4f8', borderRadius: '8px', textDecoration: 'none', color: '#1e40af', fontWeight: '500', border: '1px solid #d1d5db' }}
+        >
+          Staff Notifications
+        </Link>
+        <Link 
+          to="/staffs/payment" 
+          style={{ padding: '10px 15px', backgroundColor: '#f0f4f8', borderRadius: '8px', textDecoration: 'none', color: '#1e40af', fontWeight: '500', border: '1px solid #d1d5db' }}
+        >
+          Staff Payment
+        </Link>
       </div>
     </div>
   );
