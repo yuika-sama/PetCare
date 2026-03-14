@@ -69,6 +69,20 @@ const TestPage = () => {
         >
           Doctor Notifications
         </Link>
+        
+        <h2 style={{ color: '#333', marginTop: '16px', borderTop: '1px solid #d1d5db', paddingTop: '16px' }}>Receptionist Pages</h2>
+        <Link 
+          to="/receptionists/today-orders" 
+          style={{ padding: '10px 15px', backgroundColor: '#f0f4f8', borderRadius: '8px', textDecoration: 'none', color: '#1e40af', fontWeight: '500', border: '1px solid #d1d5db' }}
+        >
+          Receptionist Today Orders
+        </Link>
+        <Link 
+          to="/receptionists/new-reception" 
+          style={{ padding: '10px 15px', backgroundColor: '#f0f4f8', borderRadius: '8px', textDecoration: 'none', color: '#1e40af', fontWeight: '500', border: '1px solid #d1d5db' }}
+        >
+          Receptionist New Reception
+        </Link>
       </div>
     </div>
   );

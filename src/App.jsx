@@ -10,6 +10,8 @@ import ServiceOrder from './pages/doctors/ServiceOrder';
 import RecordResult from './pages/doctors/RecordResult';
 import MedicineSelector from './pages/doctors/MedicineSelector';
 import Notifications from './pages/doctors/Notifications';
+import TodayOrders from './pages/receptionists/TodayOrders';
+import NewReception from './pages/receptionists/NewReception';
 
 function App() {
   return (
@@ -24,6 +26,8 @@ function App() {
       <Route path="/doctors/record-result/:id" element={<RecordResult />} />
       <Route path="/doctors/medicine-selector" element={<MedicineSelector />} />
       <Route path="/doctors/notifications" element={<Notifications />} />
+      <Route path="/receptionists/today-orders" element={<TodayOrders />} />
+      <Route path="/receptionists/new-reception" element={<NewReception />} />
     </Routes>
   );
 }
