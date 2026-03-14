@@ -1,17 +1,17 @@
 import React, { useState } from 'react';
 import './StaffNavBar.css';
-import { Calendar, Warehouse, Plus, PhoneCall, Menu } from 'lucide-react';
+import { FileCheck, Wallet, CirclePlus, Bell, Menu } from 'lucide-react';
 
 const navItems = [
-    { id: 'calendar', label: 'Lịch hẹn', icon: Calendar },
-    { id: 'warehouse', label: 'Kho', icon: Warehouse },
-    { id: 'plus', label: 'Tạo đơn', icon: Plus, isCenter: true },
-    { id: 'reception', label: 'Tiếp đón', icon: PhoneCall },
-    { id: 'menu', label: 'Khác', icon: Menu }
+    { id: 'today', label: 'Đơn hôm nay', icon: FileCheck },
+    { id: 'payment', label: 'Thanh toán', icon: Wallet },
+    { id: 'create', label: 'Tạo đơn', icon: CirclePlus },
+    { id: 'notifications', label: 'Thông báo', icon: Bell },
+    { id: 'more', label: 'Khác', icon: Menu }
 ];
 
 const StaffNavBar = () => {
-    const [active, setActive] = useState('reception');
+    const [active, setActive] = useState('today');
     const [pressed, setPressed] = useState(null);
 
     const handleClick = (id) => {
@@ -28,20 +28,6 @@ const StaffNavBar = () => {
                     const isActive = active === item.id;
                     const isPressed = pressed === item.id;
 
-                    if (item.isCenter) {
-                        return (
-                            <button
-                                key={item.id}
-                                className={`staff-nav-fab ${isPressed ? 'is-pressed' : ''}`}
-                                onClick={() => handleClick(item.id)}
-                                type="button"
-                                aria-label={item.label}
-                            >
-                                <Icon size={24} strokeWidth={2} />
-                            </button>
-                        );
-                    }
-
                     return (
                         <button
                             key={item.id}
@@ -49,7 +35,7 @@ const StaffNavBar = () => {
                             onClick={() => handleClick(item.id)}
                             type="button"
                         >
-                            <Icon size={22} strokeWidth={1.8} />
+                            <Icon size={26} strokeWidth={isActive ? 2 : 1.5} />
                             <span>{item.label}</span>
                         </button>
                     );

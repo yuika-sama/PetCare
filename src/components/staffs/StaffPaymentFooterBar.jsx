@@ -2,12 +2,15 @@ import React, { useState } from 'react';
 import './StaffPaymentFooterBar.css';
 import { Button } from 'semantic-ui-react';
 
-const StaffPaymentFooterBar = () => {
+const StaffPaymentFooterBar = ({ onPayClick }) => {
     const [pressed, setPressed] = useState('');
 
     const handlePress = (value) => {
         setPressed(value);
         window.setTimeout(() => setPressed(''), 140);
+        if (value === 'pay' && onPayClick) {
+            onPayClick();
+        }
     };
 
     return (

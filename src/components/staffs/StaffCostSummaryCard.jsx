@@ -29,7 +29,7 @@ const feeRows = [
 const StaffCostSummaryCard = () => {
     return (
         <section className="staff-cost-card">
-            <h2>Tổng hợp chi phí</h2>
+            <h2 className="cost-card-title">Chi tiết hoá đơn</h2>
 
             <div className="pet-chip">
                 <strong>Kuro</strong>

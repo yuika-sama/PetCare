@@ -6,11 +6,12 @@
     padding: 16px;
 }
 
-.staff-cost-card h2 {
-    text-align: center;
-    margin: 0 0 14px;
-    font-size: 22px;
+.cost-card-title {
+    font-size: 18px;
+    font-weight: 700;
     color: #1f2328;
+    margin-bottom: 16px;
+    text-align: left;
 }
 
 .pet-chip {
@@ -25,19 +26,21 @@
 }
 
 .pet-chip strong {
-    font-size: 22px;
+    font-size: 16px;
     color: #252a30;
 }
 
 .pet-chip span {
     color: #69747c;
-    font-size: 15px;
+    font-size: 14px;
 }
 
 .pet-chip .meta {
     display: inline-flex;
     align-items: center;
     gap: 4px;
+    color: #69747c;
+    font-size: 14px;
 }
 
 .cost-header-row,
@@ -147,9 +150,10 @@
 }
 
 .payment-summary h3 {
-    text-align: center;
+    text-align: left;
     margin: 0 0 10px;
-    font-size: 22px;
+    font-size: 18px;
+    font-weight: 700;
     color: #1f2328;
 }
 
@@ -179,7 +183,8 @@
 }
 
 .payment-total strong {
-    font-size: 40px;
+    font-size: 24px;
+    color: #179a82;
 }
 
 .payment-history {

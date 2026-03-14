@@ -5,6 +5,7 @@ import { Search, SlidersHorizontal } from 'lucide-react';
 import StaffNavBar from '../../components/staffs/StaffNavBar';
 import StaffStatusTabs from '../../components/staffs/StaffStatusTabs';
 import StaffReceptionCard from '../../components/staffs/StaffReceptionCard';
+import StaffCompletedReceptionCard from '../../components/staffs/StaffCompletedReceptionCard';
 
 const demoCards = [
     {
@@ -52,6 +53,24 @@ const demoCards = [
 
 const ReceptionList = () => {
     const [query, setQuery] = useState('');
+    const [activeTab, setActiveTab] = useState('cho');
+
+    // Filter cards based on tab and query
+    const filteredCards = demoCards.filter(card => {
+        const matchQuery = card.customer.toLowerCase().includes(query.toLowerCase());
+        
+        if (activeTab === 'all') return matchQuery;
+        
+        // Define tab to status mapping
+        const tabStatusMap = {
+            'cho': 'received',
+            'da': 'exam',
+            'huy': 'cancelled',
+            'hoanthanh': 'done'
+        };
+        
+        return matchQuery && card.status === tabStatusMap[activeTab];
+    });
 
     return (
         <div className="staff-page">
@@ -79,12 +98,17 @@ const ReceptionList = () => {
                 </div>
 
                 <div className="staff-tabs-wrap">
-                    <StaffStatusTabs />
+                    <StaffStatusTabs onChange={(key) => setActiveTab(key)} />
                 </div>
 
                 <div className="staff-cards">
-                    {demoCards.map((card) => (
-                        <StaffReceptionCard key={card.id} {...card} />
+                    {filteredCards.map((card) => (
+                        activeTab === 'hoanthanh' ? (
+                            <StaffCompletedReceptionCard 
+                            />
+                        ) : (
+                            <StaffReceptionCard key={card.id} {...card} />
+                        )
                     ))}
                 </div>
             </div>

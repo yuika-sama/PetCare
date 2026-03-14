@@ -1,13 +1,15 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './Payment.css';
 import StaffTopHeader from '../../components/staffs/StaffTopHeader';
 import StaffPaymentInfoCard from '../../components/staffs/StaffPaymentInfoCard';
 import StaffCostSummaryCard from '../../components/staffs/StaffCostSummaryCard';
 import StaffPaymentFooterBar from '../../components/staffs/StaffPaymentFooterBar';
+import StaffPaymentModal from '../../components/staffs/StaffPaymentModal';
 
 const Payment = () => {
     const navigate = useNavigate();
+    const [isModalOpen, setIsModalOpen] = useState(false);
 
     return (
         <div className="staff-payment-page">
@@ -25,7 +27,16 @@ const Payment = () => {
                 </div>
             </div>
 
-            <StaffPaymentFooterBar />
+            <StaffPaymentFooterBar onPayClick={() => setIsModalOpen(true)} />
+
+            <StaffPaymentModal 
+                open={isModalOpen} 
+                onClose={() => setIsModalOpen(false)}
+                onConfirm={() => {
+                    setIsModalOpen(false);
+                    // Add your confirm logic here
+                }}
+            />
         </div>
     );
 };

@@ -30,11 +30,12 @@
 }
 
 .remain-row span {
-    font-size: 18px;
+    font-size: 16px;
 }
 
 .remain-row strong {
-    font-size: 40px;
+    font-size: 24px;
+    color: #1da088;
 }
 
 .footer-actions {
@@ -72,7 +73,7 @@
     }
 
     .remain-row strong {
-        font-size: 38px;
+        font-size: 22px;
     }
 
     .footer-actions .ui.button {
