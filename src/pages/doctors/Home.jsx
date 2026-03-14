@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { CircleArrowRight, Info } from 'lucide-react';
 import './Home.css';
-import StatCard from '../../components/StatCard';
+import StatCard from '../../components/doctor/StatCard';
 
 const Home = () => {
     const [activeTab, setActiveTab] = useState('Workspace');

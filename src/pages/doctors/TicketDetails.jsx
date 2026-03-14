@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import './TicketDetails.css';
-import '../../components/TicketCard.css';
+import '../../components/doctor/TicketCard.css';
 
 import { ChevronLeft, MoreVertical, Phone, TriangleAlert, Cake, Weight, Mars } from 'lucide-react';
 

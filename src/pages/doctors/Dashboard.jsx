@@ -1,7 +1,7 @@
 import React from 'react';
 import DoctorLayout from '../../layouts/DoctorLayout';
-import TicketCard from '../../components/TicketCard';
-import TabStatus from '../../components/TabStatus';
+import TicketCard from '../../components/doctor/TicketCard';
+import TabStatus from '../../components/doctor/TabStatus';
 
 const Dashboard = () => {
     const dummyTickets = [
