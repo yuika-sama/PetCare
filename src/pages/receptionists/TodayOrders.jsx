@@ -2,6 +2,7 @@ import React, { useState, useMemo } from 'react';
 import { Search, SlidersHorizontal, ChevronDown, ChevronUp, ChevronLeft, ChevronRight, UserRound, PlusCircle, Calendar } from 'lucide-react';
 import ReceptionistLayout from '../../layouts/ReceptionistLayout';
 import ReceptionCard from '../../components/receptionist/ReceptionCard';
+import ReceivedCard from '../../components/receptionist/ReceivedCard';
 import './TodayOrders.css';
 
 const MONTH_NAMES = [
@@ -75,6 +76,8 @@ const TodayOrders = () => {
         { key: 'cho', label: 'Chờ tiếp đón', count: 3 },
         { key: 'da', label: 'Đã tiếp đón', count: 10 },
         { key: 'huy', label: 'Đã hủy', count: 16 },
+        { key: 'hoanthanh', label: 'Hoàn thành', count: 16 },
+        { key: 'all', label: 'Tất cả', count: 16 },
     ];
 
     // const customers = [
@@ -98,6 +101,36 @@ const TodayOrders = () => {
     //     },
     // ];
     const customers = []
+
+    const receivedOrders = [
+        {
+            id: 1,
+            customerName: 'Nguyễn Anh Đức',
+            phone: '0912345678',
+            ticketId: '2141441',
+            status: 'Đã tiếp đón',
+            createdAt: 'Tạo đơn lúc 10:03 - 20/03/2026',
+            pets: [
+                { name: 'Kuro', breed: 'Chó Poodle', gender: 'male', age: '3 Tuổi', weight: '4.5kg' },
+            ],
+            sourceOrder: '2141441',
+            paymentEnabled: true,
+        },
+        {
+            id: 2,
+            customerName: 'Nguyễn Duy Ngọc',
+            phone: '0908264671',
+            ticketId: '2141441',
+            status: 'Đã tiếp đón',
+            createdAt: 'Tiếp đón lúc 10:03 - 20/03/2026',
+            pets: [
+                { name: 'Kuro', breed: 'Chó Poodle', gender: 'male', age: '3 Tuổi', weight: '4.5kg' },
+                { name: 'Mike', breed: 'Mèo Anh lông ngắn', gender: 'male', age: '2 Tuổi', weight: '2.5kg' },
+            ],
+            sourceOrder: null,
+            paymentEnabled: false,
+        },
+    ];
 
     return (
         <ReceptionistLayout>
@@ -224,29 +257,61 @@ const TodayOrders = () => {
                     ))}
                 </div>
 
-                {/* Customers List */}
-                {customers.length > 0 ? (
+                {/* Content by tab */}
+                {activeStatus === 'cho' && (
+                    <>
+                        {customers.length > 0 ? (
+                            <div className="to-customers-list">
+                                {customers.map(c => (
+                                    <ReceptionCard
+                                        key={c.id}
+                                        name={c.name}
+                                        phone={c.phone}
+                                        avatar={c.avatar}
+                                        onAdd={() => console.log('Add', c.id)}
+                                    />
+                                ))}
+                            </div>
+                        ) : (
+                            <div className="to-empty-state">
+                                <div className="to-empty-icon">
+                                    <UserRound size={32} color="#a1a1aa" />
+                                </div>
+                                <p className="to-empty-text">Không tìm thấy khách hàng</p>
+                                <button className="to-empty-add-btn" onClick={() => setShowNewCustomerModal(true)}>
+                                    <PlusCircle size={18} color="#209D80" />
+                                    <span>Tạo mới khách hàng</span>
+                                </button>
+                            </div>
+                        )}
+                    </>
+                )}
+
+                {activeStatus === 'da' && (
                     <div className="to-customers-list">
-                        {customers.map(c => (
-                            <ReceptionCard
-                                key={c.id}
-                                name={c.name}
-                                phone={c.phone}
-                                avatar={c.avatar}
-                                onAdd={() => console.log('Add', c.id)}
+                        {receivedOrders.map(order => (
+                            <ReceivedCard
+                                key={order.id}
+                                customerName={order.customerName}
+                                phone={order.phone}
+                                ticketId={order.ticketId}
+                                status={order.status}
+                                createdAt={order.createdAt}
+                                pets={order.pets}
+                                sourceOrder={order.sourceOrder}
+                                paymentEnabled={order.paymentEnabled}
+                                onPayment={() => console.log('Payment', order.id)}
                             />
                         ))}
                     </div>
-                ) : (
+                )}
+
+                {activeStatus === 'huy' && (
                     <div className="to-empty-state">
                         <div className="to-empty-icon">
                             <UserRound size={32} color="#a1a1aa" />
                         </div>
-                        <p className="to-empty-text">Không tìm thấy khách hàng</p>
-                        <button className="to-empty-add-btn" onClick={() => setShowNewCustomerModal(true)}>
-                            <PlusCircle size={18} color="#209D80" />
-                            <span>Tạo mới khách hàng</span>
-                        </button>
+                        <p className="to-empty-text">Không có đơn hủy</p>
                     </div>
                 )}
             </div>

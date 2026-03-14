@@ -1,0 +1,120 @@
+.received-card {
+    background-color: #fff;
+    border-radius: 12px;
+    padding: 16px;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+}
+
+/* Header */
+.rc-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 4px;
+}
+
+.rc-card-name {
+    font-size: 16px;
+    font-weight: 700;
+    color: #1a1a1a;
+    margin: 0;
+}
+
+.rc-card-ticket-id {
+    font-size: 13px;
+    color: #888;
+    font-weight: 500;
+}
+
+.rc-card-sub-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 4px;
+}
+
+.rc-card-phone {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 13px;
+    color: #209D80;
+}
+
+.rc-card-status {
+    font-size: 13px;
+    font-weight: 600;
+    color: #209D80;
+}
+
+.rc-card-created {
+    font-size: 12px;
+    color: #aaa;
+    margin: 0 0 12px 0;
+}
+
+/* Pets */
+.rc-card-pets {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 12px;
+}
+
+.rc-card-pet-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 12px;
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    font-size: 13px;
+    flex-wrap: wrap;
+}
+
+.rc-card-pet-name {
+    font-weight: 700;
+    color: #1a1a1a;
+}
+
+.rc-card-pet-detail {
+    color: #888;
+    display: flex;
+    align-items: center;
+    gap: 3px;
+}
+
+/* Footer */
+.rc-card-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.rc-card-source {
+    font-size: 13px;
+    color: #888;
+}
+
+.rc-card-source-id {
+    color: #209D80;
+    font-weight: 600;
+}
+
+.rc-card-pay-btn {
+    padding: 10px 24px;
+    border-radius: 20px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+    background-color: #209D80;
+    color: #fff;
+    transition: opacity 0.2s;
+}
+
+.rc-card-pay-btn.disabled {
+    background-color: #e5e7eb;
+    color: #aaa;
+    cursor: default;
+}

@@ -160,6 +160,9 @@
     display: flex;
     gap: 12px;
     margin-bottom: 16px;
+    background-color: #fff;
+    border-radius: 16px;
+    padding: 12px;
 }
 
 .to-stat-card {
@@ -167,21 +170,22 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 14px 16px;
-    border: 1px solid #e5e7eb;
+    padding: 16px 18px;
+    border: none;
     border-radius: 12px;
-    background-color: #fff;
+    background-color: #EAF6F4;
 }
 
 .to-stat-label {
-    font-size: 14px;
+    font-size: 13px;
+    font-weight: 500;
     color: #666;
 }
 
 .to-stat-value {
-    font-size: 22px;
+    font-size: 24px;
     font-weight: 700;
-    color: #209D80;
+    color: #1C9B84;
 }
 
 /* Search */
@@ -231,10 +235,13 @@
 /* Status Tabs */
 .to-status-tabs {
     display: flex;
-    gap: 8px;
+    gap: 4px;
     margin-bottom: 16px;
     overflow-x: auto;
     scrollbar-width: none;
+    background-color: #EAF6F4;
+    border-radius: 20px;
+    padding: 4px;
 }
 
 .to-status-tabs::-webkit-scrollbar {
@@ -251,16 +258,16 @@
     font-weight: 500;
     cursor: pointer;
     white-space: nowrap;
-    border: 1px solid #e5e7eb;
-    background-color: #fff;
+    border: none;
+    background-color: transparent;
     color: #666;
     transition: all 0.2s;
 }
 
 .to-status-tab.active {
-    background-color: #209D80;
-    border-color: #209D80;
-    color: #fff;
+    background-color: #fff;
+    color: #1C9B84;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
 }
 
 .to-tab-label {
@@ -269,6 +276,17 @@
 
 .to-tab-count {
     font-weight: 700;
+}
+
+.to-status-tab.active .to-tab-count {
+    background-color: #EAF6F4;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
 }
 
 /* Customers List */
