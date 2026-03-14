@@ -1,20 +1,7 @@
 import React, { useState } from 'react';
 import { ChevronLeft, MoreVertical, Phone, Eye, Mars, Cake, Weight, ChevronUp, ChevronDown } from 'lucide-react';
+import medicineEmptyImg from '../../assets/medicine_empty.png';
 import './ServiceOrder.css';
-
-// SVG tuỳ chỉnh cho hình ảnh trạng thái rỗng đặc thù
-const EmptyDocGraphic = () => (
-    <svg width="80" height="90" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-        {/* Bìa tài liệu nghiêng ở sau */}
-        <g transform="rotate(-12 50 50)">
-            <rect x="30" y="25" width="40" height="55" rx="3" fill="#f8f9fa" stroke="#e9ecef" strokeWidth="2" />
-            <rect x="40" y="20" width="20" height="8" rx="2" fill="#88dec7" />
-        </g>
-        {/* Bìa tài liệu thẳng ở trước */}
-        <rect x="40" y="30" width="40" height="55" rx="3" fill="#f5f5f5" stroke="#e9ecef" strokeWidth="2" />
-        <rect x="50" y="25" width="20" height="8" rx="2" fill="#66cdaa" />
-    </svg>
-);
 
 const ServiceOrder = () => {
     const [activeTab, setActiveTab] = useState('Dịch vụ');
@@ -126,7 +113,7 @@ const ServiceOrder = () => {
                         {isMedsExpanded && (
                             <div className={`so-accordion-content ${medsList.length === 0 ? 'empty-state' : 'meds-list-container'}`}>
                                 {medsList.length === 0 ? (
-                                    <EmptyDocGraphic />
+                                    <img src={medicineEmptyImg} alt="Empty medicine" width="80" height="90" style={{ objectFit: 'contain' }} />
                                 ) : (
                                     <div className="so-meds-list">
                                         {medsList.map(med => (

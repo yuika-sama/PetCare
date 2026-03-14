@@ -7,6 +7,8 @@ import DoctorDashboard from './pages/doctors/Dashboard';
 import DoctorTickets from './pages/doctors/Tickets';
 import DoctorTicketDetails from './pages/doctors/TicketDetails';
 import ServiceOrder from './pages/doctors/ServiceOrder';
+import RecordResult from './pages/doctors/RecordResult';
+import MedicineSelector from './pages/doctors/MedicineSelector';
 
 function App() {
   return (
@@ -18,6 +20,8 @@ function App() {
       <Route path="/doctors/tickets" element={<DoctorTickets />} />
       <Route path="/doctors/tickets/:id" element={<DoctorTicketDetails />} />
       <Route path="/doctors/service-order/:id" element={<ServiceOrder />} />
+      <Route path="/doctors/record-result/:id" element={<RecordResult />} />
+      <Route path="/doctors/medicine-selector" element={<MedicineSelector />} />
     </Routes>
   );
 }

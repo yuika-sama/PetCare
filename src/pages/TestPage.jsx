@@ -51,6 +51,18 @@ const TestPage = () => {
         >
           Doctor Service Order
         </Link>
+        <Link 
+          to="/doctors/record-result/1" 
+          style={{ padding: '10px 15px', backgroundColor: '#f0f4f8', borderRadius: '8px', textDecoration: 'none', color: '#1e40af', fontWeight: '500', border: '1px solid #d1d5db' }}
+        >
+          Doctor Record Result
+        </Link>
+        <Link 
+          to="/doctors/medicine-selector" 
+          style={{ padding: '10px 15px', backgroundColor: '#f0f4f8', borderRadius: '8px', textDecoration: 'none', color: '#1e40af', fontWeight: '500', border: '1px solid #d1d5db' }}
+        >
+          Doctor Medicine Selector
+        </Link>
       </div>
     </div>
   );
