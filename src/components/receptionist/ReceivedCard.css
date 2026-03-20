@@ -1,120 +1,127 @@
 .received-card {
     background-color: #fff;
-    border-radius: 12px;
-    padding: 16px;
-    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+    border-radius: 20px;
+    padding: 20px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
 }
 
-/* Header */
 .rc-card-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 4px;
+    margin-bottom: 6px;
 }
 
 .rc-card-name {
-    font-size: 16px;
+    font-size: 18px;
     font-weight: 700;
     color: #1a1a1a;
     margin: 0;
 }
 
-.rc-card-ticket-id {
-    font-size: 13px;
-    color: #888;
-    font-weight: 500;
-}
-
 .rc-card-sub-header {
     display: flex;
-    justify-content: space-between;
     align-items: center;
-    margin-bottom: 4px;
+    margin-bottom: 6px;
 }
 
 .rc-card-phone {
     display: flex;
     align-items: center;
-    gap: 4px;
-    font-size: 13px;
-    color: #209D80;
+    gap: 6px;
+    font-size: 15px;
+    color: #209d80;
 }
 
 .rc-card-status {
-    font-size: 13px;
-    font-weight: 600;
-    color: #209D80;
+    font-size: 14px;
+    font-weight: 500;
+    color: #10b981;
 }
 
 .rc-card-created {
-    font-size: 12px;
-    color: #aaa;
-    margin: 0 0 12px 0;
+    font-size: 13px;
+    color: #9ca3af;
+    margin: 0 0 16px 0;
 }
 
-/* Pets */
+.rc-divider {
+    border: none;
+    border-top: 1px solid #f3f4f6;
+    margin: 16px 0;
+}
+
 .rc-card-pets {
     display: flex;
     flex-direction: column;
-    gap: 8px;
-    margin-bottom: 12px;
+    gap: 12px;
 }
 
 .rc-card-pet-row {
     display: flex;
     align-items: center;
-    gap: 8px;
-    padding: 10px 12px;
+    gap: 12px;
+    padding: 14px 16px;
     border: 1px solid #e5e7eb;
-    border-radius: 10px;
-    font-size: 13px;
+    border-radius: 12px;
+    font-size: 14px;
     flex-wrap: wrap;
 }
 
 .rc-card-pet-name {
     font-weight: 700;
-    color: #1a1a1a;
+    color: #111827;
+    font-size: 16px;
 }
 
 .rc-card-pet-detail {
-    color: #888;
+    color: #6b7280;
     display: flex;
     align-items: center;
-    gap: 3px;
+    gap: 4px;
 }
 
-/* Footer */
 .rc-card-footer {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    margin-top: 16px;
+}
+
+.rc-card-footer.full-btn {
+    justify-content: center;
 }
 
 .rc-card-source {
-    font-size: 13px;
-    color: #888;
+    font-size: 15px;
+    color: #6b7280;
+    font-weight: 500;
 }
 
 .rc-card-source-id {
-    color: #209D80;
+    color: #209d80;
     font-weight: 600;
 }
 
 .rc-card-pay-btn {
-    padding: 10px 24px;
-    border-radius: 20px;
-    font-size: 14px;
+    padding: 12px 32px;
+    border-radius: 12px;
+    font-size: 15px;
     font-weight: 600;
     cursor: pointer;
     border: none;
-    background-color: #209D80;
+    background-color: #209d80;
     color: #fff;
     transition: opacity 0.2s;
 }
 
+.rc-card-pay-btn.full-width {
+    width: 100%;
+    padding: 14px;
+}
+
 .rc-card-pay-btn.disabled {
-    background-color: #e5e7eb;
-    color: #aaa;
+    background-color: #f3f4f6;
+    color: #9ca3af;
     cursor: default;
 }

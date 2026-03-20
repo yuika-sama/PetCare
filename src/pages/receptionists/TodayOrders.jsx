@@ -115,6 +115,7 @@ const TodayOrders = () => {
             ],
             sourceOrder: '2141441',
             paymentEnabled: true,
+            hideSource: true,
         },
         {
             id: 2,
@@ -129,6 +130,7 @@ const TodayOrders = () => {
             ],
             sourceOrder: null,
             paymentEnabled: false,
+            hideSource: false,
         },
     ];
 
@@ -300,6 +302,7 @@ const TodayOrders = () => {
                                 pets={order.pets}
                                 sourceOrder={order.sourceOrder}
                                 paymentEnabled={order.paymentEnabled}
+                                hideSource={order.hideSource}
                                 onPayment={() => console.log('Payment', order.id)}
                             />
                         ))}
@@ -391,7 +394,7 @@ const TodayOrders = () => {
                                 </div>
                             </div>
 
-                            <div className="to-modal-field">
+                            {/* <div className="to-modal-field">
                                 <label className="to-modal-label">Ngày hẹn</label>
                                 <div className="to-modal-input-icon-wrapper">
                                     <input
@@ -402,7 +405,7 @@ const TodayOrders = () => {
                                     />
                                     <Calendar size={20} color="#888" className="to-modal-input-icon" />
                                 </div>
-                            </div>
+                            </div> */}
                         </div>
 
                         <div className="to-modal-actions">

@@ -199,14 +199,29 @@
 
 /* Form Fields */
 .nr-field {
-    margin-bottom: 16px;
+    margin-bottom: 22px;
+    position: relative;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    background-color: #fff;
+    transition: border-color 0.2s;
+}
+
+.nr-field:focus-within {
+    border-color: #209D80;
 }
 
 .nr-field-label {
-    display: block;
-    font-size: 13px;
+    position: absolute;
+    top: -8px;
+    left: 12px;
+    font-size: 12px;
     color: #888;
-    margin-bottom: 6px;
+    background: #fff;
+    padding: 0 4px;
+    margin: 0;
+    z-index: 2;
+    line-height: 1;
 }
 
 .nr-required {
@@ -216,40 +231,48 @@
 .nr-input-with-suffix {
     display: flex;
     align-items: center;
-    border: 1px solid #e5e7eb;
-    border-radius: 10px;
+    border-radius: 8px;
     overflow: hidden;
-    background-color: #fff;
+}
+
+.nr-input-wrapper {
+    display: flex;
+    align-items: center;
+    border-radius: 8px;
+    overflow: hidden;
 }
 
 .nr-input {
     flex: 1;
     border: none;
     outline: none;
-    padding: 12px 16px;
+    padding: 14px 16px;
     font-size: 15px;
     color: #333;
     background-color: transparent;
+    width: 100%;
+    box-sizing: border-box;
 }
 
 .nr-input-suffix {
-    padding: 12px 16px 12px 0;
-    font-size: 14px;
+    padding: 14px 16px 14px 0;
+    font-size: 15px;
     color: #aaa;
 }
 
 .nr-select-wrapper {
     position: relative;
+    border-radius: 8px;
+    overflow: hidden;
 }
 
 .nr-select {
     width: 100%;
-    padding: 12px 40px 12px 16px;
-    border: 1px solid #e5e7eb;
-    border-radius: 10px;
+    padding: 14px 40px 14px 16px;
+    border: none;
     font-size: 15px;
     color: #333;
-    background-color: #fff;
+    background-color: transparent;
     appearance: none;
     cursor: pointer;
     outline: none;
@@ -257,7 +280,7 @@
 
 .nr-select-icon {
     position: absolute;
-    right: 12px;
+    right: 14px;
     top: 50%;
     transform: translateY(-50%);
     pointer-events: none;
@@ -265,15 +288,15 @@
 
 .nr-textarea {
     width: 100%;
-    padding: 12px 16px;
-    border: 1px solid #e5e7eb;
-    border-radius: 10px;
+    padding: 14px 16px;
+    border: none;
+    border-radius: 8px;
     font-size: 15px;
     color: #333;
     resize: none;
     outline: none;
     font-family: inherit;
-    background-color: #fff;
+    background-color: transparent;
     box-sizing: border-box;
 }
 

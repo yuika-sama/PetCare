@@ -2,55 +2,73 @@ import React from 'react';
 import { Phone, Mars, Cake, Weight } from 'lucide-react';
 import './ReceivedCard.css';
 
-const ReceivedCard = ({ customerName, phone, ticketId, status, createdAt, pets, sourceOrder, onPayment, paymentEnabled = true }) => {
+const ReceivedCard = ({
+    customerName,
+    phone,
+    status,
+    createdAt,
+    pets,
+    sourceOrder,
+    onPayment,
+    paymentEnabled = true,
+    hideSource = false,
+}) => {
     return (
         <div className="received-card">
-            {/* Header */}
             <div className="rc-card-header">
                 <h3 className="rc-card-name">{customerName}</h3>
-                <span className="rc-card-ticket-id">#{ticketId}</span>
-            </div>
-            <div className="rc-card-sub-header">
-                <div className="rc-card-phone">
-                    <Phone size={14} color="#209D80" />
-                    <span>{phone}</span>
-                </div>
                 <span className="rc-card-status">{status}</span>
             </div>
-            <p className="rc-card-created">{createdAt}</p>
 
-            {/* Pets */}
+            <div className="rc-card-sub-header">
+                <div className="rc-card-phone">
+                    <Phone size={16} color="#209D80" strokeWidth={2.5} />
+                    <span>{phone}</span>
+                </div>
+            </div>
+
+            <p className="rc-card-created">{createdAt}</p>
+            <hr className="rc-divider" />
+
             <div className="rc-card-pets">
                 {pets.map((pet, idx) => (
                     <div key={idx} className="rc-card-pet-row">
                         <span className="rc-card-pet-name">{pet.name}</span>
                         <span className="rc-card-pet-detail">
                             {pet.breed}
-                            {pet.gender === 'male' && <Mars size={12} color="#3b82f6" style={{ marginLeft: '2px' }} />}
+                            {pet.gender === 'male' && (
+                                <Mars size={14} color="#3b82f6" style={{ marginLeft: '4px' }} />
+                            )}
                         </span>
                         <span className="rc-card-pet-detail">
-                            <Cake size={13} color="#888" />
+                            <Cake size={14} color="#888" />
                             {pet.age}
                         </span>
                         <span className="rc-card-pet-detail">
-                            <Weight size={13} color="#888" />
+                            <Weight size={14} color="#888" />
                             {pet.weight}
                         </span>
                     </div>
                 ))}
             </div>
 
-            {/* Footer */}
-            <div className="rc-card-footer">
-                <div className="rc-card-source">
-                    {sourceOrder ? (
-                        <span>Tiếp đón từ đơn <span className="rc-card-source-id">#{sourceOrder}</span></span>
-                    ) : (
-                        <span>Tiếp đón trực tiếp</span>
-                    )}
-                </div>
+            <hr className="rc-divider" />
+
+            <div className={`rc-card-footer ${hideSource ? 'full-btn' : ''}`}>
+                {!hideSource && (
+                    <div className="rc-card-source">
+                        {sourceOrder ? (
+                            <span>
+                                Tiếp đón từ đơn <span className="rc-card-source-id">#{sourceOrder}</span>
+                            </span>
+                        ) : (
+                            <span>Tiếp đón trực tiếp</span>
+                        )}
+                    </div>
+                )}
+
                 <button
-                    className={`rc-card-pay-btn ${paymentEnabled ? '' : 'disabled'}`}
+                    className={`rc-card-pay-btn ${paymentEnabled ? '' : 'disabled'} ${hideSource ? 'full-width' : ''}`}
                     onClick={paymentEnabled ? onPayment : undefined}
                 >
                     Thanh toán

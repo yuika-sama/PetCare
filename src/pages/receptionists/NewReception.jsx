@@ -10,6 +10,9 @@ const NewReception = () => {
     const [description, setDescription] = useState('');
     const [examType, setExamType] = useState('');
     const [assignee, setAssignee] = useState('');
+    const [birthDate, setBirthDate] = useState('');
+    const [assignedDoctor, setAssignedDoctor] = useState('');
+    const [notes, setNotes] = useState('');
 
     const pets = [
         { name: 'Kuro' },
@@ -113,6 +116,19 @@ const NewReception = () => {
                         </div>
                     </div>
 
+                    {/* Birth Date */}
+                    <div className="nr-field">
+                        <label className="nr-field-label">Ngày sinh</label>
+                        <div className="nr-input-wrapper">
+                            <input
+                                type="date"
+                                className="nr-input"
+                                value={birthDate}
+                                onChange={(e) => setBirthDate(e.target.value)}
+                            />
+                        </div>
+                    </div>
+
                     {/* Reason */}
                     <div className="nr-field">
                         <label className="nr-field-label">Lý do khám <span className="nr-required">*</span></label>
@@ -144,43 +160,73 @@ const NewReception = () => {
                         />
                     </div>
 
-                    {/* Exam Type - only visible when emergency */}
-                    {isEmergency && (
-                        <div className="nr-field">
-                            <label className="nr-field-label">Hình thức khám</label>
-                            <div className="nr-select-wrapper">
-                                <select
-                                    className="nr-select"
-                                    value={examType}
-                                    onChange={(e) => setExamType(e.target.value)}
-                                >
-                                    <option value="" disabled></option>
-                                    <option value="khammoi">Khám mới</option>
-                                    <option value="taikham">Tái khám</option>
-                                </select>
-                                <ChevronDown size={18} color="#888" className="nr-select-icon" />
-                            </div>
+                    {/* Exam Type */}
+                    <div className="nr-field">
+                        <label className="nr-field-label">Hình thức khám</label>
+                        <div className="nr-select-wrapper">
+                            <select
+                                className="nr-select"
+                                value={examType}
+                                onChange={(e) => setExamType(e.target.value)}
+                            >
+                                <option value="" disabled></option>
+                                <option value="khammoi">Khám mới</option>
+                                <option value="taikham">Tái khám</option>
+                            </select>
+                            <ChevronDown size={18} color="#888" className="nr-select-icon" />
                         </div>
-                    )}
+                    </div>
 
-                    {/* Assignee - only visible when emergency */}
-                    {isEmergency && (
-                        <div className="nr-field">
-                            <label className="nr-field-label">Người thực hiện <span className="nr-required">*</span></label>
+                    {/* Assigned Doctor */}
+                    <div style={{ display: 'flex', gap: '10px', alignItems: 'flex-start' }}>
+                        <div className="nr-field" style={{ flex: 1, marginBottom: '20px' }}>
+                            <label className="nr-field-label">Bác sĩ phụ trách <span className="nr-required">*</span></label>
                             <div className="nr-select-wrapper">
                                 <select
                                     className="nr-select"
-                                    value={assignee}
-                                    onChange={(e) => setAssignee(e.target.value)}
+                                    value={assignedDoctor}
+                                    onChange={(e) => setAssignedDoctor(e.target.value)}
                                 >
                                     <option value="" disabled></option>
-                                    <option value="lehuyanh">Lê Huy Anh</option>
-                                    <option value="nguyenvanan">Nguyễn Văn An</option>
+                                    <option value="bshauyan">Bs. Hà Huy An</option>
+                                    <option value="bsbinh">Bs. Bình</option>
                                 </select>
                                 <ChevronDown size={18} color="#888" className="nr-select-icon" />
                             </div>
                         </div>
-                    )}
+                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#FFFBEB', color: '#D97706', padding: '0 16px', borderRadius: '8px', border: '1px solid #FDE68A', height: '48px', fontSize: '14px', fontWeight: '500' }}>
+                            02 ca
+                        </div>
+                    </div>
+
+                    {/* Assignee */}
+                    <div className="nr-field">
+                        <label className="nr-field-label">Người thực hiện <span className="nr-required">*</span></label>
+                        <div className="nr-select-wrapper">
+                            <select
+                                className="nr-select"
+                                value={assignee}
+                                onChange={(e) => setAssignee(e.target.value)}
+                            >
+                                <option value="" disabled></option>
+                                <option value="lehuyanh">Lê Huy Anh</option>
+                                <option value="nguyenvanan">Nguyễn Văn An</option>
+                            </select>
+                            <ChevronDown size={18} color="#888" className="nr-select-icon" />
+                        </div>
+                    </div>
+
+                    {/* Notes */}
+                    <div className="nr-field">
+                        <label className="nr-field-label">Lưu ý</label>
+                        <textarea
+                            className="nr-textarea"
+                            value={notes}
+                            onChange={(e) => setNotes(e.target.value)}
+                            rows={3}
+                            placeholder=""
+                        />
+                    </div>
 
                     {/* Emergency Toggle */}
                     <div className="nr-toggle-row">
