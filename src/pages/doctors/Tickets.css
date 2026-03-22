@@ -95,6 +95,11 @@
     border-color: #209D80;
 }
 
+.filter-btn.active {
+    background-color: #eaf6f4;
+    border-color: #209d80;
+}
+
 .tickets-content-area {
     padding: 16px 16px 24px 16px;
 }
@@ -102,4 +107,15 @@
 .tickets-list {
     display: flex;
     flex-direction: column;
+}
+
+.tickets-empty-state {
+    margin-top: 16px;
+    padding: 16px;
+    border: 1px dashed #cbd5e1;
+    border-radius: 12px;
+    color: #64748b;
+    text-align: center;
+    font-size: 14px;
+    background: #fff;
 }

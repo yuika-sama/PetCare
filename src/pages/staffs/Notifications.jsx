@@ -7,31 +7,31 @@ import StaffNotificationCard from '../../components/staffs/StaffNotificationCard
 const notifications = [
     {
         id: 1,
-        title: 'Thuc hien thanh toan!',
-        time: '3 phut',
+        title: 'Thực hiện thanh toán!',
+        time: '3 phút',
         orderCode: '25REC573275',
-        customerName: 'Nguyen Anh Duc'
+        customerName: 'Nguyễn Anh Đức'
     },
     {
         id: 2,
-        title: 'Thuc hien thanh toan!',
-        time: '3 phut',
+        title: 'Thực hiện thanh toán!',
+        time: '3 phút',
         orderCode: '25REC573275',
-        customerName: 'Nguyen Anh Duc'
+        customerName: 'Nguyễn Anh Đức'
     },
     {
         id: 3,
-        title: 'Thuc hien thanh toan!',
-        time: '3 phut',
+        title: 'Thực hiện thanh toán!',
+        time: '3 phút',
         orderCode: '25REC573275',
-        customerName: 'Nguyen Anh Duc'
+        customerName: 'Nguyễn Anh Đức'
     },
     {
         id: 4,
-        title: 'Thuc hien thanh toan!',
-        time: '3 phut',
+        title: 'Thực hiện thanh toán!',
+        time: '3 phút',
         orderCode: '25REC573275',
-        customerName: 'Nguyen Anh Duc'
+        customerName: 'Nguyễn Anh Đức'
     }
 ];
 
@@ -41,7 +41,7 @@ const Notifications = () => {
     return (
         <div className="staff-notifications-page">
             <div className="staff-notifications-shell">
-                <StaffTopHeader title="Thong bao" onBack={() => navigate(-1)} />
+                <StaffTopHeader title="Thông báo" onBack={() => navigate(-1)} />
 
                 <section className="staff-notifications-list">
                     {notifications.map((item) => (
@@ -51,8 +51,8 @@ const Notifications = () => {
                             time={item.time}
                             message={(
                                 <>
-                                    Phieu tiep don <span className="accent">{item.orderCode}</span> cua khach hang{' '}
-                                    <span className="accent">{item.customerName}</span> da hoan thanh. Hay tien hanh thanh toan ngay!
+                                    Phiếu tiếp đón <span className="accent">{item.orderCode}</span> của khách hàng{' '}
+                                    <span className="accent">{item.customerName}</span> đã hoàn thành. Hãy tiến hành thanh toán ngay!
                                 </>
                             )}
                         />

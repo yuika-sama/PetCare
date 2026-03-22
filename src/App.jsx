@@ -12,9 +12,17 @@ import MedicineSelector from './pages/doctors/MedicineSelector';
 import Notifications from './pages/doctors/Notifications';
 import TodayOrders from './pages/receptionists/TodayOrders';
 import NewReception from './pages/receptionists/NewReception';
+import ClinicalQueue from './pages/receptionists/ClinicalQueue';
+import ReceptionistAdvancePayments from './pages/receptionists/AdvancePayments';
+import DoctorPatientHistory from './pages/doctors/PatientHistory';
+import DoctorTreatmentPlans from './pages/doctors/TreatmentPlans';
+import DoctorTreatmentPlanDetail from './pages/doctors/TreatmentPlanDetail';
 import StaffReceptionList from './pages/staffs/ReceptionList';
 import StaffNotifications from './pages/staffs/Notifications';
 import StaffPayment from './pages/staffs/Payment';
+import StaffReceiptList from './pages/staffs/ReceiptList';
+import StaffReceiptDetail from './pages/staffs/ReceiptDetail';
+import StaffAdvancePayments from './pages/staffs/AdvancePaymentManagement';
 
 function App() {
   return (
@@ -31,9 +39,18 @@ function App() {
       <Route path="/doctors/notifications" element={<Notifications />} />
       <Route path="/receptionists/today-orders" element={<TodayOrders />} />
       <Route path="/receptionists/new-reception" element={<NewReception />} />
+      <Route path="/receptionists/clinical-queue" element={<ClinicalQueue />} />
+      <Route path="/receptionists/advance-payments" element={<ReceptionistAdvancePayments />} />
+      <Route path="/doctors/patient-history" element={<DoctorPatientHistory />} />
+      <Route path="/doctors/treatment-plans" element={<DoctorTreatmentPlans />} />
+      <Route path="/doctors/treatment-plans/new" element={<DoctorTreatmentPlanDetail />} />
+      <Route path="/doctors/treatment-plans/:id" element={<DoctorTreatmentPlanDetail />} />
       <Route path="/staffs/receptions" element={<StaffReceptionList />} />
       <Route path="/staffs/notifications" element={<StaffNotifications />} />
       <Route path="/staffs/payment" element={<StaffPayment />} />
+      <Route path="/staffs/receipt-list" element={<StaffReceiptList />} />
+      <Route path="/staffs/receipt-list/:id" element={<StaffReceiptDetail />} />
+      <Route path="/staffs/advance-payments" element={<StaffAdvancePayments />} />
     </Routes>
   );
 }

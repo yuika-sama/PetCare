@@ -232,6 +232,45 @@
     cursor: pointer;
 }
 
+.to-filter-panel {
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    padding: 12px;
+    margin-bottom: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.to-filter-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.to-filter-item label {
+    font-size: 13px;
+    color: #55606b;
+    font-weight: 600;
+}
+
+.to-filter-item select {
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    padding: 6px 10px;
+    font-size: 13px;
+}
+
+.to-filter-checkbox {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #475569;
+    font-size: 13px;
+}
+
 /* Status Tabs */
 .to-status-tabs {
     display: flex;

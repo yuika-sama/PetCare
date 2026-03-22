@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { Search, SlidersHorizontal, ChevronDown, ChevronUp, ChevronLeft, ChevronRight, UserRound, PlusCircle, Calendar } from 'lucide-react';
+import { Search, SlidersHorizontal, ChevronDown, ChevronUp, ChevronLeft, ChevronRight, UserRound, PlusCircle } from 'lucide-react';
 import ReceptionistLayout from '../../layouts/ReceptionistLayout';
 import ReceptionCard from '../../components/receptionist/ReceptionCard';
 import ReceivedCard from '../../components/receptionist/ReceivedCard';
@@ -11,13 +11,103 @@ const MONTH_NAMES = [
 ];
 const DAY_LABELS = ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
 
-// Sample badge data (date -> count)
-const BADGE_DATA = { 7: 7, 8: 12, 10: 22, 11: 4 };
+const initialOrders = [
+    {
+        id: 1,
+        customerName: 'Nguyễn Anh Đức',
+        phone: '0912345678',
+        ticketId: '2141441',
+        status: 'cho',
+        statusLabel: 'Chờ tiếp đón',
+        createdAt: 'Tạo đơn lúc 10:03 - 20/03/2026',
+        date: 20,
+        species: 'cho',
+        hasAdvance: true,
+        pets: [{ name: 'Kuro', breed: 'Chó Poodle', gender: 'male', age: '3 Tuổi', weight: '4.5kg' }],
+        sourceOrder: '2141441',
+        paymentEnabled: false,
+        hideSource: false,
+        avatar: 'https://placehold.co/80x80/e0f2ef/209D80?text=NAD'
+    },
+    {
+        id: 2,
+        customerName: 'Lê Huyền Linh',
+        phone: '0816278274',
+        ticketId: '2141442',
+        status: 'cho',
+        statusLabel: 'Chờ tiếp đón',
+        createdAt: 'Tạo đơn lúc 11:10 - 20/03/2026',
+        date: 20,
+        species: 'meo',
+        hasAdvance: false,
+        pets: [{ name: 'Mike', breed: 'Mèo Anh lông ngắn', gender: 'male', age: '2 Tuổi', weight: '2.5kg' }],
+        sourceOrder: null,
+        paymentEnabled: false,
+        hideSource: false,
+        avatar: 'https://placehold.co/80x80/e0f2ef/209D80?text=LHL'
+    },
+    {
+        id: 3,
+        customerName: 'Nguyễn Duy Ngọc',
+        phone: '0908264671',
+        ticketId: '2141551',
+        status: 'da',
+        statusLabel: 'Đã tiếp đón',
+        createdAt: 'Tiếp đón lúc 09:03 - 20/03/2026',
+        date: 20,
+        species: 'cho',
+        hasAdvance: true,
+        pets: [{ name: 'Milo', breed: 'Chó Corgi', gender: 'male', age: '4 Tuổi', weight: '7kg' }],
+        sourceOrder: null,
+        paymentEnabled: true,
+        hideSource: false,
+        avatar: 'https://placehold.co/80x80/e0f2ef/209D80?text=NDN'
+    },
+    {
+        id: 4,
+        customerName: 'Trần Minh Hạnh',
+        phone: '0902627274',
+        ticketId: '2141999',
+        status: 'huy',
+        statusLabel: 'Đã hủy',
+        createdAt: 'Hủy lúc 08:50 - 20/03/2026',
+        date: 20,
+        species: 'khac',
+        hasAdvance: false,
+        pets: [{ name: 'Peach', breed: 'Thỏ Mini', gender: 'female', age: '1 Tuổi', weight: '1.1kg' }],
+        sourceOrder: null,
+        paymentEnabled: false,
+        hideSource: false,
+        avatar: 'https://placehold.co/80x80/e0f2ef/209D80?text=TMH'
+    },
+    {
+        id: 5,
+        customerName: 'Hà An Huy',
+        phone: '0977771234',
+        ticketId: '2141777',
+        status: 'hoanthanh',
+        statusLabel: 'Hoàn thành',
+        createdAt: 'Hoàn thành lúc 07:45 - 20/03/2026',
+        date: 20,
+        species: 'cho',
+        hasAdvance: true,
+        pets: [{ name: 'Pika', breed: 'Chó Phốc sóc', gender: 'female', age: '5 Tuổi', weight: '2.3kg' }],
+        sourceOrder: '2141333',
+        paymentEnabled: true,
+        hideSource: false,
+        avatar: 'https://placehold.co/80x80/e0f2ef/209D80?text=HAH'
+    }
+];
 
 const TodayOrders = () => {
     const [activeStatus, setActiveStatus] = useState('cho');
     const [calendarExpanded, setCalendarExpanded] = useState(false);
     const [showNewCustomerModal, setShowNewCustomerModal] = useState(false);
+    const [searchTerm, setSearchTerm] = useState('');
+    const [showFilterPanel, setShowFilterPanel] = useState(false);
+    const [speciesFilter, setSpeciesFilter] = useState('all');
+    const [onlyAdvance, setOnlyAdvance] = useState(false);
+    const [orders, setOrders] = useState(initialOrders);
     const [newCustomer, setNewCustomer] = useState({
         name: '', phone: '', petName: '', species: '', breed: '', appointmentDate: ''
     });
@@ -72,67 +162,98 @@ const TodayOrders = () => {
         setSelectedDate(1);
     };
 
-    const statusTabs = [
-        { key: 'cho', label: 'Chờ tiếp đón', count: 3 },
-        { key: 'da', label: 'Đã tiếp đón', count: 10 },
-        { key: 'huy', label: 'Đã hủy', count: 16 },
-        { key: 'hoanthanh', label: 'Hoàn thành', count: 16 },
-        { key: 'all', label: 'Tất cả', count: 16 },
-    ];
+    const badgeData = useMemo(() => {
+        const map = {};
+        orders.forEach((order) => {
+            map[order.date] = (map[order.date] || 0) + 1;
+        });
+        return map;
+    }, [orders]);
 
-    // const customers = [
-    //     {
-    //         id: 1,
-    //         name: 'Nguyễn Anh Đức',
-    //         phone: '0912345678',
-    //         avatar: 'https://placehold.co/80x80/e0f2ef/209D80?text=NAD'
-    //     },
-    //     {
-    //         id: 2,
-    //         name: 'Lê Huyền Linh',
-    //         phone: '0816278274',
-    //         avatar: 'https://placehold.co/80x80/e0f2ef/209D80?text=LHL'
-    //     },
-    //     {
-    //         id: 3,
-    //         name: 'Trần Minh Hạnh',
-    //         phone: '0902627274',
-    //         avatar: 'https://placehold.co/80x80/e0f2ef/209D80?text=TMH'
-    //     },
-    // ];
-    const customers = []
+    const filteredByDate = useMemo(
+        () => orders.filter((order) => order.date === selectedDate),
+        [orders, selectedDate]
+    );
 
-    const receivedOrders = [
-        {
-            id: 1,
-            customerName: 'Nguyễn Anh Đức',
-            phone: '0912345678',
-            ticketId: '2141441',
-            status: 'Đã tiếp đón',
-            createdAt: 'Tạo đơn lúc 10:03 - 20/03/2026',
+    const filteredBySearchAndFilters = useMemo(() => {
+        const keyword = searchTerm.trim().toLowerCase();
+        return filteredByDate.filter((order) => {
+            const searchable = `${order.customerName} ${order.phone} ${order.ticketId} ${order.pets[0]?.name || ''}`.toLowerCase();
+            const matchesKeyword = !keyword || searchable.includes(keyword);
+            const matchesSpecies = speciesFilter === 'all' || order.species === speciesFilter;
+            const matchesAdvance = !onlyAdvance || order.hasAdvance;
+            return matchesKeyword && matchesSpecies && matchesAdvance;
+        });
+    }, [filteredByDate, searchTerm, speciesFilter, onlyAdvance]);
+
+    const statusTabs = useMemo(() => {
+        const count = (status) => filteredByDate.filter((item) => item.status === status).length;
+        return [
+            { key: 'cho', label: 'Chờ tiếp đón', count: count('cho') },
+            { key: 'da', label: 'Đã tiếp đón', count: count('da') },
+            { key: 'huy', label: 'Đã hủy', count: count('huy') },
+            { key: 'hoanthanh', label: 'Hoàn thành', count: count('hoanthanh') },
+            { key: 'all', label: 'Tất cả', count: filteredByDate.length }
+        ];
+    }, [filteredByDate]);
+
+    const activeOrders = useMemo(() => {
+        if (activeStatus === 'all') return filteredBySearchAndFilters;
+        return filteredBySearchAndFilters.filter((order) => order.status === activeStatus);
+    }, [activeStatus, filteredBySearchAndFilters]);
+
+    const waitingCustomers = useMemo(
+        () => activeOrders.filter((order) => order.status === 'cho'),
+        [activeOrders]
+    );
+
+    const shouldUseReceivedCard = activeStatus !== 'cho';
+
+    const handleCreateCustomer = () => {
+        if (!newCustomer.name || !newCustomer.phone || !newCustomer.petName || !newCustomer.species || !newCustomer.breed) {
+            return;
+        }
+
+        const orderId = Date.now();
+        const shortName = newCustomer.name
+            .split(' ')
+            .filter(Boolean)
+            .slice(0, 2)
+            .map((part) => part[0]?.toUpperCase())
+            .join('') || 'KH';
+
+        const newOrder = {
+            id: orderId,
+            customerName: newCustomer.name,
+            phone: newCustomer.phone,
+            ticketId: `${orderId}`.slice(-7),
+            status: 'cho',
+            statusLabel: 'Chờ tiếp đón',
+            createdAt: 'Tạo đơn vừa xong',
+            date: selectedDate,
+            species: newCustomer.species,
+            hasAdvance: false,
             pets: [
-                { name: 'Kuro', breed: 'Chó Poodle', gender: 'male', age: '3 Tuổi', weight: '4.5kg' },
-            ],
-            sourceOrder: '2141441',
-            paymentEnabled: true,
-            hideSource: true,
-        },
-        {
-            id: 2,
-            customerName: 'Nguyễn Duy Ngọc',
-            phone: '0908264671',
-            ticketId: '2141441',
-            status: 'Đã tiếp đón',
-            createdAt: 'Tiếp đón lúc 10:03 - 20/03/2026',
-            pets: [
-                { name: 'Kuro', breed: 'Chó Poodle', gender: 'male', age: '3 Tuổi', weight: '4.5kg' },
-                { name: 'Mike', breed: 'Mèo Anh lông ngắn', gender: 'male', age: '2 Tuổi', weight: '2.5kg' },
+                {
+                    name: newCustomer.petName,
+                    breed: newCustomer.breed,
+                    gender: 'male',
+                    age: '--',
+                    weight: '--'
+                }
             ],
             sourceOrder: null,
             paymentEnabled: false,
             hideSource: false,
-        },
-    ];
+            avatar: `https://placehold.co/80x80/e0f2ef/209D80?text=${shortName}`
+        };
+
+        setOrders((prev) => [newOrder, ...prev]);
+        setShowNewCustomerModal(false);
+        setActiveStatus('cho');
+        setSearchTerm('');
+        setNewCustomer({ name: '', phone: '', petName: '', species: '', breed: '', appointmentDate: '' });
+    };
 
     return (
         <ReceptionistLayout>
@@ -183,8 +304,8 @@ const TodayOrders = () => {
                                             className={`to-day-circle ${date === selectedDate ? 'active' : ''}`}
                                             onClick={() => setSelectedDate(date)}
                                         >
-                                            {BADGE_DATA[date] && (
-                                                <span className="to-day-badge">{BADGE_DATA[date]}</span>
+                                            {badgeData[date] && (
+                                                <span className="to-day-badge">{badgeData[date]}</span>
                                             )}
                                             <span className="to-day-number">{date}</span>
                                         </div>
@@ -204,8 +325,8 @@ const TodayOrders = () => {
                                             className={`to-day-circle ${date === selectedDate ? 'active' : ''}`}
                                             onClick={() => setSelectedDate(date)}
                                         >
-                                            {BADGE_DATA[date] && (
-                                                <span className="to-day-badge">{BADGE_DATA[date]}</span>
+                                            {badgeData[date] && (
+                                                <span className="to-day-badge">{badgeData[date]}</span>
                                             )}
                                             <span className="to-day-number">{date}</span>
                                         </div>
@@ -226,11 +347,11 @@ const TodayOrders = () => {
                 <div className="to-stats-row">
                     <div className="to-stat-card">
                         <span className="to-stat-label">Đã tiếp đón</span>
-                        <span className="to-stat-value">11</span>
+                        <span className="to-stat-value">{statusTabs.find((tab) => tab.key === 'da')?.count || 0}</span>
                     </div>
                     <div className="to-stat-card">
                         <span className="to-stat-label">Đang thực hiện</span>
-                        <span className="to-stat-value">11</span>
+                        <span className="to-stat-value">{statusTabs.find((tab) => tab.key === 'hoanthanh')?.count || 0}</span>
                     </div>
                 </div>
 
@@ -238,12 +359,44 @@ const TodayOrders = () => {
                 <div className="to-search-container">
                     <div className="to-search-box">
                         <Search size={20} color="#209D80" />
-                        <input type="text" placeholder="Search" className="to-search-input" />
+                        <input
+                            type="text"
+                            placeholder="Tìm theo tên, SĐT, mã phiếu, pet"
+                            className="to-search-input"
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                        />
                     </div>
-                    <button className="to-filter-btn">
+                    <button className="to-filter-btn" onClick={() => setShowFilterPanel((prev) => !prev)}>
                         <SlidersHorizontal size={20} color="#209D80" />
                     </button>
                 </div>
+
+                {showFilterPanel && (
+                    <div className="to-filter-panel">
+                        <div className="to-filter-item">
+                            <label htmlFor="species-filter">Loài</label>
+                            <select
+                                id="species-filter"
+                                value={speciesFilter}
+                                onChange={(e) => setSpeciesFilter(e.target.value)}
+                            >
+                                <option value="all">Tất cả</option>
+                                <option value="cho">Chó</option>
+                                <option value="meo">Mèo</option>
+                                <option value="khac">Khác</option>
+                            </select>
+                        </div>
+                        <label className="to-filter-checkbox">
+                            <input
+                                type="checkbox"
+                                checked={onlyAdvance}
+                                onChange={(e) => setOnlyAdvance(e.target.checked)}
+                            />
+                            Chỉ khách có phiếu tạm ứng
+                        </label>
+                    </div>
+                )}
 
                 {/* Status Tabs */}
                 <div className="to-status-tabs">
@@ -262,12 +415,12 @@ const TodayOrders = () => {
                 {/* Content by tab */}
                 {activeStatus === 'cho' && (
                     <>
-                        {customers.length > 0 ? (
+                        {waitingCustomers.length > 0 ? (
                             <div className="to-customers-list">
-                                {customers.map(c => (
+                                {waitingCustomers.map((c) => (
                                     <ReceptionCard
                                         key={c.id}
-                                        name={c.name}
+                                        name={c.customerName}
                                         phone={c.phone}
                                         avatar={c.avatar}
                                         onAdd={() => console.log('Add', c.id)}
@@ -289,15 +442,15 @@ const TodayOrders = () => {
                     </>
                 )}
 
-                {activeStatus === 'da' && (
+                {shouldUseReceivedCard && activeOrders.length > 0 && (
                     <div className="to-customers-list">
-                        {receivedOrders.map(order => (
+                        {activeOrders.map((order) => (
                             <ReceivedCard
                                 key={order.id}
                                 customerName={order.customerName}
                                 phone={order.phone}
                                 ticketId={order.ticketId}
-                                status={order.status}
+                                status={order.statusLabel}
                                 createdAt={order.createdAt}
                                 pets={order.pets}
                                 sourceOrder={order.sourceOrder}
@@ -309,12 +462,12 @@ const TodayOrders = () => {
                     </div>
                 )}
 
-                {activeStatus === 'huy' && (
+                {activeStatus !== 'cho' && activeOrders.length === 0 && (
                     <div className="to-empty-state">
                         <div className="to-empty-icon">
                             <UserRound size={32} color="#a1a1aa" />
                         </div>
-                        <p className="to-empty-text">Không có đơn hủy</p>
+                        <p className="to-empty-text">Không có đơn phù hợp bộ lọc</p>
                     </div>
                 )}
             </div>
@@ -410,7 +563,7 @@ const TodayOrders = () => {
 
                         <div className="to-modal-actions">
                             <button className="to-modal-btn-cancel" onClick={() => setShowNewCustomerModal(false)}>Hủy bỏ</button>
-                            <button className="to-modal-btn-submit" onClick={() => setShowNewCustomerModal(false)}>Tạo mới</button>
+                            <button className="to-modal-btn-submit" onClick={handleCreateCustomer}>Tạo mới</button>
                         </div>
                     </div>
                 </>

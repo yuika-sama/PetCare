@@ -1,0 +1,76 @@
+.staff-advance-page {
+    min-height: 100vh;
+    background: linear-gradient(180deg, #ffffff 0%, #f4faf9 45%, #f1f7f8 100%);
+    padding-bottom: 110px;
+}
+
+.staff-advance-content {
+    width: min(480px, calc(100% - 32px));
+    margin: 0 auto;
+    padding: 26px 0 40px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.staff-advance-content h1 {
+    margin: 0;
+    font-size: 24px;
+}
+
+.staff-advance-content input {
+    border: 1px solid #dbe1e8;
+    border-radius: 10px;
+    padding: 10px 12px;
+}
+
+.sap-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.sap-card {
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    background: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px;
+}
+
+.sap-card p {
+    margin: 4px 0 0;
+    color: #64748b;
+}
+
+.sap-right {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 6px;
+}
+
+.sap-status {
+    background: #fff7ed;
+    color: #b45309;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 700;
+    padding: 4px 8px;
+}
+
+.sap-status.done {
+    background: #ecfdf5;
+    color: #047857;
+}
+
+.sap-create {
+    border: none;
+    border-radius: 10px;
+    background: #209d80;
+    color: #fff;
+    font-weight: 700;
+    padding: 10px 12px;
+}

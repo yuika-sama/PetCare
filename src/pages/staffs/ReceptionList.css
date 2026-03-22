@@ -82,8 +82,31 @@
     padding: 8px 0 4px;
 }
 
+.staff-inline-filter {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    color: #4b5563;
+}
+
+.staff-inline-filter input {
+    width: 14px;
+    height: 14px;
+}
+
 .staff-cards {
     display: flex;
     flex-direction: column;
     gap: 16px;
+}
+
+.staff-empty {
+    background: #ffffff;
+    border: 1px dashed #d1d5db;
+    border-radius: 12px;
+    padding: 16px;
+    text-align: center;
+    font-size: 14px;
+    color: #64748b;
 }

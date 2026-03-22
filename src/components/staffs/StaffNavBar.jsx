@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import './StaffNavBar.css';
 import { FileCheck, Wallet, CirclePlus, Bell, Menu } from 'lucide-react';
 
@@ -11,13 +12,29 @@ const navItems = [
 ];
 
 const StaffNavBar = () => {
-    const [active, setActive] = useState('today');
+    const navigate = useNavigate();
+    const { pathname } = useLocation();
+    const [active, setActive] = useState(
+        pathname.includes('/receipt-list') ? 'payment' : pathname.includes('/notifications') ? 'notifications' : pathname.includes('/advance-payments') ? 'create' : pathname.includes('/payment') ? 'more' : 'today'
+    );
     const [pressed, setPressed] = useState(null);
 
     const handleClick = (id) => {
         setActive(id);
         setPressed(id);
         window.setTimeout(() => setPressed(null), 140);
+
+        const mapPath = {
+            today: '/staffs/receptions',
+            payment: '/staffs/receipt-list',
+            create: '/staffs/advance-payments',
+            notifications: '/staffs/notifications',
+            more: '/staffs/payment'
+        };
+
+        if (mapPath[id]) {
+            navigate(mapPath[id]);
+        }
     };
 
     return (

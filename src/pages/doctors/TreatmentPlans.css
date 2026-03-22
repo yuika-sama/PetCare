@@ -1,0 +1,74 @@
+.treatment-plans-page {
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.tp-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.tp-header h1 {
+    margin: 0;
+    font-size: 24px;
+}
+
+.tp-header button {
+    border: none;
+    border-radius: 10px;
+    background: #209d80;
+    color: #fff;
+    font-weight: 700;
+    padding: 10px 14px;
+}
+
+.tp-filters {
+    display: grid;
+    grid-template-columns: 1fr 150px;
+    gap: 10px;
+}
+
+.tp-filters input,
+.tp-filters select {
+    border: 1px solid #dbe1e8;
+    border-radius: 10px;
+    padding: 10px 12px;
+}
+
+.tp-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.tp-card {
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    background: #fff;
+    padding: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    cursor: pointer;
+}
+
+.tp-card p,
+.tp-card small {
+    margin: 4px 0 0;
+}
+
+.tp-card span {
+    color: #0f766e;
+    font-weight: 700;
+}
+
+.tp-empty {
+    border: 1px dashed #cbd5e1;
+    border-radius: 12px;
+    text-align: center;
+    color: #64748b;
+    padding: 14px;
+}

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo, useState } from 'react';
 import DoctorLayout from '../../layouts/DoctorLayout';
 import TicketCard from '../../components/doctor/TicketCard';
 import TabStatus from '../../components/doctor/TabStatus';
@@ -11,9 +11,14 @@ const FilterIcon = () => <SlidersVertical size={20} color="#209D80" />;
 const MoreVerticalIcon = () => <MoreVertical size={24} color="#1a1a1a" />;
 
 const Tickets = () => {
+    const [activeTab, setActiveTab] = useState('pending');
+    const [searchTerm, setSearchTerm] = useState('');
+    const [onlyAlert, setOnlyAlert] = useState(false);
+
     const dummyTickets = [
         {
             id: 1,
+            code: 'PK2141441',
             customerName: 'Nguyễn Anh Đức',
             dateTime: '10:03 - 20/03/2026',
             paidAmount: '0đ',
@@ -34,6 +39,7 @@ const Tickets = () => {
         },
         {
             id: 2,
+            code: 'PK2141442',
             customerName: 'Nguyễn Anh Đức',
             dateTime: '10:03 - 20/03/2026',
             paidAmount: '0đ',
@@ -52,6 +58,7 @@ const Tickets = () => {
         },
         {
             id: 3,
+            code: 'PK2141443',
             customerName: 'Nguyễn Anh Đức',
             dateTime: '10:03 - 20/03/2026',
             paidAmount: '0đ',
@@ -67,8 +74,52 @@ const Tickets = () => {
             services: [
                 { name: 'Khám lâm sàng', status: 'pending' }
             ]
+        },
+        {
+            id: 4,
+            code: 'PK2142001',
+            customerName: 'Lê Huyền Linh',
+            dateTime: '11:45 - 20/03/2026',
+            paidAmount: '200.000đ',
+            totalAmount: '/1.200.000đ',
+            pet: {
+                name: 'Milo',
+                breed: 'Mèo Anh lông ngắn',
+                gender: 'female',
+                age: '2 Tuổi',
+                weight: '3.2kg',
+                hasAlert: true
+            },
+            services: [
+                { name: 'Khám lâm sàng', status: 'completed' },
+                { name: 'Xét nghiệm máu', status: 'completed' }
+            ]
         }
     ];
+
+    const inferStatus = (services) => {
+        if (services.length === 0) return 'pending';
+        const hasPending = services.some((service) => service.status === 'pending');
+        const hasCompleted = services.some((service) => service.status === 'completed');
+        if (hasPending && hasCompleted) return 'in_progress';
+        if (hasPending) return 'pending';
+        return 'completed';
+    };
+
+    const filteredTickets = useMemo(() => {
+        const keyword = searchTerm.trim().toLowerCase();
+
+        return dummyTickets.filter((ticket) => {
+            const status = inferStatus(ticket.services);
+            const matchesTab = activeTab === 'all' || status === activeTab;
+
+            const text = `${ticket.customerName} ${ticket.pet.name} ${ticket.pet.breed} ${ticket.code}`.toLowerCase();
+            const matchesSearch = !keyword || text.includes(keyword);
+            const matchesAlert = !onlyAlert || ticket.pet.hasAlert;
+
+            return matchesTab && matchesSearch && matchesAlert;
+        });
+    }, [activeTab, searchTerm, onlyAlert]);
 
     return (
         <DoctorLayout>
@@ -84,20 +135,29 @@ const Tickets = () => {
                     <div className="tickets-search-filter">
                         <div className="search-box">
                             <span className="search-icon"><SearchIcon /></span>
-                            <input type="text" placeholder="Search" className="search-input" />
+                            <input
+                                type="text"
+                                placeholder="Tìm theo khách hàng, pet, mã phiếu"
+                                className="search-input"
+                                value={searchTerm}
+                                onChange={(e) => setSearchTerm(e.target.value)}
+                            />
                         </div>
-                        <button className="filter-btn">
+                        <button className={`filter-btn ${onlyAlert ? 'active' : ''}`} onClick={() => setOnlyAlert((prev) => !prev)}>
                             <FilterIcon />
                         </button>
                     </div>
                 </div>
 
                 <div className="tickets-content-area">
-                    <TabStatus />
+                    <TabStatus onTabChange={setActiveTab} />
                     <div className="tickets-list">
-                        {dummyTickets.map((ticket) => (
+                        {filteredTickets.map((ticket) => (
                             <TicketCard key={ticket.id} {...ticket} />
                         ))}
+                        {filteredTickets.length === 0 && (
+                            <div className="tickets-empty-state">Không có phiếu khám phù hợp bộ lọc.</div>
+                        )}
                     </div>
                 </div>
             </div>

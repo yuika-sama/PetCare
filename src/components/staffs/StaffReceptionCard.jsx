@@ -18,7 +18,8 @@ const StaffReceptionCard = ({
     status = 'received',
     pets,
     paid,
-    total
+    total,
+    onPay
 }) => {
     const [pressed, setPressed] = useState(false);
 
@@ -72,7 +73,11 @@ const StaffReceptionCard = ({
                 </div>
                 <Button
                     className="staff-pay-btn"
-                    onClick={handlePress}
+                    onClick={(event) => {
+                        event.stopPropagation();
+                        handlePress();
+                        if (onPay) onPay();
+                    }}
                 >
                     Thanh toán
                 </Button>

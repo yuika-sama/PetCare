@@ -1,16 +1,26 @@
 import React, { useState } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { CalendarCheck, CreditCard, PlusCircle, Bell, Menu } from 'lucide-react';
 import './ReceptionistNavBar.css';
 
 const ReceptionistNavBar = () => {
-    const [activeTab, setActiveTab] = useState('donhom');
+    const navigate = useNavigate();
+    const { pathname } = useLocation();
+    const [activeTab, setActiveTab] = useState(
+        pathname.includes('/advance-payments') ? 'thanhtoan' : 'donhom'
+    );
+
+    const go = (tab, path) => {
+        setActiveTab(tab);
+        navigate(path);
+    };
 
     return (
         <div className="rc-bottom-nav">
             <div className="rc-nav-content">
                 <div
                     className={`rc-nav-item ${activeTab === 'donhom' ? 'active' : ''}`}
-                    onClick={() => setActiveTab('donhom')}
+                    onClick={() => go('donhom', '/receptionists/today-orders')}
                 >
                     <CalendarCheck size={26} strokeWidth={1.8} />
                     <span>Đơn hôm nay</span>
@@ -18,14 +28,14 @@ const ReceptionistNavBar = () => {
 
                 <div
                     className={`rc-nav-item ${activeTab === 'thanhtoan' ? 'active' : ''}`}
-                    onClick={() => setActiveTab('thanhtoan')}
+                    onClick={() => go('thanhtoan', '/receptionists/advance-payments')}
                 >
                     <CreditCard size={26} strokeWidth={1.8} />
                     <span>Thanh toán</span>
                 </div>
 
                 <div className="rc-nav-fab-placeholder">
-                    <button className="rc-nav-fab">
+                    <button className="rc-nav-fab" onClick={() => navigate('/receptionists/new-reception')}>
                         <PlusCircle size={28} color="#fff" strokeWidth={2} />
                     </button>
                     <span className="rc-nav-fab-label">Tạo đơn</span>
@@ -33,7 +43,7 @@ const ReceptionistNavBar = () => {
 
                 <div
                     className={`rc-nav-item ${activeTab === 'thongbao' ? 'active' : ''}`}
-                    onClick={() => setActiveTab('thongbao')}
+                    onClick={() => go('thongbao', '/receptionists/clinical-queue')}
                 >
                     <Bell size={26} strokeWidth={1.8} />
                     <span>Thông báo</span>
@@ -41,7 +51,7 @@ const ReceptionistNavBar = () => {
 
                 <div
                     className={`rc-nav-item ${activeTab === 'khac' ? 'active' : ''}`}
-                    onClick={() => setActiveTab('khac')}
+                    onClick={() => go('khac', '/receptionists/new-reception')}
                 >
                     <Menu size={26} strokeWidth={1.8} />
                     <span>Khác</span>

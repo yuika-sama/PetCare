@@ -83,6 +83,32 @@ const TestPage = () => {
         >
           Receptionist New Reception
         </Link>
+        <Link 
+          to="/receptionists/clinical-queue" 
+          style={{ padding: '10px 15px', backgroundColor: '#f0f4f8', borderRadius: '8px', textDecoration: 'none', color: '#1e40af', fontWeight: '500', border: '1px solid #d1d5db' }}
+        >
+          Receptionist Clinical Queue
+        </Link>
+        <Link 
+          to="/receptionists/advance-payments" 
+          style={{ padding: '10px 15px', backgroundColor: '#f0f4f8', borderRadius: '8px', textDecoration: 'none', color: '#1e40af', fontWeight: '500', border: '1px solid #d1d5db' }}
+        >
+          Receptionist Advance Payments
+        </Link>
+
+        <h2 style={{ color: '#333', marginTop: '16px', borderTop: '1px solid #d1d5db', paddingTop: '16px' }}>Doctor Extra Pages</h2>
+        <Link 
+          to="/doctors/patient-history" 
+          style={{ padding: '10px 15px', backgroundColor: '#f0f4f8', borderRadius: '8px', textDecoration: 'none', color: '#1e40af', fontWeight: '500', border: '1px solid #d1d5db' }}
+        >
+          Doctor Patient History
+        </Link>
+        <Link 
+          to="/doctors/treatment-plans" 
+          style={{ padding: '10px 15px', backgroundColor: '#f0f4f8', borderRadius: '8px', textDecoration: 'none', color: '#1e40af', fontWeight: '500', border: '1px solid #d1d5db' }}
+        >
+          Doctor Treatment Plans
+        </Link>
 
         <h2 style={{ color: '#333', marginTop: '16px', borderTop: '1px solid #d1d5db', paddingTop: '16px' }}>Staff Pages</h2>
         <Link 
@@ -102,6 +128,18 @@ const TestPage = () => {
           style={{ padding: '10px 15px', backgroundColor: '#f0f4f8', borderRadius: '8px', textDecoration: 'none', color: '#1e40af', fontWeight: '500', border: '1px solid #d1d5db' }}
         >
           Staff Payment
+        </Link>
+        <Link 
+          to="/staffs/receipt-list" 
+          style={{ padding: '10px 15px', backgroundColor: '#f0f4f8', borderRadius: '8px', textDecoration: 'none', color: '#1e40af', fontWeight: '500', border: '1px solid #d1d5db' }}
+        >
+          Staff Receipt List
+        </Link>
+        <Link 
+          to="/staffs/advance-payments" 
+          style={{ padding: '10px 15px', backgroundColor: '#f0f4f8', borderRadius: '8px', textDecoration: 'none', color: '#1e40af', fontWeight: '500', border: '1px solid #d1d5db' }}
+        >
+          Staff Advance Payments
         </Link>
       </div>
     </div>
