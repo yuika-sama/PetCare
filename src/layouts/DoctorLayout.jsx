@@ -11,7 +11,7 @@ const DoctorLayout = ({ children }) => {
             </div>
 
             {/* NavBar dùng chung cho tất cả các trang của Bác sĩ */}
-            <NavBar />
+            {/* <NavBar /> */}
         </div>
     );
 };

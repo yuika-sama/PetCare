@@ -60,7 +60,7 @@ const ReceiptList = () => {
                     {filtered.length === 0 && <div className="receipt-empty">Không có phiếu thu phù hợp.</div>}
                 </div>
             </div>
-            <StaffNavBar />
+            {/* <StaffNavBar /> */}
         </div>
     );
 };

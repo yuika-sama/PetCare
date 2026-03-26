@@ -8,7 +8,7 @@ const ReceptionistLayout = ({ children }) => {
             <div className="receptionist-main-content">
                 {children}
             </div>
-            <ReceptionistNavBar />
+            {/* <ReceptionistNavBar /> */}
         </div>
     );
 };
