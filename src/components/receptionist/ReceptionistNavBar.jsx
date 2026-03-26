@@ -7,7 +7,7 @@ const ReceptionistNavBar = () => {
     const navigate = useNavigate();
     const { pathname } = useLocation();
     const [activeTab, setActiveTab] = useState(
-        pathname.includes('/advance-payments') ? 'thanhtoan' : 'donhom'
+        pathname.includes('/clinical-queue') ? 'thongbao' : pathname.includes('/new-reception') ? 'khac' : 'donhom'
     );
 
     const go = (tab, path) => {
@@ -28,7 +28,7 @@ const ReceptionistNavBar = () => {
 
                 <div
                     className={`rc-nav-item ${activeTab === 'thanhtoan' ? 'active' : ''}`}
-                    onClick={() => go('thanhtoan', '/receptionists/advance-payments')}
+                    onClick={() => go('thanhtoan', '/receptionists/today-orders')}
                 >
                     <CreditCard size={26} strokeWidth={1.8} />
                     <span>Thanh toán</span>

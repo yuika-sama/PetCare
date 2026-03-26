@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 
 const TestPage = () => {
   return (
-    <div style={{ padding: '20px', fontFamily: 'system-ui, -apple-system, sans-serif' }}>
+    <div style={{ padding: '20px', fontFamily: 'Roboto, Helvetica, Arial, sans-serif' }}>
       <h1 style={{ color: '#333' }}>Project Test Navigation</h1>
       <p style={{ color: '#666', marginBottom: '20px' }}>
         Use this page to easily navigate to the different screens in the project during development.
@@ -89,26 +89,6 @@ const TestPage = () => {
         >
           Receptionist Clinical Queue
         </Link>
-        <Link 
-          to="/receptionists/advance-payments" 
-          style={{ padding: '10px 15px', backgroundColor: '#f0f4f8', borderRadius: '8px', textDecoration: 'none', color: '#1e40af', fontWeight: '500', border: '1px solid #d1d5db' }}
-        >
-          Receptionist Advance Payments
-        </Link>
-
-        <h2 style={{ color: '#333', marginTop: '16px', borderTop: '1px solid #d1d5db', paddingTop: '16px' }}>Doctor Extra Pages</h2>
-        <Link 
-          to="/doctors/patient-history" 
-          style={{ padding: '10px 15px', backgroundColor: '#f0f4f8', borderRadius: '8px', textDecoration: 'none', color: '#1e40af', fontWeight: '500', border: '1px solid #d1d5db' }}
-        >
-          Doctor Patient History
-        </Link>
-        <Link 
-          to="/doctors/treatment-plans" 
-          style={{ padding: '10px 15px', backgroundColor: '#f0f4f8', borderRadius: '8px', textDecoration: 'none', color: '#1e40af', fontWeight: '500', border: '1px solid #d1d5db' }}
-        >
-          Doctor Treatment Plans
-        </Link>
 
         <h2 style={{ color: '#333', marginTop: '16px', borderTop: '1px solid #d1d5db', paddingTop: '16px' }}>Staff Pages</h2>
         <Link 
@@ -135,11 +115,19 @@ const TestPage = () => {
         >
           Staff Receipt List
         </Link>
-        <Link 
-          to="/staffs/advance-payments" 
+
+        <h2 style={{ color: '#333', marginTop: '16px', borderTop: '1px solid #d1d5db', paddingTop: '16px' }}>Tech Staff Pages</h2>
+        <Link
+          to="/techs/home"
           style={{ padding: '10px 15px', backgroundColor: '#f0f4f8', borderRadius: '8px', textDecoration: 'none', color: '#1e40af', fontWeight: '500', border: '1px solid #d1d5db' }}
         >
-          Staff Advance Payments
+          Tech Staff Home
+        </Link>
+        <Link
+          to="/techs/record-result/1"
+          style={{ padding: '10px 15px', backgroundColor: '#f0f4f8', borderRadius: '8px', textDecoration: 'none', color: '#1e40af', fontWeight: '500', border: '1px solid #d1d5db' }}
+        >
+          Tech Staff Record Result
         </Link>
       </div>
     </div>

@@ -3,7 +3,7 @@
     background: linear-gradient(180deg, #F9FDFD 0%, #DFF4EF 100%);
     min-height: 100vh;
     box-sizing: border-box;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    font-family: "Roboto", Helvetica, Arial, sans-serif;
 }
 
 .home-header {

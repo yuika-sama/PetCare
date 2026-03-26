@@ -1,7 +1,7 @@
 .cs-page {
     min-height: 100vh;
     background: #ecf1ef;
-    font-family: system-ui, -apple-system, sans-serif;
+    font-family: "Roboto", Helvetica, Arial, sans-serif;
     display: flex;
     flex-direction: column;
 }

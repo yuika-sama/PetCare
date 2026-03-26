@@ -129,22 +129,23 @@ const Tickets = () => {
                         </button>
                     </div>
 
-                    <div className="tickets-search-filter">
-                        <div className="search-box">
-                            <span className="search-icon"><SearchIcon /></span>
-                            <input
-                                type="text"
-                                placeholder="Search"
-                                className="search-input"
-                                value={searchTerm}
-                                onChange={(e) => setSearchTerm(e.target.value)}
-                            />
-                        </div>
+                    <div className="search-box">
+                        <span className="search-icon"><SearchIcon /></span>
+                        <input
+                            type="text"
+                            placeholder="Tìm kiếm..."
+                            className="search-input"
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                        />
+                    </div>
+                    
+                    <div style={{ marginTop: '16px' }}>
+                        <TabStatus activeTab={activeTab} onTabChange={setActiveTab} />
                     </div>
                 </div>
 
                 <div className="tickets-content-area">
-                    <TabStatus onTabChange={setActiveTab} />
                     <div className="tickets-list">
                         {filteredTickets.map((ticket) => (
                             <TicketCard key={ticket.id} {...ticket} />

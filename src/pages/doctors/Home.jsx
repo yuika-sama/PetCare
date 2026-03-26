@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { CircleArrowRight, Info } from 'lucide-react';
 import './Home.css';
 import StatCard from '../../components/doctor/StatCard';
 
 const Home = () => {
+    const navigate = useNavigate();
     const [activeTab, setActiveTab] = useState('Workspace');
 
     // Mốc dữ liệu thống kê
@@ -108,6 +110,7 @@ const Home = () => {
                             unit={stat.unit}
                             variant={stat.variant}
                             icon={<TargetIcon />}
+                            onClick={() => navigate('/doctors/tickets')}
                         />
                     ))}
                 </div>

@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Input, Flag } from 'semantic-ui-react';
 import './Login.css';
 import bgImage from '../assets/LoginBG.png';
+import logoImage from '../assets/petical_logo.png';
 
 import { Eye, EyeOff } from 'lucide-react';
 
@@ -15,6 +16,9 @@ const Login = () => {
         <div className="login-container">
             <div className="login-header" style={{ backgroundImage: `url(${bgImage})` }}></div>
             <div className="login-form-container">
+                <div className="login-logo-wrap">
+                    <img src={logoImage} alt="Petical logo" className="login-logo" />
+                </div>
                 <h1 className="login-title">Xin chào!</h1>
                 <p className="login-subtitle">Vui lòng đăng nhập để sử dụng dịch vụ!</p>
 
@@ -54,7 +58,7 @@ const Login = () => {
                         <span className="checkmark"></span>
                         Lưu tài khoản
                     </label>
-                    <a href="#" className="forgot-password" onClick={(e) => e.preventDefault()}>Quên mật khẩu?</a>
+                    {/* <a href="#" className="forgot-password" onClick={(e) => e.preventDefault()}>Quên mật khẩu?</a> */}
                 </div>
 
                 <button className="login-button">Đăng nhập</button>

@@ -15,7 +15,7 @@ const StaffNavBar = () => {
     const navigate = useNavigate();
     const { pathname } = useLocation();
     const [active, setActive] = useState(
-        pathname.includes('/receipt-list') ? 'payment' : pathname.includes('/notifications') ? 'notifications' : pathname.includes('/advance-payments') ? 'create' : pathname.includes('/payment') ? 'more' : 'today'
+        pathname.includes('/receipt-list') ? 'payment' : pathname.includes('/notifications') ? 'notifications' : pathname.includes('/payment') ? 'more' : 'today'
     );
     const [pressed, setPressed] = useState(null);
 
@@ -27,7 +27,7 @@ const StaffNavBar = () => {
         const mapPath = {
             today: '/staffs/receptions',
             payment: '/staffs/receipt-list',
-            create: '/staffs/advance-payments',
+            create: '/staffs/receptions',
             notifications: '/staffs/notifications',
             more: '/staffs/payment'
         };
