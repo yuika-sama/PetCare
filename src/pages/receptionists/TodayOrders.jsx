@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { Search, SlidersHorizontal, ChevronDown, ChevronUp, ChevronLeft, ChevronRight, UserRound, PlusCircle } from 'lucide-react';
+import { Search, Bell, ChevronDown, ChevronUp, ChevronLeft, ChevronRight, UserRound, PlusCircle } from 'lucide-react';
 import ReceptionistLayout from '../../layouts/ReceptionistLayout';
 import ReceptionCard from '../../components/receptionist/ReceptionCard';
 import ReceivedCard from '../../components/receptionist/ReceivedCard';
@@ -11,21 +11,27 @@ const MONTH_NAMES = [
 ];
 const DAY_LABELS = ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
 
+const ORDER_STATUS = {
+    RECEIVED: 'da_tiep_don',
+    WAITING_PAYMENT: 'cho_thanh_toan',
+    PAID: 'da_thanh_toan'
+};
+
 const initialOrders = [
     {
         id: 1,
         customerName: 'Nguyễn Anh Đức',
         phone: '0912345678',
         ticketId: '2141441',
-        status: 'cho',
-        statusLabel: 'Chờ tiếp đón',
-        createdAt: 'Tạo đơn lúc 10:03 - 20/03/2026',
+        status: ORDER_STATUS.RECEIVED,
+        statusLabel: 'Đã tiếp đón',
+        createdAt: 'Tiếp đón lúc 10:03 - 20/03/2026',
         date: 20,
         species: 'cho',
         hasAdvance: true,
         pets: [{ name: 'Kuro', breed: 'Chó Poodle', gender: 'male', age: '3 Tuổi', weight: '4.5kg' }],
         sourceOrder: '2141441',
-        paymentEnabled: false,
+        paymentEnabled: true,
         hideSource: false,
         avatar: 'https://placehold.co/80x80/e0f2ef/209D80?text=NAD'
     },
@@ -34,15 +40,15 @@ const initialOrders = [
         customerName: 'Lê Huyền Linh',
         phone: '0816278274',
         ticketId: '2141442',
-        status: 'cho',
-        statusLabel: 'Chờ tiếp đón',
-        createdAt: 'Tạo đơn lúc 11:10 - 20/03/2026',
+        status: ORDER_STATUS.RECEIVED,
+        statusLabel: 'Đã tiếp đón',
+        createdAt: 'Tiếp đón lúc 11:10 - 20/03/2026',
         date: 20,
         species: 'meo',
         hasAdvance: false,
         pets: [{ name: 'Mike', breed: 'Mèo Anh lông ngắn', gender: 'male', age: '2 Tuổi', weight: '2.5kg' }],
         sourceOrder: null,
-        paymentEnabled: false,
+        paymentEnabled: true,
         hideSource: false,
         avatar: 'https://placehold.co/80x80/e0f2ef/209D80?text=LHL'
     },
@@ -51,14 +57,16 @@ const initialOrders = [
         customerName: 'Nguyễn Duy Ngọc',
         phone: '0908264671',
         ticketId: '2141551',
-        status: 'da',
-        statusLabel: 'Đã tiếp đón',
-        createdAt: 'Tiếp đón lúc 09:03 - 20/03/2026',
+        status: ORDER_STATUS.WAITING_PAYMENT,
+        statusLabel: 'Chờ thanh toán',
+        createdAt: 'Lập phiếu lúc 09:03 - 20/03/2026',
         date: 20,
         species: 'cho',
         hasAdvance: true,
         pets: [{ name: 'Milo', breed: 'Chó Corgi', gender: 'male', age: '4 Tuổi', weight: '7kg' }],
         sourceOrder: null,
+        serviceSummary: '82 Hug × 16 Hug',
+        totalAmount: '251.000đ',
         paymentEnabled: true,
         hideSource: false,
         avatar: 'https://placehold.co/80x80/e0f2ef/209D80?text=NDN'
@@ -68,15 +76,17 @@ const initialOrders = [
         customerName: 'Trần Minh Hạnh',
         phone: '0902627274',
         ticketId: '2141999',
-        status: 'huy',
-        statusLabel: 'Đã hủy',
-        createdAt: 'Hủy lúc 08:50 - 20/03/2026',
+        status: ORDER_STATUS.WAITING_PAYMENT,
+        statusLabel: 'Chờ thanh toán',
+        createdAt: 'Lập phiếu lúc 08:50 - 20/03/2026',
         date: 20,
         species: 'khac',
         hasAdvance: false,
         pets: [{ name: 'Peach', breed: 'Thỏ Mini', gender: 'female', age: '1 Tuổi', weight: '1.1kg' }],
         sourceOrder: null,
-        paymentEnabled: false,
+        serviceSummary: '12 Hug × 04 Hug',
+        totalAmount: '179.000đ',
+        paymentEnabled: true,
         hideSource: false,
         avatar: 'https://placehold.co/80x80/e0f2ef/209D80?text=TMH'
     },
@@ -85,37 +95,61 @@ const initialOrders = [
         customerName: 'Hà An Huy',
         phone: '0977771234',
         ticketId: '2141777',
-        status: 'hoanthanh',
-        statusLabel: 'Hoàn thành',
-        createdAt: 'Hoàn thành lúc 07:45 - 20/03/2026',
+        status: ORDER_STATUS.PAID,
+        statusLabel: 'Đã thanh toán',
+        createdAt: 'Thanh toán lúc 07:45 - 20/03/2026',
         date: 20,
         species: 'cho',
         hasAdvance: true,
         pets: [{ name: 'Pika', breed: 'Chó Phốc sóc', gender: 'female', age: '5 Tuổi', weight: '2.3kg' }],
         sourceOrder: '2141333',
-        paymentEnabled: true,
+        serviceSummary: '64 Hug × 08 Hug',
+        totalAmount: '368.000đ',
+        paymentEnabled: false,
         hideSource: false,
         avatar: 'https://placehold.co/80x80/e0f2ef/209D80?text=HAH'
+    },
+    {
+        id: 6,
+        customerName: 'Phạm Ngọc Vy',
+        phone: '0933338899',
+        ticketId: '2141880',
+        status: ORDER_STATUS.PAID,
+        statusLabel: 'Đã thanh toán',
+        createdAt: 'Thanh toán lúc 13:25 - 20/03/2026',
+        date: 20,
+        species: 'meo',
+        hasAdvance: true,
+        pets: [{ name: 'Bông', breed: 'Mèo Ba Tư', gender: 'female', age: '3 Tuổi', weight: '3.2kg' }],
+        sourceOrder: null,
+        serviceSummary: '31 Hug × 06 Hug',
+        totalAmount: '205.000đ',
+        paymentEnabled: false,
+        hideSource: false,
+        avatar: 'https://placehold.co/80x80/e0f2ef/209D80?text=PNV'
     }
 ];
 
 const TodayOrders = () => {
-    const [activeStatus, setActiveStatus] = useState('cho');
+    const [activeStatus, setActiveStatus] = useState(ORDER_STATUS.RECEIVED);
     const [calendarExpanded, setCalendarExpanded] = useState(false);
     const [showNewCustomerModal, setShowNewCustomerModal] = useState(false);
     const [searchTerm, setSearchTerm] = useState('');
-    const [showFilterPanel, setShowFilterPanel] = useState(false);
-    const [speciesFilter, setSpeciesFilter] = useState('all');
-    const [onlyAdvance, setOnlyAdvance] = useState(false);
     const [orders, setOrders] = useState(initialOrders);
     const [newCustomer, setNewCustomer] = useState({
         name: '', phone: '', petName: '', species: '', breed: '', appointmentDate: ''
     });
 
     const today = new Date();
+    const todayDate = today.getDate();
+    const fallbackDate = initialOrders[0]?.date || todayDate;
+    const defaultSelectedDate = initialOrders.some((order) => order.date === todayDate)
+        ? todayDate
+        : fallbackDate;
+
     const [viewYear, setViewYear] = useState(today.getFullYear());
     const [viewMonth, setViewMonth] = useState(today.getMonth()); // 0-indexed
-    const [selectedDate, setSelectedDate] = useState(today.getDate());
+    const [selectedDate, setSelectedDate] = useState(defaultSelectedDate);
 
     // Build the full month grid
     const monthGrid = useMemo(() => {
@@ -180,20 +214,16 @@ const TodayOrders = () => {
         return filteredByDate.filter((order) => {
             const searchable = `${order.customerName} ${order.phone} ${order.ticketId} ${order.pets[0]?.name || ''}`.toLowerCase();
             const matchesKeyword = !keyword || searchable.includes(keyword);
-            const matchesSpecies = speciesFilter === 'all' || order.species === speciesFilter;
-            const matchesAdvance = !onlyAdvance || order.hasAdvance;
-            return matchesKeyword && matchesSpecies && matchesAdvance;
+            return matchesKeyword;
         });
-    }, [filteredByDate, searchTerm, speciesFilter, onlyAdvance]);
+    }, [filteredByDate, searchTerm]);
 
     const statusTabs = useMemo(() => {
         const count = (status) => filteredByDate.filter((item) => item.status === status).length;
         return [
-            { key: 'cho', label: 'Chờ tiếp đón', count: count('cho') },
-            { key: 'da', label: 'Đã tiếp đón', count: count('da') },
-            { key: 'huy', label: 'Đã hủy', count: count('huy') },
-            { key: 'hoanthanh', label: 'Hoàn thành', count: count('hoanthanh') },
-            { key: 'all', label: 'Tất cả', count: filteredByDate.length }
+            { key: ORDER_STATUS.RECEIVED, label: 'Đã tiếp đón', count: count(ORDER_STATUS.RECEIVED) },
+            { key: ORDER_STATUS.WAITING_PAYMENT, label: 'Chờ thanh toán', count: count(ORDER_STATUS.WAITING_PAYMENT) },
+            { key: ORDER_STATUS.PAID, label: 'Đã thanh toán', count: count(ORDER_STATUS.PAID) }
         ];
     }, [filteredByDate]);
 
@@ -202,12 +232,12 @@ const TodayOrders = () => {
         return filteredBySearchAndFilters.filter((order) => order.status === activeStatus);
     }, [activeStatus, filteredBySearchAndFilters]);
 
-    const waitingCustomers = useMemo(
-        () => activeOrders.filter((order) => order.status === 'cho'),
+    const receivedCustomers = useMemo(
+        () => activeOrders.filter((order) => order.status === ORDER_STATUS.RECEIVED),
         [activeOrders]
     );
 
-    const shouldUseReceivedCard = activeStatus !== 'cho';
+    const shouldUseSimpleReceptionCard = activeStatus === ORDER_STATUS.RECEIVED;
 
     const handleCreateCustomer = () => {
         if (!newCustomer.name || !newCustomer.phone || !newCustomer.petName || !newCustomer.species || !newCustomer.breed) {
@@ -227,8 +257,8 @@ const TodayOrders = () => {
             customerName: newCustomer.name,
             phone: newCustomer.phone,
             ticketId: `${orderId}`.slice(-7),
-            status: 'cho',
-            statusLabel: 'Chờ tiếp đón',
+            status: ORDER_STATUS.RECEIVED,
+            statusLabel: 'Đã tiếp đón',
             createdAt: 'Tạo đơn vừa xong',
             date: selectedDate,
             species: newCustomer.species,
@@ -250,7 +280,7 @@ const TodayOrders = () => {
 
         setOrders((prev) => [newOrder, ...prev]);
         setShowNewCustomerModal(false);
-        setActiveStatus('cho');
+        setActiveStatus(ORDER_STATUS.RECEIVED);
         setSearchTerm('');
         setNewCustomer({ name: '', phone: '', petName: '', species: '', breed: '', appointmentDate: '' });
     };
@@ -260,10 +290,18 @@ const TodayOrders = () => {
             <div className="today-orders-page">
                 {/* Header */}
                 <div className="to-header">
-                    <h1 className="to-page-title">Đơn hôm nay</h1>
-                    <div className="to-header-avatar">
-                        <img src="https://placehold.co/40x40/e0f2ef/209D80?text=Dr" alt="avatar" />
+                    <div className="to-header-user">
+                        <div className="to-header-avatar">
+                            <img src="https://placehold.co/80x80/e0f2ef/209D80?text=TT" alt="Thu Trang" />
+                        </div>
+                        <div className="to-header-texts">
+                            <p className="to-header-greeting">Xin chào</p>
+                            <h1 className="to-header-name">Lê tân Thu Trang</h1>
+                        </div>
                     </div>
+                    <button className="to-header-bell-btn" type="button" aria-label="Thông báo">
+                        <Bell size={20} color="#1a1a1a" strokeWidth={2} />
+                    </button>
                 </div>
 
                 {/* Calendar Strip */}
@@ -344,16 +382,16 @@ const TodayOrders = () => {
                 </div>
 
                 {/* Stats Row */}
-                <div className="to-stats-row">
+                {/* <div className="to-stats-row">
                     <div className="to-stat-card">
                         <span className="to-stat-label">Đã tiếp đón</span>
-                        <span className="to-stat-value">{statusTabs.find((tab) => tab.key === 'da')?.count || 0}</span>
+                        <span className="to-stat-value">{statusTabs.find((tab) => tab.key === ORDER_STATUS.RECEIVED)?.count || 0}</span>
                     </div>
                     <div className="to-stat-card">
-                        <span className="to-stat-label">Đang thực hiện</span>
-                        <span className="to-stat-value">{statusTabs.find((tab) => tab.key === 'hoanthanh')?.count || 0}</span>
+                        <span className="to-stat-label">Đã thanh toán</span>
+                        <span className="to-stat-value">{statusTabs.find((tab) => tab.key === ORDER_STATUS.PAID)?.count || 0}</span>
                     </div>
-                </div>
+                </div> */}
 
                 {/* Search Bar */}
                 <div className="to-search-container">
@@ -361,42 +399,13 @@ const TodayOrders = () => {
                         <Search size={20} color="#209D80" />
                         <input
                             type="text"
-                            placeholder="Tìm theo tên, SĐT, mã phiếu, pet"
+                            placeholder="Search"
                             className="to-search-input"
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
                         />
                     </div>
-                    <button className="to-filter-btn" onClick={() => setShowFilterPanel((prev) => !prev)}>
-                        <SlidersHorizontal size={20} color="#209D80" />
-                    </button>
                 </div>
-
-                {showFilterPanel && (
-                    <div className="to-filter-panel">
-                        <div className="to-filter-item">
-                            <label htmlFor="species-filter">Loài</label>
-                            <select
-                                id="species-filter"
-                                value={speciesFilter}
-                                onChange={(e) => setSpeciesFilter(e.target.value)}
-                            >
-                                <option value="all">Tất cả</option>
-                                <option value="cho">Chó</option>
-                                <option value="meo">Mèo</option>
-                                <option value="khac">Khác</option>
-                            </select>
-                        </div>
-                        <label className="to-filter-checkbox">
-                            <input
-                                type="checkbox"
-                                checked={onlyAdvance}
-                                onChange={(e) => setOnlyAdvance(e.target.checked)}
-                            />
-                            Chỉ khách có phiếu tạm ứng
-                        </label>
-                    </div>
-                )}
 
                 {/* Status Tabs */}
                 <div className="to-status-tabs">
@@ -413,11 +422,11 @@ const TodayOrders = () => {
                 </div>
 
                 {/* Content by tab */}
-                {activeStatus === 'cho' && (
+                {shouldUseSimpleReceptionCard && (
                     <>
-                        {waitingCustomers.length > 0 ? (
+                        {receivedCustomers.length > 0 ? (
                             <div className="to-customers-list">
-                                {waitingCustomers.map((c) => (
+                                {receivedCustomers.map((c) => (
                                     <ReceptionCard
                                         key={c.id}
                                         name={c.customerName}
@@ -442,7 +451,7 @@ const TodayOrders = () => {
                     </>
                 )}
 
-                {shouldUseReceivedCard && activeOrders.length > 0 && (
+                {!shouldUseSimpleReceptionCard && activeOrders.length > 0 && (
                     <div className="to-customers-list">
                         {activeOrders.map((order) => (
                             <ReceivedCard
@@ -454,7 +463,12 @@ const TodayOrders = () => {
                                 createdAt={order.createdAt}
                                 pets={order.pets}
                                 sourceOrder={order.sourceOrder}
+                                serviceSummary={order.serviceSummary}
+                                totalAmount={order.totalAmount}
                                 paymentEnabled={order.paymentEnabled}
+                                paymentButtonLabel={
+                                    order.status === ORDER_STATUS.PAID ? 'Đã thanh toán' : 'Thanh toán'
+                                }
                                 hideSource={order.hideSource}
                                 onPayment={() => console.log('Payment', order.id)}
                             />
@@ -462,7 +476,7 @@ const TodayOrders = () => {
                     </div>
                 )}
 
-                {activeStatus !== 'cho' && activeOrders.length === 0 && (
+                {!shouldUseSimpleReceptionCard && activeOrders.length === 0 && (
                     <div className="to-empty-state">
                         <div className="to-empty-icon">
                             <UserRound size={32} color="#a1a1aa" />
@@ -478,7 +492,7 @@ const TodayOrders = () => {
                     <div className="to-modal-overlay" onClick={() => setShowNewCustomerModal(false)}></div>
                     <div className="to-modal-content">
                         <div className="to-modal-handle"></div>
-                        <h2 className="to-modal-title">Tạo mới khách hàng & thú cưng</h2>
+                        <h2 className="to-modal-title">Tạo mới khách hàng</h2>
 
                         <div className="to-modal-form">
                             <div className="to-modal-field">
@@ -501,7 +515,7 @@ const TodayOrders = () => {
                                 />
                             </div>
 
-                            <div className="to-modal-field-row">
+                            {/* <div className="to-modal-field-row">
                                 <div className="to-modal-field to-modal-field-half">
                                     <label className="to-modal-label">Thú cưng <span className="to-modal-req">*</span></label>
                                     <input
@@ -527,9 +541,9 @@ const TodayOrders = () => {
                                         <ChevronDown size={18} color="#888" className="to-modal-select-icon" />
                                     </div>
                                 </div>
-                            </div>
+                            </div> */}
 
-                            <div className="to-modal-field">
+                            {/* <div className="to-modal-field">
                                 <label className="to-modal-label">Giống <span className="to-modal-req">*</span></label>
                                 <div className="to-modal-select-wrapper">
                                     <select
@@ -545,7 +559,7 @@ const TodayOrders = () => {
                                     </select>
                                     <ChevronDown size={18} color="#888" className="to-modal-select-icon" />
                                 </div>
-                            </div>
+                            </div> */}
 
                             {/* <div className="to-modal-field">
                                 <label className="to-modal-label">Ngày hẹn</label>

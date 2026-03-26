@@ -1,5 +1,5 @@
 import React from 'react';
-import { Phone, Mars, Cake, Weight } from 'lucide-react';
+import { Phone, Mars, Venus, Cake, Weight } from 'lucide-react';
 import './ReceivedCard.css';
 
 const ReceivedCard = ({
@@ -12,12 +12,21 @@ const ReceivedCard = ({
     onPayment,
     paymentEnabled = true,
     hideSource = false,
+    totalAmount,
+    serviceSummary,
+    paymentButtonLabel = 'Thanh toán',
 }) => {
+    const resolvedSummary = serviceSummary || (sourceOrder ? `${sourceOrder} Hug × 16 Hug` : '--');
+    const shouldShowSummaryChip = Boolean(serviceSummary || totalAmount);
+
     return (
         <div className="received-card">
             <div className="rc-card-header">
                 <h3 className="rc-card-name">{customerName}</h3>
-                <span className="rc-card-status">{status}</span>
+                <div className="rc-card-status-group">
+                    <span className="rc-card-status">{status}</span>
+                    {shouldShowSummaryChip && <span className="rc-card-summary-chip">{resolvedSummary}</span>}
+                </div>
             </div>
 
             <div className="rc-card-sub-header">
@@ -39,6 +48,9 @@ const ReceivedCard = ({
                             {pet.gender === 'male' && (
                                 <Mars size={14} color="#3b82f6" style={{ marginLeft: '4px' }} />
                             )}
+                            {pet.gender === 'female' && (
+                                <Venus size={14} color="#3b82f6" style={{ marginLeft: '4px' }} />
+                            )}
                         </span>
                         <span className="rc-card-pet-detail">
                             <Cake size={14} color="#888" />
@@ -55,7 +67,11 @@ const ReceivedCard = ({
             <hr className="rc-divider" />
 
             <div className={`rc-card-footer ${hideSource ? 'full-btn' : ''}`}>
-                {!hideSource && (
+                {!!totalAmount && (
+                    <div className="rc-card-amount">{totalAmount}</div>
+                )}
+
+                {!hideSource && !totalAmount && (
                     <div className="rc-card-source">
                         {sourceOrder ? (
                             <span>
@@ -71,7 +87,7 @@ const ReceivedCard = ({
                     className={`rc-card-pay-btn ${paymentEnabled ? '' : 'disabled'} ${hideSource ? 'full-width' : ''}`}
                     onClick={paymentEnabled ? onPayment : undefined}
                 >
-                    Thanh toán
+                    {paymentButtonLabel}
                 </button>
             </div>
         </div>

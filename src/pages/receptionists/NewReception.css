@@ -300,6 +300,52 @@
     box-sizing: border-box;
 }
 
+.nr-assigned-row {
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+}
+
+.nr-assigned-field {
+    flex: 1;
+    margin-bottom: 20px;
+}
+
+.nr-shift-select-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+    background: #FFFBEB;
+    color: #D97706;
+    border-radius: 8px;
+    border: 1px solid #FDE68A;
+    height: 48px;
+    min-width: 94px;
+    margin-top: 0;
+}
+
+.nr-shift-select {
+    width: 100%;
+    height: 100%;
+    border: none;
+    outline: none;
+    background: transparent;
+    color: #D97706;
+    font-size: 14px;
+    font-weight: 500;
+    padding: 0 30px 0 14px;
+    appearance: none;
+    cursor: pointer;
+}
+
+.nr-shift-select-icon {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    pointer-events: none;
+}
+
 /* Toggle */
 .nr-toggle-row {
     display: flex;
@@ -378,5 +424,128 @@
 
 .nr-btn-submit {
     background-color: #209D80;
+    color: #fff;
+}
+
+/* Add Pet Modal */
+.nr-pet-modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.35);
+    z-index: 1100;
+}
+
+.nr-pet-modal {
+    position: fixed;
+    left: 50%;
+    bottom: 0;
+    transform: translateX(-50%);
+    width: min(100%, 480px);
+    background: #fff;
+    border-top-left-radius: 16px;
+    border-top-right-radius: 16px;
+    z-index: 1101;
+    padding: 8px 8px 12px;
+    box-sizing: border-box;
+}
+
+.nr-pet-modal-handle {
+    width: 38px;
+    height: 4px;
+    border-radius: 999px;
+    background: #d1d5db;
+    margin: 0 auto 8px;
+}
+
+.nr-pet-modal-title {
+    margin: 0 0 12px;
+    text-align: center;
+    font-size: 24px;
+    font-weight: 700;
+    color: #1f2937;
+}
+
+.nr-pet-modal-form-row {
+    display: flex;
+    gap: 8px;
+}
+
+.nr-pet-modal-field {
+    border: 1px solid #d1d5db;
+    border-radius: 12px;
+    padding: 6px 10px 8px;
+    margin-bottom: 10px;
+    box-sizing: border-box;
+}
+
+.nr-pet-modal-field-half {
+    flex: 1;
+}
+
+.nr-pet-modal-label {
+    display: block;
+    font-size: 12px;
+    color: #6b7280;
+    margin-bottom: 2px;
+}
+
+.nr-pet-modal-input {
+    width: 100%;
+    border: none;
+    outline: none;
+    font-size: 16px;
+    color: #111827;
+    background: transparent;
+    padding: 0;
+}
+
+.nr-pet-modal-select-wrapper {
+    position: relative;
+}
+
+.nr-pet-modal-select {
+    width: 100%;
+    border: none;
+    outline: none;
+    font-size: 16px;
+    color: #111827;
+    background: transparent;
+    appearance: none;
+    padding: 0 18px 0 0;
+}
+
+.nr-pet-modal-select-icon {
+    position: absolute;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    pointer-events: none;
+}
+
+.nr-pet-modal-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 6px;
+}
+
+.nr-pet-modal-btn-cancel,
+.nr-pet-modal-btn-submit {
+    flex: 1;
+    border-radius: 12px;
+    border: none;
+    font-size: 20px;
+    font-weight: 700;
+    padding: 10px 12px;
+    cursor: pointer;
+}
+
+.nr-pet-modal-btn-cancel {
+    background: #f3f4f6;
+    color: #0ea68b;
+    border: 1px solid #0ea68b;
+}
+
+.nr-pet-modal-btn-submit {
+    background: #0ea68b;
     color: #fff;
 }

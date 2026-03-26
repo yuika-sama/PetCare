@@ -4,6 +4,14 @@ import './NewReception.css';
 
 const NewReception = () => {
     const [selectedPet, setSelectedPet] = useState('Kuro');
+    const [pets, setPets] = useState([
+        { name: 'Kuro' },
+        { name: 'Katy' },
+    ]);
+    const [showAddPetModal, setShowAddPetModal] = useState(false);
+    const [newPetName, setNewPetName] = useState('');
+    const [newPetSpecies, setNewPetSpecies] = useState('');
+    const [newPetBreed, setNewPetBreed] = useState('');
     const [isEmergency, setIsEmergency] = useState(false);
     const [weight, setWeight] = useState('');
     const [reason, setReason] = useState('');
@@ -14,10 +22,19 @@ const NewReception = () => {
     const [assignedDoctor, setAssignedDoctor] = useState('');
     const [notes, setNotes] = useState('');
 
-    const pets = [
-        { name: 'Kuro' },
-        { name: 'Katy' },
-    ];
+    const handleCreatePet = () => {
+        if (!newPetName.trim() || !newPetSpecies || !newPetBreed.trim()) {
+            return;
+        }
+
+        const createdPet = { name: newPetName.trim() };
+        setPets((prev) => [...prev, createdPet]);
+        setSelectedPet(createdPet.name);
+        setShowAddPetModal(false);
+        setNewPetName('');
+        setNewPetSpecies('');
+        setNewPetBreed('');
+    };
 
     const petInfo = {
         name: 'Kuro',
@@ -70,7 +87,7 @@ const NewReception = () => {
                             <span>{pet.name}</span>
                         </button>
                     ))}
-                    <button className="nr-pet-chip-add">
+                    <button type="button" className="nr-pet-chip-add" onClick={() => setShowAddPetModal(true)}>
                         <Plus size={18} color="#209D80" />
                     </button>
                 </div>
@@ -246,6 +263,68 @@ const NewReception = () => {
                 <button className="nr-btn-cancel">Hủy bỏ</button>
                 <button className="nr-btn-submit">Tạo phiếu</button>
             </div>
+
+            {showAddPetModal && (
+                <>
+                    <div className="nr-pet-modal-overlay" onClick={() => setShowAddPetModal(false)}></div>
+                    <div className="nr-pet-modal">
+                        <div className="nr-pet-modal-handle"></div>
+                        <h3 className="nr-pet-modal-title">Tạo mới thú cưng</h3>
+
+                        <div className="nr-pet-modal-form-row">
+                            <div className="nr-pet-modal-field nr-pet-modal-field-half">
+                                <label className="nr-pet-modal-label">Thú cưng <span className="nr-required">*</span></label>
+                                <input
+                                    type="text"
+                                    className="nr-pet-modal-input"
+                                    value={newPetName}
+                                    onChange={(e) => setNewPetName(e.target.value)}
+                                />
+                            </div>
+
+                            <div className="nr-pet-modal-field nr-pet-modal-field-half">
+                                <label className="nr-pet-modal-label">Loài <span className="nr-required">*</span></label>
+                                <div className="nr-pet-modal-select-wrapper">
+                                    <select
+                                        className="nr-pet-modal-select"
+                                        value={newPetSpecies}
+                                        onChange={(e) => setNewPetSpecies(e.target.value)}
+                                    >
+                                        <option value="" disabled></option>
+                                        <option value="cho">Chó</option>
+                                        <option value="meo">Mèo</option>
+                                        <option value="khac">Khác</option>
+                                    </select>
+                                    <ChevronDown size={16} color="#666" className="nr-pet-modal-select-icon" />
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="nr-pet-modal-field">
+                            <label className="nr-pet-modal-label">Giống <span className="nr-required">*</span></label>
+                            <div className="nr-pet-modal-select-wrapper">
+                                <select
+                                    className="nr-pet-modal-select"
+                                    value={newPetBreed}
+                                    onChange={(e) => setNewPetBreed(e.target.value)}
+                                >
+                                    <option value="" disabled></option>
+                                    <option value="poodle">Poodle</option>
+                                    <option value="corgi">Corgi</option>
+                                    <option value="husky">Husky</option>
+                                    <option value="golden">Golden Retriever</option>
+                                </select>
+                                <ChevronDown size={16} color="#666" className="nr-pet-modal-select-icon" />
+                            </div>
+                        </div>
+
+                        <div className="nr-pet-modal-actions">
+                            <button type="button" className="nr-pet-modal-btn-cancel" onClick={() => setShowAddPetModal(false)}>Hủy bỏ</button>
+                            <button type="button" className="nr-pet-modal-btn-submit" onClick={handleCreatePet}>Tạo mới</button>
+                        </div>
+                    </div>
+                </>
+            )}
         </div>
     );
 };
