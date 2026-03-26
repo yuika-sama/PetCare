@@ -1,27 +1,13 @@
 import React, { useState } from 'react';
-import { ChevronLeft, MoreVertical, Phone, Eye, Mars, Cake, Weight, ChevronUp, ChevronDown } from 'lucide-react';
-import medicineEmptyImg from '../../assets/medicine_empty.png';
+import { ChevronLeft, MoreVertical, Phone, Eye, Mars, Cake, Weight } from 'lucide-react';
+import ServiceAccordion from '../../components/doctor/ServiceAccordion';
+import TreatmentHistoryTimeline from '../../components/doctor/TreatmentHistoryTimeline';
 import './ServiceOrder.css';
 
 const ServiceOrder = () => {
     const [activeTab, setActiveTab] = useState('Dịch vụ');
-    const [isExamExpanded, setIsExamExpanded] = useState(true);
-    const [isMedsExpanded, setIsMedsExpanded] = useState(true);
 
-    const tabs = ['Dịch vụ', 'Kết quả', 'Hàng hóa', 'Lịch sử điều trị'];
-
-    const medsList = [
-        {
-            id: 1,
-            name: 'Đại tràng Trường Phúc',
-            desc: 'Điều trị viêm loét đại tràng, rối loạn tiêu hóa (3 vỉ x 10 viên)',
-            price: '120.000đ',
-            unit: '/hộp',
-            stock: '2.000',
-            image: 'https://placehold.co/80x80/f4f4f5/a1a1aa?text=Med',
-            selected: false
-        }
-    ];
+    const tabs = ['Dịch vụ', 'Lịch sử điều trị'];
 
     return (
         <div className="service-order-page">
@@ -78,14 +64,8 @@ const ServiceOrder = () => {
 
                 {/* Accordions / Sections */}
                 <div className="so-sections">
-                    {/* KHÁM BỆNH */}
-                    <div className="so-accordion">
-                        <div className="so-accordion-header" onClick={() => setIsExamExpanded(!isExamExpanded)}>
-                            <h3>KHÁM BỆNH</h3>
-                            {isExamExpanded ? <ChevronUp size={20} color="#666" /> : <ChevronDown size={20} color="#666" />}
-                        </div>
-                        {isExamExpanded && (
-                            <div className="so-accordion-content">
+                    {activeTab === 'Dịch vụ' && (
+                        <ServiceAccordion title="KHÁM BỆNH" defaultExpanded>
                                 <div className="so-service-item">
                                     <div className="so-service-row">
                                         <span className="so-service-name">Khám lâm sàng</span>
@@ -100,47 +80,10 @@ const ServiceOrder = () => {
                                         <span className="so-exec-name">Nguyễn Văn An</span>
                                     </div>
                                 </div>
-                            </div>
-                        )}
-                    </div>
+                        </ServiceAccordion>
+                    )}
 
-                    {/* THUỐC & VẬT TƯ ĐI KÈM */}
-                    <div className="so-accordion">
-                        <div className="so-accordion-header" onClick={() => setIsMedsExpanded(!isMedsExpanded)}>
-                            <h3>THUỐC & VẬT TƯ ĐI KÈM</h3>
-                            {isMedsExpanded ? <ChevronUp size={20} color="#666" /> : <ChevronDown size={20} color="#666" />}
-                        </div>
-                        {isMedsExpanded && (
-                            <div className={`so-accordion-content ${medsList.length === 0 ? 'empty-state' : 'meds-list-container'}`}>
-                                {medsList.length === 0 ? (
-                                    <img src={medicineEmptyImg} alt="Empty medicine" width="80" height="90" style={{ objectFit: 'contain' }} />
-                                ) : (
-                                    <div className="so-meds-list">
-                                        {medsList.map(med => (
-                                            <div key={med.id} className="so-med-item">
-                                                <div className="so-med-checkbox">
-                                                    <input type="checkbox" id={`med-${med.id}`} defaultChecked={med.selected} />
-                                                    <label htmlFor={`med-${med.id}`}></label>
-                                                </div>
-                                                <img src={med.image} alt={med.name} className="so-med-image" />
-                                                <div className="so-med-details">
-                                                    <h4 className="so-med-name">{med.name}</h4>
-                                                    <p className="so-med-desc">{med.desc}</p>
-                                                    <div className="so-med-footer">
-                                                        <div className="so-med-price-box">
-                                                            <span className="so-med-price">{med.price}</span>
-                                                            <span className="so-med-unit"> {med.unit}</span>
-                                                        </div>
-                                                        <span className="so-med-stock">Tồn: <strong>{med.stock}</strong></span>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        ))}
-                                    </div>
-                                )}
-                            </div>
-                        )}
-                    </div>
+                    {activeTab === 'Lịch sử điều trị' && <TreatmentHistoryTimeline />}
                 </div>
             </div>
 

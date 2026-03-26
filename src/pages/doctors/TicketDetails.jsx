@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import './TicketDetails.css';
 import '../../components/doctor/TicketCard.css';
 
@@ -43,11 +43,11 @@ const NoteModal = ({ note, onClose }) => {
 const TicketDetails = ({ note = "Khách hàng khó tính, yêu cầu không gọi điện, pet hung dữ nên cần nhẹ nhàng khi thực hiện dịch vụ" }) => {
     const [showModal, setShowModal] = useState(false);
 
-    useEffect(() => {
+    const handleStartClick = () => {
         if (note) {
             setShowModal(true);
         }
-    }, [note]);
+    };
 
     return (
         <div className="ticket-details-page">
@@ -138,7 +138,7 @@ const TicketDetails = ({ note = "Khách hàng khó tính, yêu cầu không gọ
 
             {/* Bottom Action Bar */}
             <div className="bottom-action-bar">
-                <button className="primary-action-btn">Bắt đầu</button>
+                <button className="primary-action-btn" onClick={handleStartClick}>Bắt đầu</button>
             </div>
         </div>
     );
