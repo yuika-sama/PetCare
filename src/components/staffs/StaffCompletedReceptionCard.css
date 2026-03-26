@@ -77,14 +77,17 @@
     padding: 14px 20px;
     margin: 16px 0;
     border: 1px solid #ebedef;
-    overflow-x: auto; /* Thêm scroll nếu vẫn bị tràn ở màn quá bé */
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
 }
 
 .pet-tag {
     display: flex;
     align-items: center;
     gap: 12px;
-    white-space: nowrap;
+    width: 100%;
+    flex-wrap: wrap;
 }
 
 .pet-name {

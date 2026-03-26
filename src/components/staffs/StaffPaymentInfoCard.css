@@ -23,6 +23,19 @@
     text-align: center;
 }
 
+.staff-payment-qr-box.has-image {
+    padding: 0;
+    overflow: hidden;
+    justify-content: center;
+}
+
+.staff-payment-qr-image {
+    width: 100%;
+    height: auto;
+    display: block;
+    object-fit: cover;
+}
+
 .qr-title {
     margin: 0;
     font-size: 19px;

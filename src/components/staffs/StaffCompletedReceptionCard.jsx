@@ -11,8 +11,7 @@ const StaffCompletedReceptionCard = ({
     pets = [
         { name: "Kuro", breed: "Chó Poodle", gender: "male", age: "3 Tuổi", weight: "4.5kg" }
     ],
-    totalAmount = "2.650.000đ",
-    subAmount = "2.650.000đ"
+    totalAmount = "2.650.000đ"
 }) => {
     return (
         <div className="completed-reception-card">
@@ -61,7 +60,6 @@ const StaffCompletedReceptionCard = ({
             <div className="card-footer">
                 <div className="amount-group">
                     <span className="total-amount">{totalAmount}</span>
-                    <span className="sub-amount">/{subAmount}</span>
                 </div>
             </div>
         </div>

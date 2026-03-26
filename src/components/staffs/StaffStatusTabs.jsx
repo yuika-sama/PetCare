@@ -2,10 +2,9 @@ import React, { useState } from 'react';
 import './StaffStatusTabs.css';
 
 const defaultTabs = [
-    { key: 'cho', label: 'Chờ tiếp đón', count: 3 },
     { key: 'da', label: 'Đã tiếp đón', count: 10 },
-    { key: 'huy', label: 'Đã hủy', count: 16 },
-    { key: 'hoanthanh', label: 'Hoàn thành', count: 16 },
+    { key: 'cho', label: 'Chờ thanh toán', count: 3 },
+    { key: 'hoanthanh', label: 'Đã hoàn thành', count: 16 },
     { key: 'all', label: 'Tất cả', count: 16 },
 ];
 

@@ -4,7 +4,7 @@ import { Phone, PawPrint, Cake, Weight, ShieldCheck } from 'lucide-react';
 import { Button } from 'semantic-ui-react';
 
 const statusStyles = {
-    received: { label: 'Đã tiếp đón', color: '#f0a020' },
+    received: { label: 'Chờ thanh toán', color: '#f0a020' },
     exam: { label: 'Đang khám', color: '#16a34a' },
     done: { label: 'Hoàn thành', color: '#2563eb' },
     waiting: { label: 'Đang chờ', color: '#64748b' }
@@ -17,7 +17,6 @@ const StaffReceptionCard = ({
     createdAt,
     status = 'received',
     pets,
-    paid,
     total,
     onPay
 }) => {
@@ -68,8 +67,7 @@ const StaffReceptionCard = ({
 
             <div className="staff-card-footer">
                 <div className="staff-card-amounts">
-                    <div className="paid">{paid}</div>
-                    <div className="total">/{total}</div>
+                    <div className="total-amount">{total}</div>
                 </div>
                 <Button
                     className="staff-pay-btn"

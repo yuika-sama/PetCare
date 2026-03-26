@@ -25,7 +25,7 @@ const StaffPaymentModal = ({ open, onClose, onConfirm, remainAmount = '750.000đ
                     <strong>{remainAmount}</strong>
                 </div>
 
-                <div className="staff-modal-radio-group action-type-group">
+                {/* <div className="staff-modal-radio-group action-type-group">
                     <label className="radio-label">
                         <input
                             type="radio"
@@ -56,7 +56,7 @@ const StaffPaymentModal = ({ open, onClose, onConfirm, remainAmount = '750.000đ
                         <span className="custom-radio" />
                         Hoàn tiền
                     </label>
-                </div>
+                </div> */}
 
                 <div className="staff-modal-field">
                     <label className="field-label">Số tiền <span>*</span></label>
@@ -96,7 +96,7 @@ const StaffPaymentModal = ({ open, onClose, onConfirm, remainAmount = '750.000đ
                         <span className="custom-radio" />
                         Thẻ
                     </label>
-                    <label className="radio-label">
+                    {/* <label className="radio-label">
                         <input
                             type="radio"
                             name="paymentMethod"
@@ -105,7 +105,7 @@ const StaffPaymentModal = ({ open, onClose, onConfirm, remainAmount = '750.000đ
                         />
                         <span className="custom-radio" />
                         QR
-                    </label>
+                    </label> */}
                     <label className="radio-label">
                         <input
                             type="radio"
@@ -114,7 +114,7 @@ const StaffPaymentModal = ({ open, onClose, onConfirm, remainAmount = '750.000đ
                             onChange={() => setPaymentMethod('tm')}
                         />
                         <span className="custom-radio" />
-                        TM
+                        Tiền mặt
                     </label>
                     <label className="radio-label">
                         <input
@@ -124,7 +124,7 @@ const StaffPaymentModal = ({ open, onClose, onConfirm, remainAmount = '750.000đ
                             onChange={() => setPaymentMethod('ck')}
                         />
                         <span className="custom-radio" />
-                        CK
+                        Chuyển khoản
                     </label>
                 </div>
 
