@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { ChevronLeft, MoreVertical, Phone, Mars, Cake, Weight, ChevronUp, ChevronDown, Plus, Upload, Minus, PencilLine } from 'lucide-react';
+import FeatureDevelopingModal from '../../components/common/FeatureDevelopingModal';
 import './RecordResult.css';
 
 const RecordResult = () => {
@@ -62,8 +63,9 @@ const RecordResult = () => {
         }
     ]);
     const [showDosageModal, setShowDosageModal] = useState(false);
+    const [showFeatureModal, setShowFeatureModal] = useState(false);
 
-    const updateQty = (id, delta) => {
+    const _updateQty = (id, delta) => {
         setMedsList(prevList => 
             prevList.map(med => {
                 if (med.id === id) {
@@ -79,11 +81,7 @@ const RecordResult = () => {
         { id: 1, label: 'Cận lâm sàng' },
         { id: 2, label: 'Điều trị nội trú' },
         { id: 3, label: 'Điều trị ngoại trú' },
-        { id: 4, label: 'Phẫu thuật - Thủ thuật' },
-        { id: 5, label: 'Grooming-Spa' },
-        { id: 6, label: 'Kết thúc cho về' },
-        { id: 7, label: 'Chuyển viện' },
-        { id: 8, label: 'Bỏ khám' },
+        { id: 4, label: 'Kết thúc cho về' },
     ];
 
     return (
@@ -124,9 +122,9 @@ const RecordResult = () => {
                         <span className="rr-pet-stat"><Weight size={14} color="#888" /> 4.5kg</span>
                     </div>
 
-                    <div className="rr-emergency-tag">
+                    {/* <div className="rr-emergency-tag">
                         Cấp cứu
-                    </div>
+                    </div> */}
                 </div>
 
                 {/* Exam Details Card */}
@@ -247,7 +245,7 @@ const RecordResult = () => {
             {/* Bottom Actions */}
             <div className="rr-bottom-actions">
                 <button className="rr-btn-cancel">Hủy bỏ</button>
-                <button className="rr-btn-confirm">Xác nhận</button>
+                <button className="rr-btn-confirm" onClick={() => setShowFeatureModal(true)}>Xác nhận</button>
             </div>
 
             {/* Dosage Modal Bottom Sheet */}
@@ -300,6 +298,8 @@ const RecordResult = () => {
                     </div>
                 </>
             )}
+
+            <FeatureDevelopingModal open={showFeatureModal} onClose={() => setShowFeatureModal(false)} />
         </div>
     );
 }

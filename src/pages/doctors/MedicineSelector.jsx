@@ -1,9 +1,18 @@
 import React, { useState } from 'react';
 import { ChevronLeft, Search, SlidersHorizontal, Minus, Plus, ChevronDown } from 'lucide-react';
+import MedicineCard from '../../components/doctor/MedicineCard';
 import './MedicineSelector.css';
 
 const MedicineSelector = () => {
     const [showDosageModal, setShowDosageModal] = useState(false);
+    const [activeDosageMedId, setActiveDosageMedId] = useState(null);
+    const [dosageDraft, setDosageDraft] = useState({
+        morning: 0,
+        noon: 0,
+        afternoon: 0,
+        evening: 0,
+        note: ''
+    });
 
     // Thêm trường qty (số lượng) và unit (đơn vị)
     const [medsList, setMedsList] = useState([
@@ -17,7 +26,15 @@ const MedicineSelector = () => {
             image: 'https://placehold.co/80x80/f4f4f5/a1a1aa?text=Med',
             selected: true, // Item đầu tiên được chọn mẫu
             qty: 0,
-            selectedUnit: 'Hộp'
+            selectedUnit: 'Hộp',
+            expanded: true,
+            dosage: {
+                morning: 1,
+                noon: 0,
+                afternoon: 0,
+                evening: 1,
+                note: 'Uống thuốc trước khi ăn'
+            }
         },
         {
             id: 2,
@@ -29,7 +46,15 @@ const MedicineSelector = () => {
             image: 'https://placehold.co/80x80/f4f4f5/a1a1aa?text=Med',
             selected: false,
             qty: 0,
-            selectedUnit: 'Hộp'
+            selectedUnit: 'Hộp',
+            expanded: false,
+            dosage: {
+                morning: 0,
+                noon: 0,
+                afternoon: 0,
+                evening: 0,
+                note: ''
+            }
         },
         {
             id: 3,
@@ -41,7 +66,15 @@ const MedicineSelector = () => {
             image: 'https://placehold.co/80x80/f4f4f5/a1a1aa?text=Med',
             selected: false,
             qty: 0,
-            selectedUnit: 'Hộp'
+            selectedUnit: 'Hộp',
+            expanded: false,
+            dosage: {
+                morning: 0,
+                noon: 0,
+                afternoon: 0,
+                evening: 0,
+                note: ''
+            }
         },
         {
             id: 4,
@@ -53,14 +86,28 @@ const MedicineSelector = () => {
             image: 'https://placehold.co/80x80/f4f4f5/a1a1aa?text=Med',
             selected: false,
             qty: 0,
-            selectedUnit: 'Hộp'
+            selectedUnit: 'Hộp',
+            expanded: false,
+            dosage: {
+                morning: 0,
+                noon: 0,
+                afternoon: 0,
+                evening: 0,
+                note: ''
+            }
         }
     ]);
 
     const toggleSelection = (id) => {
         setMedsList(prevList => 
             prevList.map(med => 
-                med.id === id ? { ...med, selected: !med.selected } : med
+                med.id === id
+                    ? {
+                        ...med,
+                        selected: !med.selected,
+                        expanded: med.selected ? false : med.expanded
+                    }
+                    : med
             )
         );
     };
@@ -75,6 +122,45 @@ const MedicineSelector = () => {
                 return med;
             })
         );
+    };
+
+    const toggleExpand = (id) => {
+        setMedsList((prevList) =>
+            prevList.map((med) => {
+                if (med.id === id) {
+                    return { ...med, expanded: !med.expanded, selected: true };
+                }
+                return { ...med, expanded: false };
+            })
+        );
+    };
+
+    const openDosageModal = (id) => {
+        const target = medsList.find((med) => med.id === id);
+        if (!target) return;
+        setActiveDosageMedId(id);
+        setDosageDraft({ ...target.dosage });
+        setShowDosageModal(true);
+    };
+
+    const updateDosageValue = (field, delta) => {
+        setDosageDraft((prev) => ({
+            ...prev,
+            [field]: Math.max(0, prev[field] + delta)
+        }));
+    };
+
+    const saveDosage = () => {
+        if (!activeDosageMedId) return;
+        setMedsList((prevList) =>
+            prevList.map((med) =>
+                med.id === activeDosageMedId
+                    ? { ...med, dosage: { ...dosageDraft }, expanded: true, selected: true }
+                    : med
+            )
+        );
+        setShowDosageModal(false);
+        setActiveDosageMedId(null);
     };
 
     return (
@@ -101,56 +187,14 @@ const MedicineSelector = () => {
             <div className="ms-content">
                 <div className="ms-meds-list">
                     {medsList.map(med => (
-                        <div key={med.id} className={`ms-med-card ${med.selected ? 'selected' : ''}`}>
-                            <div className="ms-med-main-row">
-                                <div className="ms-med-checkbox" onClick={() => toggleSelection(med.id)}>
-                                    <div className={`ms-checkbox-box ${med.selected ? 'checked' : ''}`}></div>
-                                </div>
-                                <img src={med.image} alt={med.name} className="ms-med-image-sm" />
-                                <div className="ms-med-info-box">
-                                    <h4 className="ms-med-name-sm">{med.name}</h4>
-                                    <p className="ms-med-desc-sm">{med.desc}</p>
-                                    <div className="ms-med-footer-sm">
-                                        <div className="ms-med-price-tag">
-                                            <span className="ms-price-num">{med.price}</span>
-                                            <span className="ms-price-unit"> {med.unit}</span>
-                                        </div>
-                                        <span className="ms-stock-txt">Tồn: <strong>{med.stock}</strong></span>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            {/* Expandable Action Area when selected */}
-                            {med.selected && (
-                                <div className="ms-med-expanded-area">
-                                    <div className="ms-qty-row">
-                                        <span className="ms-qty-label">Số lượng</span>
-                                        <div className="ms-qty-controls-wrapper">
-                                            <div className="ms-unit-select">
-                                                <span>{med.selectedUnit}</span>
-                                                <ChevronDown size={16} color="#444" />
-                                            </div>
-                                            <div className="ms-qty-stepper">
-                                                <button onClick={() => updateQty(med.id, -1)} className="ms-stepper-btn">
-                                                    <Minus size={16} color="#666" />
-                                                </button>
-                                                <span className="ms-qty-val">{med.qty}</span>
-                                                <button onClick={() => updateQty(med.id, 1)} className="ms-stepper-btn">
-                                                    <Plus size={16} color="#666" />
-                                                </button>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    
-                                    <div className="ms-dosage-row">
-                                        <span className="ms-qty-label">Liều dùng</span>
-                                        <button className="ms-btn-dosage" onClick={() => setShowDosageModal(true)}>
-                                            Thêm liều dùng
-                                        </button>
-                                    </div>
-                                </div>
-                            )}
-                        </div>
+                        <MedicineCard
+                            key={med.id}
+                            med={med}
+                            onToggleSelection={toggleSelection}
+                            onToggleExpand={toggleExpand}
+                            onUpdateQty={updateQty}
+                            onOpenDosageModal={openDosageModal}
+                        />
                     ))}
                 </div>
             </div>
@@ -158,7 +202,7 @@ const MedicineSelector = () => {
             {/* Bottom Actions */}
             <div className="ms-bottom-actions">
                 <button className="ms-btn-skip">Bỏ qua</button>
-                <button className="ms-btn-confirm" onClick={() => setShowDosageModal(true)}>Xác nhận</button>
+                <button className="ms-btn-confirm">Xác nhận</button>
             </div>
 
             {/* Dosage Modal Bottom Sheet */}
@@ -175,11 +219,33 @@ const MedicineSelector = () => {
                                     <span className="dosage-label">{time}</span>
                                     <div className="dosage-controls">
                                         <div className="dosage-stepper">
-                                            <button className="dosage-step-btn">
+                                            <button
+                                                className="dosage-step-btn"
+                                                type="button"
+                                                onClick={() => updateDosageValue(
+                                                    idx === 0 ? 'morning' : idx === 1 ? 'noon' : idx === 2 ? 'afternoon' : 'evening',
+                                                    -1
+                                                )}
+                                            >
                                                 <Minus size={16} color="#666" />
                                             </button>
-                                            <span className="dosage-step-val">{idx % 2 === 0 ? 1 : 0}</span>
-                                            <button className="dosage-step-btn">
+                                            <span className="dosage-step-val">
+                                                {idx === 0
+                                                    ? dosageDraft.morning
+                                                    : idx === 1
+                                                        ? dosageDraft.noon
+                                                        : idx === 2
+                                                            ? dosageDraft.afternoon
+                                                            : dosageDraft.evening}
+                                            </span>
+                                            <button
+                                                className="dosage-step-btn"
+                                                type="button"
+                                                onClick={() => updateDosageValue(
+                                                    idx === 0 ? 'morning' : idx === 1 ? 'noon' : idx === 2 ? 'afternoon' : 'evening',
+                                                    1
+                                                )}
+                                            >
                                                 <Plus size={16} color="#666" />
                                             </button>
                                         </div>
@@ -196,7 +262,8 @@ const MedicineSelector = () => {
                                 <div className="dosage-textarea-box">
                                     <textarea 
                                         className="dosage-textarea" 
-                                        defaultValue="Uống thuốc trước khi ăn"
+                                        value={dosageDraft.note}
+                                        onChange={(event) => setDosageDraft((prev) => ({ ...prev, note: event.target.value }))}
                                     ></textarea>
                                     <span className="dosage-char-count">2000</span>
                                 </div>
@@ -204,7 +271,7 @@ const MedicineSelector = () => {
                         </div>
 
                         <div className="dosage-bottom-action">
-                            <button className="dosage-btn-confirm-final" onClick={() => setShowDosageModal(false)}>
+                            <button className="dosage-btn-confirm-final" onClick={saveDosage}>
                                 Xác nhận
                             </button>
                         </div>

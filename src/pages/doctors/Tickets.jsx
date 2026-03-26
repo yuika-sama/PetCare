@@ -4,16 +4,14 @@ import TicketCard from '../../components/doctor/TicketCard';
 import TabStatus from '../../components/doctor/TabStatus';
 import './Tickets.css';
 
-import { Search, SlidersVertical, MoreVertical } from 'lucide-react';
+import { Search, Bell } from 'lucide-react';
 
 const SearchIcon = () => <Search size={20} color="#209D80" />;
-const FilterIcon = () => <SlidersVertical size={20} color="#209D80" />;
-const MoreVerticalIcon = () => <MoreVertical size={24} color="#1a1a1a" />;
+const BellIcon = () => <Bell size={22} color="#111827" strokeWidth={1.8} />;
 
 const Tickets = () => {
     const [activeTab, setActiveTab] = useState('pending');
     const [searchTerm, setSearchTerm] = useState('');
-    const [onlyAlert, setOnlyAlert] = useState(false);
 
     const dummyTickets = [
         {
@@ -115,11 +113,10 @@ const Tickets = () => {
 
             const text = `${ticket.customerName} ${ticket.pet.name} ${ticket.pet.breed} ${ticket.code}`.toLowerCase();
             const matchesSearch = !keyword || text.includes(keyword);
-            const matchesAlert = !onlyAlert || ticket.pet.hasAlert;
 
-            return matchesTab && matchesSearch && matchesAlert;
+            return matchesTab && matchesSearch;
         });
-    }, [activeTab, searchTerm, onlyAlert]);
+    }, [activeTab, searchTerm]);
 
     return (
         <DoctorLayout>
@@ -128,7 +125,7 @@ const Tickets = () => {
                     <div className="tickets-top-bar">
                         <h1 className="tickets-title">Phiếu khám</h1>
                         <button className="icon-btn">
-                            <MoreVerticalIcon />
+                            <BellIcon />
                         </button>
                     </div>
 
@@ -137,15 +134,12 @@ const Tickets = () => {
                             <span className="search-icon"><SearchIcon /></span>
                             <input
                                 type="text"
-                                placeholder="Tìm theo khách hàng, pet, mã phiếu"
+                                placeholder="Search"
                                 className="search-input"
                                 value={searchTerm}
                                 onChange={(e) => setSearchTerm(e.target.value)}
                             />
                         </div>
-                        <button className={`filter-btn ${onlyAlert ? 'active' : ''}`} onClick={() => setOnlyAlert((prev) => !prev)}>
-                            <FilterIcon />
-                        </button>
                     </div>
                 </div>
 

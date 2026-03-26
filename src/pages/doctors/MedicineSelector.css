@@ -101,6 +101,12 @@
     padding: 16px;
     box-shadow: 0 1px 3px rgba(0,0,0,0.05);
     border: 1px solid transparent;
+    cursor: pointer;
+}
+
+.ms-med-card:focus-visible {
+    outline: 2px solid #209D80;
+    outline-offset: 2px;
 }
 
 /* Selection state */
@@ -203,10 +209,10 @@
 .ms-med-expanded-area {
     margin-top: 16px;
     padding-top: 16px;
-    border-top: 1px dashed #eaeaea;
+    border-top: 1px solid #ebebeb;
     display: flex;
     flex-direction: column;
-    gap: 16px;
+    gap: 12px;
 }
 
 .ms-qty-row, .ms-dosage-row {
@@ -216,7 +222,7 @@
 }
 
 .ms-qty-label {
-    font-size: 14px;
+    font-size: 16px;
     font-weight: 600;
     color: #4a4a4a;
     margin-left: 32px; /* indent to align with text */
@@ -233,10 +239,11 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    width: 90px;
+    width: 110px;
+    height: 40px;
     padding: 8px 12px;
     border: 1px solid #e5e7eb;
-    border-radius: 8px;
+    border-radius: 12px;
     font-size: 14px;
     color: #444;
     cursor: pointer;
@@ -247,7 +254,7 @@
     display: flex;
     align-items: center;
     border: 1px solid #e5e7eb;
-    border-radius: 8px;
+    border-radius: 12px;
     overflow: hidden;
     background-color: #fff;
 }
@@ -255,7 +262,7 @@
 .ms-stepper-btn {
     background: none;
     border: none;
-    padding: 8px 12px;
+    padding: 10px 12px;
     cursor: pointer;
     display: flex;
     align-items: center;
@@ -267,7 +274,7 @@
 }
 
 .ms-qty-val {
-    width: 30px;
+    width: 36px;
     text-align: center;
     font-size: 14px;
     font-weight: 500;
@@ -275,15 +282,48 @@
 }
 
 .ms-btn-dosage {
-    padding: 10px 16px;
+    padding: 10px 14px;
     background-color: #fff;
     border: 1px solid #209D80;
     color: #209D80;
     font-size: 14px;
     font-weight: 600;
-    border-radius: 8px;
-    width: 200px; /* match controls width mostly */
+    border-radius: 10px;
+    width: fit-content;
     cursor: pointer;
+    margin-left: 32px;
+}
+
+.ms-btn-dosage-edit {
+    border: none;
+    background: transparent;
+    color: #209D80;
+    cursor: pointer;
+    margin-right: 4px;
+    display: flex;
+    align-items: center;
+}
+
+.ms-dosage-summary {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-left: 32px;
+    color: #444;
+    font-size: 16px;
+}
+
+.ms-dosage-summary-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 10px;
+}
+
+.ms-dosage-summary-row.note span:last-child {
+    text-align: right;
+    max-width: 64%;
+    color: #525252;
 }
 
 /* Bottom Actions */

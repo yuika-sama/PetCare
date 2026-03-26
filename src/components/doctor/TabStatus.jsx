@@ -2,10 +2,8 @@ import React, { useState } from 'react';
 import './TabStatus.css';
 
 const tabsConfig = [
-    { id: 'pending', label: 'Chờ thực hiện', count: 3 },
-    { id: 'waiting_result', label: 'Chờ kết luận', count: 10 },
     { id: 'in_progress', label: 'Đang thực hiện', count: 16 },
-    { id: 'completed', label: 'Hoàn thành', count: 14 },
+    { id: 'completed', label: 'Đã hoàn thành', count: 14 },
     { id: 'all', label: 'Tất cả', count: 43 }
 ];
 

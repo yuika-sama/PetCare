@@ -9,6 +9,8 @@ import DoctorTicketDetails from './pages/doctors/TicketDetails';
 import ServiceOrder from './pages/doctors/ServiceOrder';
 import RecordResult from './pages/doctors/RecordResult';
 import MedicineSelector from './pages/doctors/MedicineSelector';
+import ClinicalServices from './pages/doctors/ClinicalServices';
+import ResultSummary from './pages/doctors/ResultSummary';
 import Notifications from './pages/doctors/Notifications';
 import TodayOrders from './pages/receptionists/TodayOrders';
 import NewReception from './pages/receptionists/NewReception';
@@ -41,6 +43,8 @@ function App() {
           <Route path="/doctors/service-order/:id" element={<ServiceOrder />} />
           <Route path="/doctors/record-result/:id" element={<RecordResult />} />
           <Route path="/doctors/medicine-selector" element={<MedicineSelector />} />
+          <Route path="/doctors/clinical-services" element={<ClinicalServices />} />
+          <Route path="/doctors/result-summary" element={<ResultSummary />} />
           <Route path="/doctors/notifications" element={<Notifications />} />
           <Route path="/doctors/patient-history" element={<DoctorPatientHistory />} />
           <Route path="/doctors/treatment-plans" element={<DoctorTreatmentPlans />} />

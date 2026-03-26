@@ -1,13 +1,19 @@
 import React, { useState } from 'react';
-import { ChevronLeft, MoreVertical, Phone, Eye, Mars, Cake, Weight } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { ChevronLeft, MoreVertical, Phone, Eye, Mars, Cake, Weight, Plus } from 'lucide-react';
 import ServiceAccordion from '../../components/doctor/ServiceAccordion';
 import TreatmentHistoryTimeline from '../../components/doctor/TreatmentHistoryTimeline';
+import FeatureDevelopingModal from '../../components/common/FeatureDevelopingModal';
 import './ServiceOrder.css';
 
 const ServiceOrder = () => {
+    const navigate = useNavigate();
     const [activeTab, setActiveTab] = useState('Dịch vụ');
+    const [selectedConclusion, setSelectedConclusion] = useState('');
+    const [showFinishModal, setShowFinishModal] = useState(false);
 
-    const tabs = ['Dịch vụ', 'Lịch sử điều trị'];
+    const tabs = ['Dịch vụ', 'Kết luận phiếu khám', 'Lịch sử điều trị'];
+    const conclusionOptions = ['Cận lâm sàng', 'Điều trị nội trú', 'Điều trị ngoại trú', 'Kết thúc cho về'];
 
     return (
         <div className="service-order-page">
@@ -65,7 +71,8 @@ const ServiceOrder = () => {
                 {/* Accordions / Sections */}
                 <div className="so-sections">
                     {activeTab === 'Dịch vụ' && (
-                        <ServiceAccordion title="KHÁM BỆNH" defaultExpanded>
+                        <>
+                            <ServiceAccordion title="KHÁM BỆNH" defaultExpanded>
                                 <div className="so-service-item">
                                     <div className="so-service-row">
                                         <span className="so-service-name">Khám lâm sàng</span>
@@ -80,18 +87,73 @@ const ServiceOrder = () => {
                                         <span className="so-exec-name">Nguyễn Văn An</span>
                                     </div>
                                 </div>
-                        </ServiceAccordion>
+                            </ServiceAccordion>
+
+                            <button
+                                className="so-add-service-card"
+                                type="button"
+                                aria-label="Thêm dịch vụ"
+                                onClick={() => navigate('/doctors/clinical-services')}
+                            >
+                                <span className="so-add-service-icon"><Plus size={40} strokeWidth={1.6} /></span>
+                            </button>
+                        </>
                     )}
 
                     {activeTab === 'Lịch sử điều trị' && <TreatmentHistoryTimeline />}
+
+                    {activeTab === 'Kết luận phiếu khám' && (
+                        <div className="so-conclusion-wrap">
+                            <div className="so-result-summary-card">
+                                <span className="so-result-summary-label">Tổng hợp kết quả</span>
+                                <button className="so-result-summary-btn" type="button" onClick={() => navigate('/doctors/result-summary')}>
+                                    <span>Kết quả</span>
+                                    <Eye size={18} />
+                                </button>
+                            </div>
+
+                            <div className="so-conclusion-block">
+                                <h3 className="so-conclusion-title">Kết luận</h3>
+                                <div className="so-conclusion-box">
+                                    <p>Ho có đờm, khó khè. Vòm họng sung tấy</p>
+                                    <span className="so-conclusion-count">2000</span>
+                                </div>
+                            </div>
+
+                            <div className="so-conclusion-block">
+                                <h3 className="so-conclusion-title">Lựa chọn <span>*</span></h3>
+                                <div className="so-conclusion-options">
+                                    {conclusionOptions.map((option) => (
+                                        <button
+                                            key={option}
+                                            type="button"
+                                            className={`so-option-item ${selectedConclusion === option ? 'active' : ''}`}
+                                            onClick={() => setSelectedConclusion(option)}
+                                        >
+                                            <span className="so-option-dot" />
+                                            <span>{option}</span>
+                                        </button>
+                                    ))}
+                                </div>
+                            </div>
+                        </div>
+                    )}
                 </div>
             </div>
 
             {/* Bottom Actions */}
-            <div className="so-bottom-actions">
-                <button className="so-btn-cancel">Hủy bỏ</button>
-                <button className="so-btn-execute">Thực hiện</button>
-            </div>
+            {activeTab === 'Kết luận phiếu khám' ? (
+                <div className="so-bottom-actions so-bottom-actions-single">
+                    <button className="so-btn-finish" onClick={() => setShowFinishModal(true)}>Kết thúc</button>
+                </div>
+            ) : (
+                <div className="so-bottom-actions">
+                    <button className="so-btn-cancel">Hủy bỏ</button>
+                    <button className="so-btn-execute">Thực hiện</button>
+                </div>
+            )}
+
+            <FeatureDevelopingModal open={showFinishModal} onClose={() => setShowFinishModal(false)} />
         </div>
     );
 }

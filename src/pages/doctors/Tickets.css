@@ -8,19 +8,19 @@
 
 .tickets-header-area {
     background-color: #ffffff;
-    padding: 16px 16px 12px 16px;
-    border-bottom: 2px solid #ecf8f5;
+    padding: 14px 8px 16px 8px;
+    border-bottom: 1px solid #eceff3;
 }
 
 .tickets-top-bar {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 16px;
+    margin-bottom: 14px;
 }
 
 .tickets-title {
-    font-size: 24px;
+    font-size: 32px;
     font-weight: 700;
     color: #1a1a1a;
     margin: 0;
@@ -39,16 +39,17 @@
 .tickets-search-filter {
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 0;
 }
 
 .search-box {
     flex: 1;
     display: flex;
     align-items: center;
-    border: 1px solid #e5e7eb;
-    border-radius: 20px;
-    padding: 8px 16px;
+    border: 1px solid #d7dce2;
+    border-radius: 14px;
+    height: 44px;
+    padding: 0 14px;
     background-color: #ffffff;
     transition: border-color 0.2s;
 }
@@ -60,7 +61,7 @@
 .search-icon {
     display: flex;
     align-items: center;
-    margin-right: 8px;
+    margin-right: 6px;
 }
 
 .search-input {
@@ -74,30 +75,7 @@
 }
 
 .search-input::placeholder {
-    color: #9ca3af;
-}
-
-.filter-btn {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 44px;
-    height: 44px;
-    border-radius: 12px;
-    border: 1px solid #e5e7eb;
-    background-color: #ffffff;
-    cursor: pointer;
-    transition: border-color 0.2s;
-}
-
-.filter-btn:active {
-    background-color: #f9fafb;
-    border-color: #209D80;
-}
-
-.filter-btn.active {
-    background-color: #eaf6f4;
-    border-color: #209d80;
+    color: #c2c8d0;
 }
 
 .tickets-content-area {
