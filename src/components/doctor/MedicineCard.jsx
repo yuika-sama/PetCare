@@ -1,5 +1,6 @@
 import React from 'react';
 import { Minus, Plus, ChevronDown, PencilLine } from 'lucide-react';
+import { Divider} from "semantic-ui-react"
 
 const MedicineCard = ({
     med,
@@ -72,6 +73,7 @@ const MedicineCard = ({
                             </div>
                         </div>
                     </div>
+
 
                     <div className="ms-dosage-row">
                         <span className="ms-qty-label">Liều dùng</span>

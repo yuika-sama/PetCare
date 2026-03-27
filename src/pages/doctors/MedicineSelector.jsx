@@ -169,7 +169,7 @@ const MedicineSelector = () => {
             <header className="ms-header">
                 <button className="ms-btn-icon"><ChevronLeft size={24} color="#1a1a1a" /></button>
                 <h1 className="ms-title">Thuốc & Vật tư đi kèm</h1>
-                <div style={{ width: 32 }}></div> {/* placeholder to balance the flex space */}
+                <div style={{ width: 32 }}></div>
             </header>
 
             {/* Search Bar */}
@@ -178,9 +178,9 @@ const MedicineSelector = () => {
                     <Search size={20} color="#209D80" className="ms-search-icon" />
                     <input type="text" placeholder="Search" className="ms-search-input" />
                 </div>
-                <button className="ms-filter-btn">
+                {/* <button className="ms-filter-btn">
                     <SlidersHorizontal size={20} color="#209D80" />
-                </button>
+                </button> */}
             </div>
 
             {/* Meds List */}

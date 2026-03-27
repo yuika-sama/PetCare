@@ -11,7 +11,7 @@
 .ms-header {
     display: flex;
     align-items: center;
-    justify-content: space-between;
+    justify-content: flex-start;
     padding: 16px;
     background-color: #fff;
 }
@@ -27,7 +27,8 @@
 }
 
 .ms-title {
-    font-size: 18px;
+    font-family: "Roboto", sans-serif;
+    font-size: 20px;
     font-weight: 600;
     margin: 0;
 }
@@ -165,13 +166,15 @@
 }
 
 .ms-med-name-sm {
-    font-size: 15px;
-    font-weight: 700;
+    font-family: "Roboto", sans-serif !important;
+    font-size: 14px;
+    font-weight: 600;
     color: #3f3f46;
     margin: 0 0 4px 0;
 }
 
 .ms-med-desc-sm {
+    font-family: "Roboto", sans-serif !important;
     font-size: 13px;
     color: #888;
     margin: 0 0 10px 0;
@@ -219,6 +222,11 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
+}
+
+.ms-qty-row{
+    border-bottom: 1px solid #ebebeb;
+    padding-bottom: 16px;
 }
 
 .ms-qty-label {
@@ -402,11 +410,12 @@
 }
 
 .dosage-modal-title {
+    font-family: "Roboto", sans-serif !important;
     text-align: center;
-    font-size: 16px;
+    font-size: 18px;
     font-weight: 700;
     color: #1a1a1a;
-    margin: 0 0 16px 0;
+    margin: 8px 0 16px 0;
 }
 
 .dosage-main-area {
