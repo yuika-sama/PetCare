@@ -1,6 +1,6 @@
 /* TicketDetails.css */
 .ticket-details-page {
-    font-family: "Roboto", Helvetica, Arial, sans-serif;
+    font-family: "Roboto", sans-serif !important;
     background-color: #f7fdfb;
     /* Light teal tint */
     min-height: 100vh;
@@ -19,7 +19,6 @@
     padding: 16px 20px;
     background-color: #ffffff;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-    /* very subtle shadow or border */
     z-index: 10;
 }
 
@@ -36,8 +35,8 @@
 }
 
 .details-title {
-    font-size: 20px;
-    font-weight: 700;
+    font-size: 24px;
+    font-weight: 600;
     color: #1a1a1a;
     margin: 0;
     flex: 1;
@@ -69,8 +68,9 @@
 }
 
 .customer-name-lg {
+    font-family: "Roboto", sans-serif !important;
     font-size: 16px;
-    font-weight: 700;
+    font-weight: 600;
     color: #1a1a1a;
     margin: 0 0 6px 0;
 }
@@ -114,12 +114,13 @@
 }
 
 .alert-box-title {
+    font-family: "Roboto", sans-serif !important;
     display: flex;
     align-items: center;
     gap: 6px;
     color: #d97706;
     /* Dark orange */
-    font-weight: 700;
+    font-weight: 600;
     font-size: 13px;
     margin-bottom: 6px;
 }
@@ -128,7 +129,6 @@
     margin: 0;
     font-size: 13px;
     color: #d97706;
-    /* Dark orange */
     line-height: 1.5;
 }
 
@@ -256,13 +256,15 @@
 }
 
 .note-modal-title {
+    font-family: "Roboto", sans-serif !important;
     font-size: 18px;
-    font-weight: 700;
+    font-weight: 600;
     color: #2D205A;
     margin: 0 0 16px 0;
 }
 
 .note-modal-text-box {
+    font-family: "Roboto", sans-serif !important;
     background-color: #FFF6EB;
     border-radius: 8px;
     padding: 16px;
@@ -270,10 +272,10 @@
     box-sizing: border-box;
     text-align: center;
     color: #C07F00;
-    font-size: 14px;
+    font-size: 13px;
     line-height: 1.5;
     margin-bottom: 24px;
-    font-weight: 500;
+    font-weight: 400;
 }
 
 .note-modal-btn {

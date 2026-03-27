@@ -165,12 +165,12 @@ const TreatmentHistoryTimeline = () => {
                                 </div>
 
                                 <div className="th-doctors">
-                                    <div className="th-row"><span>Bac si chinh</span><strong>{block.doctors.main}</strong></div>
-                                    <div className="th-row"><span>Bac si phu trach</span><strong>{block.doctors.support}</strong></div>
+                                    <div className="th-row"><span>Bác sĩ chính</span><strong>{block.doctors.main}</strong></div>
+                                    <div className="th-row"><span>Bác sĩ phụ trách</span><strong>{block.doctors.support}</strong></div>
                                 </div>
 
                                 <button className="th-collapse-btn" type="button" onClick={() => toggleExpand(block.id)}>
-                                    <span>{block.detailsLabel}</span>
+                                    <span className="th-details-label">{block.detailsLabel}</span>
                                     {expandedIds.has(block.id) ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
                                 </button>
 

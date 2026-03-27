@@ -1,4 +1,5 @@
 .service-order-page {
+    font-family: "Roboto", sans-serif !important;
     display: flex;
     flex-direction: column;
     height: 100vh;
@@ -10,7 +11,7 @@
 .so-header {
     display: flex;
     align-items: center;
-    justify-content: space-between;
+    justify-content: flex-start;
     padding: 16px;
     background-color: #fff;
 }
@@ -26,6 +27,7 @@
 }
 
 .so-title {
+    font-family: "Roboto", sans-serif !important;
     font-size: 18px;
     font-weight: 600;
     margin: 0;
@@ -222,17 +224,18 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
+    margin-bottom: 4px;
 }
 
 .so-service-name {
-    font-size: 14px;
+    font-size: 13px;
     font-weight: 600;
-    color: #444;
+    color: #888;
 }
 
 .so-service-status {
-    font-size: 12px;
-    font-weight: 500;
+    font-size: 13px;
+    font-weight: 400;
 }
 
 .so-service-status.pending {
@@ -297,12 +300,13 @@
     display: flex;
     flex-direction: column;
     gap: 14px;
+    background-color: #ffffff;
 }
 
 .so-result-summary-card {
-    border: 1px solid #d9dfdc;
+    border: 1px solid #E2E2E2;
     border-radius: 14px;
-    background: #fff;
+    background: #ffffff;
     padding: 12px;
     display: flex;
     align-items: center;
@@ -311,7 +315,7 @@
 }
 
 .so-result-summary-label {
-    font-size: 18px;
+    font-size: 16px;
     color: #2f3533;
     font-weight: 700;
 }
@@ -321,7 +325,7 @@
     height: 38px;
     border-radius: 999px;
     border: 1px solid #22a187;
-    background: #e9f5f1;
+    background: #F5FBFA;
     color: #15957a;
     font-size: 16px;
     font-weight: 700;
@@ -338,6 +342,7 @@
 }
 
 .so-conclusion-title {
+    font-family: "Roboto", sans-serif !important;
     margin: 0;
     font-size: 18px;
     color: #2f3533;
@@ -357,11 +362,19 @@
     position: relative;
 }
 
-.so-conclusion-box p {
+.so-conclusion-input {
+    width: 100%;
+    min-height: 100px;
+    border: none;
+    outline: none;
+    resize: none;
+    background: transparent;
     margin: 0;
+    padding: 0;
     color: #2f3533;
     font-size: 16px;
     line-height: 1.4;
+    font-family: "Roboto", sans-serif;
 }
 
 .so-conclusion-count {
@@ -374,8 +387,8 @@
 
 .so-conclusion-options {
     border-radius: 14px;
-    border: 1px solid #dce3e0;
-    background: #edf3f1;
+    /* border: 1px solid #dce3e0; */
+    background: #F5FBFA !important;
     padding: 12px;
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));

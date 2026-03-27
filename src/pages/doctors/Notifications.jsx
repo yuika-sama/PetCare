@@ -42,13 +42,15 @@ const Notifications = () => {
     return (
         <DoctorLayout>
             <div className="notifications-page">
-                <h1 className="notif-page-title">Thông báo</h1>
+                <header className="notif-page-header">
+                    <h1 className="notif-page-title">Thông báo</h1>
+                </header>
 
                 <div className="notif-list">
                     {notifications.map(notif => (
                         <div key={notif.id} className="notif-card">
                             <div className="notif-icon-wrapper">
-                                <Bell size={18} color="#fff" fill="#fff" />
+                                <Bell size={18} color="#24C7A9" fill="#24C7A9" />
                             </div>
                             <div className="notif-body">
                                 <div className="notif-header-row">

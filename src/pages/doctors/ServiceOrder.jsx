@@ -1,16 +1,37 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ChevronLeft, MoreVertical, Phone, Eye, Mars, Cake, Weight, Plus } from 'lucide-react';
+import { ChevronLeft, MoreVertical, Phone, Eye, Mars, Calendar, Weight, Plus, TriangleAlert } from 'lucide-react';
 import ServiceAccordion from '../../components/doctor/ServiceAccordion';
 import TreatmentHistoryTimeline from '../../components/doctor/TreatmentHistoryTimeline';
 import FeatureDevelopingModal from '../../components/common/FeatureDevelopingModal';
 import './ServiceOrder.css';
+import '../../components/doctor/TicketCard.css';
+import "@fontsource/roboto/400.css";
+import "@fontsource/roboto/500.css";
+import "@fontsource/roboto/600.css";
+import {Divider} from "semantic-ui-react";
+
+const AlertBadgeIcon = () => <TriangleAlert size={24} color="#ef4444" strokeWidth={2} />;
 
 const ServiceOrder = () => {
     const navigate = useNavigate();
     const [activeTab, setActiveTab] = useState('Dịch vụ');
     const [selectedConclusion, setSelectedConclusion] = useState('');
     const [showFinishModal, setShowFinishModal] = useState(false);
+    const MAX_CONCLUSION_LENGTH = 2000;
+    const [conclusionText, setConclusionText] = useState('Ho có đờm, khó khè. Vòm họng sung tấy');
+
+    // Two supported cases for pet info box:
+    // 1) hasAlert = true  -> show alert icon on the right
+    // 2) hasAlert = false -> no alert icon
+    const petInfo = {
+        name: 'Kuro',
+        breed: 'Chó Poodle',
+        gender: 'male',
+        age: '3 Tuổi',
+        weight: '4.5kg',
+        hasAlert: true
+    };
 
     const tabs = ['Dịch vụ', 'Kết luận phiếu khám', 'Lịch sử điều trị'];
     const conclusionOptions = ['Cận lâm sàng', 'Điều trị nội trú', 'Điều trị ngoại trú', 'Kết thúc cho về'];
@@ -21,7 +42,7 @@ const ServiceOrder = () => {
             <header className="so-header">
                 <button className="so-btn-icon"><ChevronLeft size={24} color="#1a1a1a" /></button>
                 <h1 className="so-title">Đơn dịch vụ</h1>
-                <button className="so-btn-icon"><MoreVertical size={24} color="#1a1a1a" /></button>
+                {/* <button className="so-btn-icon"><MoreVertical size={24} color="#1a1a1a" /></button> */}
             </header>
 
             <div className="so-content">
@@ -35,24 +56,48 @@ const ServiceOrder = () => {
                                 <span>0912345678</span>
                             </div>
                         </div>
-                        <div className="so-payment-info">
+                        {/* <div className="so-payment-info">
                             <span className="so-paid">0đ</span>
                             <span className="so-total">/1.000.000đ</span>
-                        </div>
+                        </div> */}
                     </div>
+
+                    <Divider/>
                     
                     <div className="so-created-info">
                         <span>Được tạo từ đơn tiếp đón lúc <span className="so-time">10:00 25/05</span></span>
                         <Eye size={16} className="so-icon-eye" />
                     </div>
 
-                    {/* Pet Info Inline */}
-                    <div className="so-pet-info-inline">
-                        <span className="so-pet-name">Kuro</span>
-                        <span className="so-pet-breed">Chó Poodle <Mars size={12} color="#3b82f6" style={{ display: 'inline', marginLeft: '2px' }} /></span>
-                        <span className="so-pet-stat"><Cake size={14} color="#888" /> 3 Tuổi</span>
-                        <span className="so-pet-stat"><Weight size={14} color="#888" /> 4.5kg</span>
-                    </div>
+                    {/* Pet Info Box - TicketCard design with 2 cases */}
+                    {petInfo.hasAlert ? (
+                        <div className="ticket-pet-info-box has-alert">
+                            <div className="ticket-pet-details">
+                                <span className="ticket-pet-name">{petInfo.name}</span>
+                                <span className="ticket-pet-breed">
+                                    {petInfo.breed}
+                                    {petInfo.gender === 'male' ? <Mars size={12} color="#3b82f6" style={{ display: 'inline', marginLeft: '4px' }} /> : null}
+                                </span>
+                                <span className="ticket-pet-stat"><Calendar size={14} color="#888" style={{ marginRight: '4px' }} /> {petInfo.age}</span>
+                                <span className="ticket-pet-stat"><Weight size={14} color="#888" style={{ marginRight: '4px' }} /> {petInfo.weight}</span>
+                            </div>
+                            <div className="ticket-pet-alert-icon">
+                                <AlertBadgeIcon />
+                            </div>
+                        </div>
+                    ) : (
+                        <div className="ticket-pet-info-box">
+                            <div className="ticket-pet-details">
+                                <span className="ticket-pet-name">{petInfo.name}</span>
+                                <span className="ticket-pet-breed">
+                                    {petInfo.breed}
+                                    {petInfo.gender === 'male' ? <Mars size={12} color="#3b82f6" style={{ display: 'inline', marginLeft: '4px' }} /> : null}
+                                </span>
+                                <span className="ticket-pet-stat"><Calendar size={14} color="#888" style={{ marginRight: '4px' }} /> {petInfo.age}</span>
+                                <span className="ticket-pet-stat"><Weight size={14} color="#888" style={{ marginRight: '4px' }} /> {petInfo.weight}</span>
+                            </div>
+                        </div>
+                    )}
                 </div>
 
                 {/* Tabs */}
@@ -115,8 +160,13 @@ const ServiceOrder = () => {
                             <div className="so-conclusion-block">
                                 <h3 className="so-conclusion-title">Kết luận</h3>
                                 <div className="so-conclusion-box">
-                                    <p>Ho có đờm, khó khè. Vòm họng sung tấy</p>
-                                    <span className="so-conclusion-count">2000</span>
+                                    <textarea
+                                        className="so-conclusion-input"
+                                        value={conclusionText}
+                                        onChange={(event) => setConclusionText(event.target.value.slice(0, MAX_CONCLUSION_LENGTH))}
+                                        maxLength={MAX_CONCLUSION_LENGTH}
+                                    />
+                                    <span className="so-conclusion-count">{MAX_CONCLUSION_LENGTH - conclusionText.length}</span>
                                 </div>
                             </div>
 

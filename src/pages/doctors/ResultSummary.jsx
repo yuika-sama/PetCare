@@ -2,6 +2,9 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ChevronLeft, ChevronUp } from 'lucide-react';
 import './ResultSummary.css';
+import "@fontsource/roboto/400.css";
+import "@fontsource/roboto/500.css";
+import "@fontsource/roboto/600.css";
 
 const detailSections = [
     {
@@ -79,7 +82,7 @@ const ResultSummary = () => {
                         {section.hasUploads && (
                             <>
                                 <div className="rs-block">
-                                    <h4>File và ảnh tải lên</h4>
+                                    <h4 className='rs-block-files-title'>File và ảnh tải lên</h4>
                                     <div className="rs-images">
                                         <div className="rs-image-card">
                                             <strong>Ảnh kết quả 1</strong>
@@ -98,7 +101,7 @@ const ResultSummary = () => {
                                 </div>
 
                                 <div className="rs-block">
-                                    <h4>Danh sách thuốc và vật tư thực tế sử dụng</h4>
+                                    <h4 className='rs-block-title'>Danh sách thuốc và vật tư thực tế sử dụng</h4>
                                     <div className="rs-med-list">
                                         {usedMedicine.map((item) => (
                                             <div className="rs-med-item" key={`${section.id}-${item.id}`}>

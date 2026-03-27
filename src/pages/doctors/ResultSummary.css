@@ -1,8 +1,8 @@
 .rs-page {
     min-height: 100vh;
-    background: #eff3f1;
+    background: #ffffff;
     color: #272a2c;
-    font-family: "Roboto", Helvetica, Arial, sans-serif;
+    font-family: "Roboto", sans-serif !important;
 }
 
 .rs-header {
@@ -18,7 +18,8 @@
 .rs-header h1 {
     margin: 0;
     font-size: 24px;
-    font-weight: 700;
+    font-family: "Roboto", sans-serif !important;
+    font-weight: 600;
 }
 
 .rs-icon-btn {
@@ -55,14 +56,16 @@
 
 .rs-card-title-row h3 {
     margin: 0;
-    font-size: 18px;
-    font-weight: 700;
+    font-size: 14px;
+    font-family: "Roboto", sans-serif !important;
+    font-weight: 600;
 }
 
 .rs-subtitle {
     margin: 2px 0 0;
     color: #7a8380;
-    font-size: 14px;
+    font-size: 12px;
+    font-family: "Roboto", sans-serif !important;
 }
 
 .rs-divider {
@@ -72,14 +75,24 @@
 
 .rs-block h4 {
     margin: 0;
-    font-size: 17px;
-    font-weight: 700;
+    font-size: 14px;
+    font-weight: 600;
     color: #4a5250;
+    padding-top: 24px;
+}
+
+.rs-block-files-title {
+    margin: 0;
+    font-size: 14px;
+    font-weight: 600;
+    color: #4a5250;
+    padding-top: 24px;
 }
 
 .rs-block p {
     margin: 4px 0 0;
-    font-size: 16px;
+    font-size: 12px;
+    font-family: "Roboto", sans-serif !important;
     color: #656f6b;
 }
 
@@ -130,6 +143,14 @@
     gap: 10px;
 }
 
+.rs-block-title {
+    margin: 0;
+    font-family: "Roboto", sans-serif !important;
+    font-size: 16px !important;
+    font-weight: 600;
+    color: #4a5250;
+}
+
 .rs-med-item:last-child {
     border-bottom: none;
 }
@@ -142,14 +163,17 @@
 }
 
 .rs-med-info strong {
-    font-size: 17px;
+    font-family: "Roboto", sans-serif !important;
+    font-size: 15px;
     color: #3a4340;
 }
 
 .rs-med-info p {
     margin: 2px 0 0;
     color: #7b8581;
-    font-size: 15px;
+    font-size: 13px;
+    padding-top: 4px;
+    font-family: "Roboto", sans-serif !important;
 }
 
 .rs-med-stats {
@@ -157,7 +181,7 @@
     display: flex;
     gap: 24px;
     color: #707a76;
-    font-size: 15px;
+    font-size: 13px;
 }
 
 .rs-med-stats b {

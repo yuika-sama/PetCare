@@ -1,19 +1,29 @@
 .notifications-page {
-    padding: 16px;
-    padding-bottom: 20px;
+    padding: 0 0 20px;
+    background: #f6f8f8;
+    min-height: 100%;
+}
+
+.notif-page-header {
+    background: #ffffff;
+    border-bottom: 1px solid #e6ecea;
+    padding: 22px 20px 26px;
+    margin-bottom: 16px;
 }
 
 .notif-page-title {
     font-size: 22px;
     font-weight: 700;
-    color: #1a1a1a;
-    margin: 0 0 20px 0;
+    color: #1f2937;
+    margin: 0;
 }
 
 .notif-list {
     display: flex;
     flex-direction: column;
     gap: 12px;
+    padding: 0 16px;
+    background-color: #F8FEFB;
 }
 
 .notif-card {
@@ -23,7 +33,10 @@
     padding: 16px;
     background-color: #fff;
     border-radius: 12px;
-    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+    border: 1px solid rgba(28, 155, 132, 0.18);
+    box-shadow:
+        0 1px 4px 0 rgba(28, 155, 132, 0.06),
+        0 2px 12px 0 rgba(28, 155, 132, 0.10);
 }
 
 .notif-icon-wrapper {
@@ -31,7 +44,7 @@
     height: 36px;
     min-width: 36px;
     border-radius: 50%;
-    background-color: #209D80;
+    background-color: #F4F4F4;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -75,5 +88,5 @@
 
 .notif-desc strong {
     color: #209D80;
-    font-weight: 600;
+    font-weight: 400;
 }

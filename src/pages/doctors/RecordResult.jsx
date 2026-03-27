@@ -90,7 +90,7 @@ const RecordResult = () => {
             <header className="rr-header">
                 <button className="rr-btn-icon"><ChevronLeft size={24} color="#1a1a1a" /></button>
                 <h1 className="rr-title">Ghi nhận kết quả</h1>
-                <button className="rr-btn-icon"><MoreVertical size={24} color="#1a1a1a" /></button>
+                {/* <button className="rr-btn-icon"><MoreVertical size={24} color="#1a1a1a" /></button> */}
             </header>
 
             <div className="rr-content">
@@ -104,15 +104,15 @@ const RecordResult = () => {
                                 <span>0912345678</span>
                             </div>
                         </div>
-                        <div className="rr-payment-info">
+                        {/* <div className="rr-payment-info">
                             <span className="rr-paid">0đ</span>
                             <span className="rr-total">/1.000.000đ</span>
-                        </div>
+                        </div> */}
                     </div>
                     
                     <div className="rr-ticket-type-row">
                         <span className="rr-ticket-type">Phiếu khám lâm sàng</span>
-                        <span className="rr-ticket-id">#2141441</span>
+                        {/* <span className="rr-ticket-id">#2141441</span> */}
                     </div>
 
                     <div className="rr-pet-info-inline">
@@ -140,10 +140,10 @@ const RecordResult = () => {
                         </div>
                     </div>
 
-                    <div className="rr-exam-info-row">
+                    {/* <div className="rr-exam-info-row">
                         <span className="rr-exam-label">Người chỉ định</span>
                         <span className="rr-exam-value">Nguyễn Văn An</span>
-                    </div>
+                    </div> */}
                     <div className="rr-exam-info-row">
                         <span className="rr-exam-label">Người thực hiện</span>
                         <span className="rr-exam-value">Bùi Huy Đức</span>

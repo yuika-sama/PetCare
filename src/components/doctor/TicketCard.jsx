@@ -28,8 +28,8 @@ const statusConfig = {
 const TicketCard = ({
     customerName,
     dateTime,
-    paidAmount,
-    totalAmount,
+    // paidAmount,
+    // totalAmount,
     pet,
     services
 }) => {
@@ -40,30 +40,30 @@ const TicketCard = ({
                     <h3 className="customer-name">{customerName}</h3>
                     <p className="datetime">{dateTime}</p>
                 </div>
-                <div className="ticket-info-right">
+                {/* <div className="ticket-info-right">
                     <span className="paid-amount">{paidAmount}</span>
                     <span className="total-amount">{totalAmount}</span>
-                </div>
+                </div> */}
             </div>
 
-            <div className={`pet-info-box ${pet.hasAlert ? 'has-alert' : ''}`}>
-                <div className="pet-details">
-                    <span className="pet-name">{pet.name}</span>
-                    <span className="pet-breed">
+            <div className={`ticket-pet-info-box ${pet.hasAlert ? 'has-alert' : ''}`}>
+                <span className="ticket-pet-details">
+                    <span className="ticket-pet-name">{pet.name}</span>
+                    <span className="ticket-pet-breed">
                         {pet.breed}
                         {pet.gender === 'male' ? <MaleIcon /> : <FemaleIcon />}
                     </span>
-                    <span className="pet-stat">
+                    <span className="ticket-pet-stat">
                         <AgeIcon /> {pet.age}
                     </span>
-                    <span className="pet-stat">
+                    <span className="ticket-pet-stat">
                         <WeightIcon /> {pet.weight}
                     </span>
-                </div>
+                </span>
                 {pet.hasAlert && (
-                    <div className="pet-alert-icon">
+                    <span className="ticket-pet-alert-icon">
                         <AlertIcon />
-                    </div>
+                    </span>
                 )}
             </div>
 

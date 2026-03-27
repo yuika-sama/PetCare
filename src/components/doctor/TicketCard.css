@@ -1,5 +1,6 @@
 /* TicketCard.css */
 .ticket-card {
+    font-family: "Roboto", sans-serif;
     background-color: #ffffff;
     border-radius: 16px;
     padding: 16px;
@@ -18,13 +19,13 @@
     font-size: 18px;
     font-weight: 700;
     color: #1a1a1a;
-    margin: 0 0 6px 0;
+    margin: 0 0 14px 0;
 }
 
 .datetime {
-    font-size: 14px;
+    font-size: 13px;
     color: #888;
-    margin: 0;
+    margin-top: 10px;
 }
 
 .ticket-info-right {
@@ -33,11 +34,10 @@
     flex-direction: column;
 }
 
-.paid-amount {
+/* .paid-amount {
     font-size: 18px;
     font-weight: 700;
     color: #ef4444;
-    /* Đỏ */
     margin-bottom: 2px;
 }
 
@@ -45,55 +45,61 @@
     font-size: 14px;
     font-weight: 600;
     color: #666;
-}
+} */
 
-.pet-info-box {
+.ticket-pet-info-box {
     display: flex;
     justify-content: space-between;
     align-items: center;
     border: 1px solid #f3f4f6;
-    border-radius: 12px;
+    border-radius: 10px;
     background-color: #f9fafb;
-    padding: 12px 14px;
+    padding: 12px;
     margin-bottom: 16px;
 }
 
-.pet-info-box.has-alert {
+.ticket-pet-info-box.has-alert {
     border-color: #fca5a5;
     background-color: #fef2f2;
 }
 
-.pet-details {
+.ticket-pet-details {
     display: flex;
     align-items: center;
-    flex-wrap: wrap;
-    gap: 8px;
-    font-size: 14px;
+    flex-wrap: nowrap;
+    gap: 10px;
+    flex: 1;
+    min-width: 0;
     color: #4b5563;
 }
 
-.pet-name {
+.ticket-pet-name {
     font-size: 16px;
     font-weight: 700;
     color: #1a1a1a;
     margin-right: 2px;
 }
 
-.pet-breed {
+.ticket-pet-breed {
+    font-size: 12px !important;
     display: flex;
     align-items: center;
+    white-space: nowrap;
 }
 
-.pet-stat {
+.ticket-pet-stat {
+    font-size: 12px;
     display: flex;
     align-items: center;
+    white-space: nowrap;
 }
 
-.pet-alert-icon {
+.ticket-pet-alert-icon {
     display: flex;
     align-items: center;
     justify-content: center;
-    padding-left: 8px;
+    margin-left: 10px;
+    flex-shrink: 0;
 }
 
 .services-list {
@@ -111,8 +117,10 @@
 
 .service-name {
     color: #4b5563;
+    font-size: 13px;
 }
 
 .service-status {
-    font-weight: 500;
+    font-size: 13px;
+    font-weight: 400;
 }

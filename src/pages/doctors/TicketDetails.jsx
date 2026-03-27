@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import './TicketDetails.css';
 import '../../components/doctor/TicketCard.css';
+import "@fontsource/roboto/600.css";
 
 import { ChevronLeft, MoreVertical, Phone, TriangleAlert, Cake, Weight, Mars } from 'lucide-react';
 
@@ -43,6 +44,18 @@ const NoteModal = ({ note, onClose }) => {
 const TicketDetails = ({ note = "Khách hàng khó tính, yêu cầu không gọi điện, pet hung dữ nên cần nhẹ nhàng khi thực hiện dịch vụ" }) => {
     const [showModal, setShowModal] = useState(false);
 
+    // Two supported pet-info cases:
+    // 1) with alert icon (hasAlert = true)
+    // 2) without alert icon (hasAlert = false)
+    const petInfo = {
+        name: 'Kuro',
+        breed: 'Chó Poodle',
+        gender: 'male',
+        age: '3 Tuổi',
+        weight: '4.5kg',
+        hasAlert: true
+    };
+
     const handleStartClick = () => {
         if (note) {
             setShowModal(true);
@@ -56,7 +69,7 @@ const TicketDetails = ({ note = "Khách hàng khó tính, yêu cầu không gọ
             <div className="details-header">
                 <button className="icon-btn-back"><BackIcon /></button>
                 <h1 className="details-title">Chi tiết phiếu khám</h1>
-                <button className="icon-btn-more"><MoreVerticalIcon /></button>
+                {/* <button className="icon-btn-more"><MoreVerticalIcon /></button> */}
             </div>
 
             {/* Content */}
@@ -72,10 +85,10 @@ const TicketDetails = ({ note = "Khách hàng khó tính, yêu cầu không gọ
                                 <span>0912345678</span>
                             </div>
                         </div>
-                        <div className="payment-info">
+                        {/* <div className="payment-info">
                             <span className="paid-val">0đ</span>
                             <span className="total-val">/1.000.000đ</span>
-                        </div>
+                        </div> */}
                     </div>
 
                     {/* Customer Alert */}
@@ -91,25 +104,43 @@ const TicketDetails = ({ note = "Khách hàng khó tính, yêu cầu không gọ
                         </div>
                     )}
 
-                    {/* Pet Info (Reusing styling pattern from TicketCard) */}
-                    <div className="pet-info-box has-alert">
-                        <div className="pet-details">
-                            <span className="pet-name">Kuro</span>
-                            <span className="pet-breed">
-                                Chó Poodle
-                                <MaleIcon />
-                            </span>
-                            <span className="pet-stat">
-                                <AgeIcon /> 3 Tuổi
-                            </span>
-                            <span className="pet-stat">
-                                <WeightIcon /> 4.5kg
-                            </span>
+                    {/* Pet Info */}
+                    {petInfo.hasAlert ? (
+                        <div className="ticket-pet-info-box has-alert">
+                            <div className="ticket-pet-details">
+                                <span className="ticket-pet-name">{petInfo.name}</span>
+                                <span className="ticket-pet-breed">
+                                    {petInfo.breed}
+                                    {petInfo.gender === 'male' ? <MaleIcon /> : null}
+                                </span>
+                                <span className="ticket-pet-stat">
+                                    <AgeIcon /> {petInfo.age}
+                                </span>
+                                <span className="ticket-pet-stat">
+                                    <WeightIcon /> {petInfo.weight}
+                                </span>
+                            </div>
+                            <div className="ticket-pet-alert-icon">
+                                <AlertBadgeIcon />
+                            </div>
                         </div>
-                        <div className="pet-alert-icon">
-                            <AlertBadgeIcon />
+                    ) : (
+                        <div className="ticket-pet-info-box">
+                            <div className="ticket-pet-details">
+                                <span className="ticket-pet-name">{petInfo.name}</span>
+                                <span className="ticket-pet-breed">
+                                    {petInfo.breed}
+                                    {petInfo.gender === 'male' ? <MaleIcon /> : null}
+                                </span>
+                                <span className="ticket-pet-stat">
+                                    <AgeIcon /> {petInfo.age}
+                                </span>
+                                <span className="ticket-pet-stat">
+                                    <WeightIcon /> {petInfo.weight}
+                                </span>
+                            </div>
                         </div>
-                    </div>
+                    )}
 
                     {/* Examination Info */}
                     <div className="exam-info-list">

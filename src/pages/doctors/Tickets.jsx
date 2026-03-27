@@ -3,17 +3,18 @@ import DoctorLayout from '../../layouts/DoctorLayout';
 import TicketCard from '../../components/doctor/TicketCard';
 import TabStatus from '../../components/doctor/TabStatus';
 import './Tickets.css';
+import "@fontsource/roboto/500.css";
 
 import { Search, Bell } from 'lucide-react';
 
 const SearchIcon = () => <Search size={20} color="#209D80" />;
-const BellIcon = () => <Bell size={22} color="#111827" strokeWidth={1.8} />;
+const BellIcon = () => <Bell size={24} color="#111827" />;
 
 const Tickets = () => {
     const [activeTab, setActiveTab] = useState('pending');
     const [searchTerm, setSearchTerm] = useState('');
 
-    const dummyTickets = [
+    const dummyTickets = useMemo(() => [
         {
             id: 1,
             code: 'PK2141441',
@@ -93,7 +94,7 @@ const Tickets = () => {
                 { name: 'Xét nghiệm máu', status: 'completed' }
             ]
         }
-    ];
+    ], []);
 
     const inferStatus = (services) => {
         if (services.length === 0) return 'pending';
@@ -116,7 +117,7 @@ const Tickets = () => {
 
             return matchesTab && matchesSearch;
         });
-    }, [activeTab, searchTerm]);
+    }, [activeTab, searchTerm, dummyTickets]);
 
     return (
         <DoctorLayout>
@@ -124,7 +125,7 @@ const Tickets = () => {
                 <div className="tickets-header-area">
                     <div className="tickets-top-bar">
                         <h1 className="tickets-title">Phiếu khám</h1>
-                        <button className="icon-btn">
+                        <button className="notification-btn" aria-label="Thông báo">
                             <BellIcon />
                         </button>
                     </div>
@@ -133,7 +134,7 @@ const Tickets = () => {
                         <span className="search-icon"><SearchIcon /></span>
                         <input
                             type="text"
-                            placeholder="Tìm kiếm..."
+                            placeholder="Search"
                             className="search-input"
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}

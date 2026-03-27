@@ -116,7 +116,7 @@
     display: inline-flex;
     align-items: center;
     gap: 6px;
-    background-color: #E6F4F1;
+    background-color: #E7FAF0;
     padding: 4px 10px;
     border-radius: 100px;
     margin-top: 12px;
@@ -132,8 +132,8 @@
 
 .status-text {
     font-size: 12px;
-    font-weight: 600;
-    color: #0D8977;
+    font-weight: 400;
+    color: #099A4A;
 }
 
 .divider {

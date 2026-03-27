@@ -76,7 +76,7 @@ const ClinicalServices = () => {
                                 <button
                                     className="cs-item-main"
                                     type="button"
-                                    onClick={() => toggleService(service.id)}
+                                    onClick={() => toggleService(service.id)}   
                                 >
                                     <span className={`cs-checkbox ${checked ? 'checked' : ''}`} />
                                     <span className="cs-name">{service.name}</span>
