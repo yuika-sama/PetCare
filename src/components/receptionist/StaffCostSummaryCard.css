@@ -7,40 +7,55 @@
 }
 
 .cost-card-title {
-    font-size: 18px;
+    font-family: "Roboto", sans-serif !important;
+    font-size: 20px;
     font-weight: 700;
     color: #1f2328;
     margin-bottom: 16px;
-    text-align: left;
+    text-align: center;
 }
 
 .pet-chip {
-    border: 1px solid #d7dddd;
-    border-radius: 14px;
-    padding: 10px 14px;
+    border: 1px solid #E2E2E2;
+    border-radius: 10px;
+    background-color: #f9fafb;
+    padding: 12px;
     display: flex;
-    flex-wrap: wrap;
     align-items: center;
-    gap: 8px 12px;
-    margin-bottom: 14px;
+    justify-content: space-between;
+    margin-bottom: 16px;
 }
 
-.pet-chip strong {
+.pet-chip-details {
+    display: flex;
+    align-items: center;
+    flex-wrap: nowrap;
+    gap: 10px;
+    flex: 1;
+    min-width: 0;
+    color: #4b5563;
+}
+
+.pet-chip-name {
     font-size: 16px;
-    color: #252a30;
+    font-weight: 700;
+    color: #1a1a1a;
+    margin-right: 2px;
 }
 
-.pet-chip span {
-    color: #69747c;
-    font-size: 14px;
+.pet-chip-breed {
+    font-size: 12px;
+    white-space: nowrap;
+    display: flex;
+    align-items: center;
 }
 
-.pet-chip .meta {
+.pet-chip-stat {
     display: inline-flex;
     align-items: center;
     gap: 4px;
-    color: #69747c;
-    font-size: 14px;
+    font-size: 12px;
+    white-space: nowrap;
 }
 
 .cost-header-row,
@@ -62,10 +77,16 @@
     margin-top: 2px;
     background: #f3f5f5;
     border-radius: 10px;
-    padding: 10px;
+    padding: 10px 10px 10px 10px;
     display: flex;
     align-items: center;
     justify-content: space-between;
+}
+
+.cost-total-row span {
+    font-family: "Roboto", sans-serif !important;
+    font-size: 16px;
+    font-weight: 500
 }
 
 .cost-total-row .left {
@@ -77,34 +98,43 @@
 }
 
 .cost-total-row strong {
-    font-size: 20px;
+    font-size: 16px;
     color: #474d53;
 }
 
 .cost-group {
-    border-bottom: 1px dashed #d9dfe2;
-    padding: 12px 0;
+    border-bottom: 1px dashed #d6dadd;
+    padding: 10px 0 2px;
 }
 
 .cost-group-header {
     display: flex;
     justify-content: space-between;
     gap: 12px;
-    margin-bottom: 8px;
+    margin-bottom: 6px;
+    align-items: flex-start;
+}
+
+.group-meta {
+    min-width: 0;
 }
 
 .group-title {
     display: inline-flex;
     align-items: center;
     gap: 6px;
-    font-size: 20px;
-    color: #494f56;
+    font-size: 14px;
+    color: #51575d;
+    font-weight: 500;
 }
 
-.cost-group-header small {
-    color: #7d878f;
-    font-size: 14px;
+.group-sub {
+    display: block;
+    color: #7f868d;
+    font-size: 12px;
     margin-left: 26px;
+    margin-top: 4px;
+    font-weight: 400;
 }
 
 .group-amounts {
@@ -113,36 +143,45 @@
 
 .group-amounts strong {
     display: block;
-    color: #535961;
-    font-size: 18px;
+    color: #50565c;
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 1;
 }
 
 .group-amounts small {
-    margin: 0;
+    display: block;
+    margin: 6px 0 0;
+    color: #777f87;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.fee-item {
+    border-top: 1px dashed #d6dadd;
+    padding: 12px 2px;
+}
+
+.fee-item-name {
+    display: block;
+    color: #565d63;
+    font-size: px;
+    line-height: 1.2;
+    font-weight: 600;
+    margin-bottom: 8px;
 }
 
 .fee-row {
-    padding: 10px 4px;
-    border-top: 1px dashed #e1e6e8;
-    color: #5e6670;
+    padding: 0;
+    border-top: none;
+    color: #5c646c;
     font-weight: 600;
+    font-size: 14px;
 }
 
-.fee-name-col {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-}
-
-.fee-name-col strong {
-    color: #4c535a;
-    font-size: 16px;
-    line-height: 1.2;
-}
-
-.fee-name-col span {
-    color: #6f7881;
-    font-size: 13px;
+.fee-unit {
+    color: #5d656d;
+    font-weight: 600;
 }
 
 .payment-summary {
@@ -150,10 +189,10 @@
 }
 
 .payment-summary h3 {
-    text-align: left;
+    text-align: center;
     margin: 0 0 10px;
-    font-size: 18px;
-    font-weight: 700;
+    font-size: 20px;
+    font-weight: 600;
     color: #1f2328;
 }
 
@@ -166,13 +205,9 @@
     font-size: 16px;
 }
 
-.payment-row strong {
-    font-weight: 600;
-}
-
 .payment-total {
-    margin-top: 10px;
-    padding-top: 10px;
+    margin-top: 32px;
+    padding-top: 32px;
     border-top: 1px solid #dfe5e7;
     display: flex;
     align-items: center;
@@ -201,7 +236,7 @@
     background: #f4f5f5;
     padding: 10px 12px;
     color: #596069;
-    font-size: 16px;
+    font-size: 14px;
     font-weight: 700;
 }
 

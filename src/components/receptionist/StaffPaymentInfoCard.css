@@ -134,6 +134,7 @@
 
 .info-group {
     margin-top: 16px;
+    margin-bottom: 16px;
     display: flex;
     flex-direction: column;
     gap: 4px;
@@ -155,6 +156,8 @@
     color: #707981;
     font-size: 18px;
     font-weight: 400;
+    /* text-align: left; */
+    margin-left: 0 !important;
 }
 
 /* Tablet Layout */

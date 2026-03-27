@@ -1,6 +1,6 @@
 import React from 'react';
 import './StaffCostSummaryCard.css';
-import { PawPrint, Cake, Weight, ChevronDown } from 'lucide-react';
+import { Mars, Calendar, Weight, ChevronDown } from 'lucide-react';
 
 const feeRows = [
     {
@@ -29,14 +29,24 @@ const feeRows = [
 const StaffCostSummaryCard = () => {
     return (
         <section className="staff-cost-card">
-            <h2 className="cost-card-title">Chi tiết hoá đơn</h2>
+            <h2 className="cost-card-title">Tổng hợp chi phí</h2>
 
             <div className="pet-chip">
-                <strong>Kuro</strong>
-                <span>Chó Poodle</span>
-                <span className="meta"><PawPrint size={14} /> 3 Tuổi</span>
-                <span className="meta"><Weight size={14} /> 4.5kg</span>
-                <span className="meta"><Cake size={14} /> </span>
+                <span className="pet-chip-details">
+                    <span className="pet-chip-name">Kuro</span>
+                    <span className="pet-chip-breed">
+                        Chó Poodle
+                        <Mars size={12} color="#3b82f6" style={{ marginLeft: '4px' }} />
+                    </span>
+                    <span className="pet-chip-stat">
+                        <Calendar size={14} color="#888" />
+                        3 Tuổi
+                    </span>
+                    <span className="pet-chip-stat">
+                        <Weight size={14} color="#888" />
+                        4.5kg
+                    </span>
+                </span>
             </div>
 
             <div className="cost-header-row">
@@ -56,66 +66,66 @@ const StaffCostSummaryCard = () => {
 
             <div className="cost-group">
                 <div className="cost-group-header">
-                    <div>
+                    <div className="group-meta">
                         <div className="group-title">
                             <ChevronDown size={20} />
                             <span>Phiếu khám</span>
                         </div>
-                        <small>Bảo hiểm bồi thường</small>
+                        <small className="group-sub">Bảo hiểm bồi thường</small>
                     </div>
                     <div className="group-amounts">
-                        <strong>2.650.000đ</strong>
+                        <strong>2.650.000VND</strong>
                         <small>200.000đ</small>
                     </div>
                 </div>
 
                 {feeRows.map((row) => (
-                    <div className="fee-row" key={row.name}>
-                        <div className="fee-name-col">
-                            <strong>{row.name}</strong>
-                            <span>{row.unit}</span>
+                    <div className="fee-item" key={row.name}>
+                        <strong className="fee-item-name">{row.name}</strong>
+                        <div className="fee-row">
+                            <span className="fee-unit">{row.unit}</span>
+                            <span>{row.price}</span>
+                            <span>{row.discount}</span>
+                            <span>{row.amount}</span>
                         </div>
-                        <span>{row.price}</span>
-                        <span>{row.discount}</span>
-                        <span>{row.amount}</span>
                     </div>
                 ))}
             </div>
 
             <div className="cost-group">
                 <div className="cost-group-header">
-                    <div>
+                    <div className="group-meta">
                         <div className="group-title">
                             <ChevronDown size={20} />
                             <span>Điều trị nội trú</span>
                         </div>
-                        <small>Bảo hiểm bồi thường</small>
+                        <small className="group-sub">Bảo hiểm bồi thường</small>
                     </div>
                     <div className="group-amounts">
-                        <strong>550.000đ</strong>
+                        <strong>550.000VND</strong>
                         <small>200.000đ</small>
                     </div>
                 </div>
 
                 {feeRows.map((row) => (
-                    <div className="fee-row" key={`${row.name}-internal`}>
-                        <div className="fee-name-col">
-                            <strong>{row.name}</strong>
-                            <span>{row.unit}</span>
+                    <div className="fee-item" key={`${row.name}-internal`}>
+                        <strong className="fee-item-name">{row.name}</strong>
+                        <div className="fee-row">
+                            <span className="fee-unit">{row.unit}</span>
+                            <span>{row.price}</span>
+                            <span>{row.discount}</span>
+                            <span>{row.amount}</span>
                         </div>
-                        <span>{row.price}</span>
-                        <span>{row.discount}</span>
-                        <span>{row.amount}</span>
                     </div>
                 ))}
             </div>
 
             <div className="payment-summary">
                 <h3>Thanh toán</h3>
-                <div className="payment-row"><span>Tổng thành tiền</span><strong>950.000đ</strong></div>
-                <div className="payment-row"><span>Chiết khấu</span><strong>50.000đ</strong></div>
-                <div className="payment-row"><span>Bảo hiểm bồi thường</span><strong>200.000đ</strong></div>
-                <div className="payment-total"><span>Tổng thanh toán</span><strong>750.000đ</strong></div>
+                <div className="payment-row"><span>Tổng thành tiền</span>950.000đ</div>
+                <div className="payment-row"><span>Chiết khấu</span>50.000đ</div>
+                <div className="payment-row"><span>Bảo hiểm bồi thường</span>200.000đ</div>
+                <div className="payment-total"><span>Tổng thanh toán</span>750.000đ</div>
             </div>
 
             <div className="payment-history">

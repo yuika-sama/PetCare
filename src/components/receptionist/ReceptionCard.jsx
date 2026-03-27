@@ -17,7 +17,7 @@ const ReceptionCard = ({ name, phone, avatar, onAdd }) => {
             <div className="reception-card-info">
                 <h3 className="reception-card-name">{name}</h3>
                 <div className="reception-card-phone">
-                    <Phone size={14} color="#209D80" />
+                    <Phone size={14} color="#fff" fill="#209D80"  />
                     <span>{phone}</span>
                 </div>
             </div>

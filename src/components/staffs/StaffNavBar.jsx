@@ -26,7 +26,7 @@ const StaffNavBar = () => {
 
         const mapPath = {
             today: '/staffs/receptions',
-            payment: '/staffs/receipt-list',
+            payment: '/staffs/payment',
             create: '/staffs/receptions',
             notifications: '/staffs/notifications',
             more: '/staffs/payment'

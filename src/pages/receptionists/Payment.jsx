@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './Payment.css';
-import StaffTopHeader from '../../components/staffs/StaffTopHeader';
-import StaffPaymentInfoCard from '../../components/staffs/StaffPaymentInfoCard';
-import StaffCostSummaryCard from '../../components/staffs/StaffCostSummaryCard';
-import StaffPaymentFooterBar from '../../components/staffs/StaffPaymentFooterBar';
-import StaffPaymentModal from '../../components/staffs/StaffPaymentModal';
+import StaffTopHeader from '../../components/receptionist/StaffTopHeader';
+import StaffPaymentInfoCard from '../../components/receptionist/StaffPaymentInfoCard';
+import StaffCostSummaryCard from '../../components/receptionist/StaffCostSummaryCard';
+import StaffPaymentFooterBar from '../../components/receptionist/StaffPaymentFooterBar';
+import StaffPaymentModal from '../../components/receptionist/StaffPaymentModal';
 
 const Payment = () => {
     const navigate = useNavigate();

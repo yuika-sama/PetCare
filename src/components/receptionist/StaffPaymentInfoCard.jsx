@@ -44,9 +44,9 @@ const canLoadImage = (url) =>
     });
 
 const StaffPaymentInfoCard = ({ 
-    orderId = "#25REC215663", 
+    // orderId = "#25REC215663", 
     time = "10:03 - 20/03/2026", 
-    status = "Hoàn thành",
+    // status = "Hoàn thành",
     customer = { 
         name: "Nguyễn Anh Đức", 
         phone: "0912345678" 
@@ -119,8 +119,8 @@ const StaffPaymentInfoCard = ({
 
             <div className="staff-payment-order-info">
                 <p className="created-time">{time}</p>
-                <span className="status-pill">{status}</span>
-                <h2 className="order-id-title">{orderId}</h2>
+                {/* <span className="status-pill">{status}</span> */}
+                {/* <h2 className="order-id-title">{orderId}</h2> */}
 
                 <div className="info-group">
                     <span className="group-label">Khách hàng</span>

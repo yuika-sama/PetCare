@@ -14,12 +14,8 @@ import ResultSummary from './pages/doctors/ResultSummary';
 import Notifications from './pages/doctors/Notifications';
 import TodayOrders from './pages/receptionists/TodayOrders';
 import NewReception from './pages/receptionists/NewReception';
-import ClinicalQueue from './pages/receptionists/ClinicalQueue';
-import StaffReceptionList from './pages/staffs/ReceptionList';
-import StaffNotifications from './pages/staffs/Notifications';
-import StaffPayment from './pages/staffs/Payment';
-import StaffReceiptList from './pages/staffs/ReceiptList';
-import StaffReceiptDetail from './pages/staffs/ReceiptDetail';
+import ReceptionistNotifications from './pages/receptionists/Notifications';
+import ReceptionistPayment from './pages/receptionists/Payment';
 import TechHome from './pages/techStaffs/Home';
 import TechRecordResult from './pages/techStaffs/RecordResult';
 import {RequireAuth, RequireRole} from './routes/routeGuard';
@@ -44,17 +40,11 @@ function App() {
           <Route path="/doctors/result-summary" element={<ResultSummary />} />
           <Route path="/doctors/notifications" element={<Notifications />} />
         </Route>
-        <Route element={<RequireRole allowedRoles={['RECEPTIONIST']} />}>
+        <Route element={<RequireRole allowedRoles={['RECEPTIONIST', 'STAFF']} />}>
           <Route path="/receptionists/today-orders" element={<TodayOrders />} />
           <Route path="/receptionists/new-reception" element={<NewReception />} />
-          <Route path="/receptionists/clinical-queue" element={<ClinicalQueue />} />
-        </Route>
-        <Route element={<RequireRole allowedRoles={['STAFF']} />}>
-          <Route path="/staffs/receptions" element={<StaffReceptionList />} />
-          <Route path="/staffs/notifications" element={<StaffNotifications />} />
-          <Route path="/staffs/payment" element={<StaffPayment />} />
-          <Route path="/staffs/receipt-list" element={<StaffReceiptList />} />
-          <Route path="/staffs/receipt-list/:id" element={<StaffReceiptDetail />} />
+          <Route path="/receptionists/notifications" element={<ReceptionistNotifications />} />
+          <Route path="/receptionists/payment" element={<ReceptionistPayment />} />
         </Route>
         <Route element={<RequireRole allowedRoles={['TECH']} />}>
           <Route path="/techs/home" element={<TechHome />} />

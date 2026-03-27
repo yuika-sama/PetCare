@@ -3,7 +3,7 @@ import './StaffPaymentModal.css';
 import { Button } from 'semantic-ui-react';
 
 const StaffPaymentModal = ({ open, onClose, onConfirm, remainAmount = '750.000đ' }) => {
-    const [actionType, setActionType] = useState('thu_tien'); // 'thu_tien', 'tam_ung', 'hoan_tien'
+    // const [actionType, setActionType] = useState('thu_tien'); // 'thu_tien', 'tam_ung', 'hoan_tien'
     const [amount, setAmount] = useState('750.000');
     const [note, setNote] = useState('Thanh toán tiền khám');
     const [paymentMethod, setPaymentMethod] = useState(''); // 'the', 'qr', 'tm', 'ck'
@@ -67,10 +67,10 @@ const StaffPaymentModal = ({ open, onClose, onConfirm, remainAmount = '750.000đ
                             onChange={(e) => setAmount(e.target.value)}
                         />
                         <div className="currency-selector">
-                            <span>đ</span>
-                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                            <span>VND</span>
+                            {/* <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                                 <polyline points="6 9 12 15 18 9" />
-                            </svg>
+                            </svg> */}
                         </div>
                     </div>
                 </div>

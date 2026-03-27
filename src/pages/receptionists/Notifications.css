@@ -1,0 +1,99 @@
+.rnotif-page {
+    padding: 0 0 20px;
+    background: #f6f8f8;
+    min-height: 100%;
+    font-family: "Roboto", Helvetica, Arial, sans-serif;
+}
+
+.rnotif-header {
+    background: #ffffff;
+    border-bottom: 1px solid #e6ecea;
+    padding: 22px 20px 26px;
+    margin-bottom: 16px;
+}
+
+.rnotif-title {
+    font-size: 22px;
+    font-weight: 700;
+    color: #1f2937;
+    margin: 0;
+}
+
+.rnotif-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 0 16px;
+    background-color: #f8fefb;
+}
+
+.rnotif-card {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 16px;
+    background-color: #fff;
+    border-radius: 12px;
+    border: 1px solid rgba(28, 155, 132, 0.18);
+    box-shadow: 0 1px 4px 0 rgba(28, 155, 132, 0.06),
+        0 2px 12px 0 rgba(28, 155, 132, 0.10);
+}
+
+.rnotif-icon-wrap {
+    width: 36px;
+    height: 36px;
+    min-width: 36px;
+    border-radius: 50%;
+    background-color: #f4f4f4;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 2px;
+}
+
+.rnotif-body {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.rnotif-head-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 8px;
+}
+
+.rnotif-card-title {
+    font-size: 14px;
+    font-weight: 700;
+    color: #1a1a1a;
+    margin: 0;
+    line-height: 1.3;
+}
+
+.rnotif-time {
+    font-size: 12px;
+    color: #a1a1aa;
+    white-space: nowrap;
+}
+
+.rnotif-desc {
+    font-size: 13px;
+    color: #666;
+    margin: 0;
+    line-height: 1.5;
+}
+
+.rnotif-desc strong {
+    color: #209d80;
+    font-weight: 400;
+}
+
+@media (max-width: 640px) {
+    .rnotif-header {
+        padding: 18px 16px 20px;
+        margin-bottom: 12px;
+    }
+}

@@ -1,5 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { Search, Bell, ChevronDown, ChevronUp, ChevronLeft, ChevronRight, UserRound, PlusCircle } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import ReceptionistLayout from '../../layouts/ReceptionistLayout';
 import ReceptionCard from '../../components/receptionist/ReceptionCard';
 import ReceivedCard from '../../components/receptionist/ReceivedCard';
@@ -14,123 +15,125 @@ const DAY_LABELS = ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
 const ORDER_STATUS = {
     RECEIVED: 'da_tiep_don',
     WAITING_PAYMENT: 'cho_thanh_toan',
-    PAID: 'da_thanh_toan'
+    PAID: 'da_thanh_toan',
+    ALL: 'tat_ca'
 };
 
 const initialOrders = [
-    {
-        id: 1,
-        customerName: 'Nguyễn Anh Đức',
-        phone: '0912345678',
-        ticketId: '2141441',
-        status: ORDER_STATUS.RECEIVED,
-        statusLabel: 'Đã tiếp đón',
-        createdAt: 'Tiếp đón lúc 10:03 - 20/03/2026',
-        date: 20,
-        species: 'cho',
-        hasAdvance: true,
-        pets: [{ name: 'Kuro', breed: 'Chó Poodle', gender: 'male', age: '3 Tuổi', weight: '4.5kg' }],
-        sourceOrder: '2141441',
-        paymentEnabled: true,
-        hideSource: false,
-        avatar: 'https://placehold.co/80x80/e0f2ef/209D80?text=NAD'
-    },
-    {
-        id: 2,
-        customerName: 'Lê Huyền Linh',
-        phone: '0816278274',
-        ticketId: '2141442',
-        status: ORDER_STATUS.RECEIVED,
-        statusLabel: 'Đã tiếp đón',
-        createdAt: 'Tiếp đón lúc 11:10 - 20/03/2026',
-        date: 20,
-        species: 'meo',
-        hasAdvance: false,
-        pets: [{ name: 'Mike', breed: 'Mèo Anh lông ngắn', gender: 'male', age: '2 Tuổi', weight: '2.5kg' }],
-        sourceOrder: null,
-        paymentEnabled: true,
-        hideSource: false,
-        avatar: 'https://placehold.co/80x80/e0f2ef/209D80?text=LHL'
-    },
-    {
-        id: 3,
-        customerName: 'Nguyễn Duy Ngọc',
-        phone: '0908264671',
-        ticketId: '2141551',
-        status: ORDER_STATUS.WAITING_PAYMENT,
-        statusLabel: 'Chờ thanh toán',
-        createdAt: 'Lập phiếu lúc 09:03 - 20/03/2026',
-        date: 20,
-        species: 'cho',
-        hasAdvance: true,
-        pets: [{ name: 'Milo', breed: 'Chó Corgi', gender: 'male', age: '4 Tuổi', weight: '7kg' }],
-        sourceOrder: null,
-        serviceSummary: '82 Hug × 16 Hug',
-        totalAmount: '251.000đ',
-        paymentEnabled: true,
-        hideSource: false,
-        avatar: 'https://placehold.co/80x80/e0f2ef/209D80?text=NDN'
-    },
-    {
-        id: 4,
-        customerName: 'Trần Minh Hạnh',
-        phone: '0902627274',
-        ticketId: '2141999',
-        status: ORDER_STATUS.WAITING_PAYMENT,
-        statusLabel: 'Chờ thanh toán',
-        createdAt: 'Lập phiếu lúc 08:50 - 20/03/2026',
-        date: 20,
-        species: 'khac',
-        hasAdvance: false,
-        pets: [{ name: 'Peach', breed: 'Thỏ Mini', gender: 'female', age: '1 Tuổi', weight: '1.1kg' }],
-        sourceOrder: null,
-        serviceSummary: '12 Hug × 04 Hug',
-        totalAmount: '179.000đ',
-        paymentEnabled: true,
-        hideSource: false,
-        avatar: 'https://placehold.co/80x80/e0f2ef/209D80?text=TMH'
-    },
-    {
-        id: 5,
-        customerName: 'Hà An Huy',
-        phone: '0977771234',
-        ticketId: '2141777',
-        status: ORDER_STATUS.PAID,
-        statusLabel: 'Đã thanh toán',
-        createdAt: 'Thanh toán lúc 07:45 - 20/03/2026',
-        date: 20,
-        species: 'cho',
-        hasAdvance: true,
-        pets: [{ name: 'Pika', breed: 'Chó Phốc sóc', gender: 'female', age: '5 Tuổi', weight: '2.3kg' }],
-        sourceOrder: '2141333',
-        serviceSummary: '64 Hug × 08 Hug',
-        totalAmount: '368.000đ',
-        paymentEnabled: false,
-        hideSource: false,
-        avatar: 'https://placehold.co/80x80/e0f2ef/209D80?text=HAH'
-    },
-    {
-        id: 6,
-        customerName: 'Phạm Ngọc Vy',
-        phone: '0933338899',
-        ticketId: '2141880',
-        status: ORDER_STATUS.PAID,
-        statusLabel: 'Đã thanh toán',
-        createdAt: 'Thanh toán lúc 13:25 - 20/03/2026',
-        date: 20,
-        species: 'meo',
-        hasAdvance: true,
-        pets: [{ name: 'Bông', breed: 'Mèo Ba Tư', gender: 'female', age: '3 Tuổi', weight: '3.2kg' }],
-        sourceOrder: null,
-        serviceSummary: '31 Hug × 06 Hug',
-        totalAmount: '205.000đ',
-        paymentEnabled: false,
-        hideSource: false,
-        avatar: 'https://placehold.co/80x80/e0f2ef/209D80?text=PNV'
-    }
+    // {
+    //     id: 1,
+    //     customerName: 'Nguyễn Anh Đức',
+    //     phone: '0912345678',
+    //     ticketId: '2141441',
+    //     status: ORDER_STATUS.RECEIVED,
+    //     statusLabel: 'Đã tiếp đón',
+    //     createdAt: 'Tiếp đón lúc 10:03 - 20/03/2026',
+    //     date: 20,
+    //     species: 'cho',
+    //     hasAdvance: true,
+    //     pets: [{ name: 'Kuro', breed: 'Chó Poodle', gender: 'male', age: '3 Tuổi', weight: '4.5kg' }],
+    //     sourceOrder: '2141441',
+    //     paymentEnabled: true,
+    //     hideSource: false,
+    //     avatar: 'https://placehold.co/80x80/e0f2ef/209D80?text=NAD'
+    // },
+    // {
+    //     id: 2,
+    //     customerName: 'Lê Huyền Linh',
+    //     phone: '0816278274',
+    //     ticketId: '2141442',
+    //     status: ORDER_STATUS.RECEIVED,
+    //     statusLabel: 'Đã tiếp đón',
+    //     createdAt: 'Tiếp đón lúc 11:10 - 20/03/2026',
+    //     date: 20,
+    //     species: 'meo',
+    //     hasAdvance: false,
+    //     pets: [{ name: 'Mike', breed: 'Mèo Anh lông ngắn', gender: 'male', age: '2 Tuổi', weight: '2.5kg' }],
+    //     sourceOrder: null,
+    //     paymentEnabled: true,
+    //     hideSource: false,
+    //     avatar: 'https://placehold.co/80x80/e0f2ef/209D80?text=LHL'
+    // },
+    // {
+    //     id: 3,
+    //     customerName: 'Nguyễn Duy Ngọc',
+    //     phone: '0908264671',
+    //     ticketId: '2141551',
+    //     status: ORDER_STATUS.WAITING_PAYMENT,
+    //     statusLabel: 'Chờ thanh toán',
+    //     createdAt: 'Lập phiếu lúc 09:03 - 20/03/2026',
+    //     date: 20,
+    //     species: 'cho',
+    //     hasAdvance: true,
+    //     pets: [{ name: 'Milo', breed: 'Chó Corgi', gender: 'male', age: '4 Tuổi', weight: '7kg' }],
+    //     sourceOrder: null,
+    //     serviceSummary: '82 Hug × 16 Hug',
+    //     totalAmount: '251.000đ',
+    //     paymentEnabled: true,
+    //     hideSource: false,
+    //     avatar: 'https://placehold.co/80x80/e0f2ef/209D80?text=NDN'
+    // },
+    // {
+    //     id: 4,
+    //     customerName: 'Trần Minh Hạnh',
+    //     phone: '0902627274',
+    //     ticketId: '2141999',
+    //     status: ORDER_STATUS.WAITING_PAYMENT,
+    //     statusLabel: 'Chờ thanh toán',
+    //     createdAt: 'Lập phiếu lúc 08:50 - 20/03/2026',
+    //     date: 20,
+    //     species: 'khac',
+    //     hasAdvance: false,
+    //     pets: [{ name: 'Peach', breed: 'Thỏ Mini', gender: 'female', age: '1 Tuổi', weight: '1.1kg' }],
+    //     sourceOrder: null,
+    //     serviceSummary: '12 Hug × 04 Hug',
+    //     totalAmount: '179.000đ',
+    //     paymentEnabled: true,
+    //     hideSource: false,
+    //     avatar: 'https://placehold.co/80x80/e0f2ef/209D80?text=TMH'
+    // },
+    // {
+    //     id: 5,
+    //     customerName: 'Hà An Huy',
+    //     phone: '0977771234',
+    //     ticketId: '2141777',
+    //     status: ORDER_STATUS.PAID,
+    //     statusLabel: 'Đã thanh toán',
+    //     createdAt: 'Thanh toán lúc 07:45 - 20/03/2026',
+    //     date: 20,
+    //     species: 'cho',
+    //     hasAdvance: true,
+    //     pets: [{ name: 'Pika', breed: 'Chó Phốc sóc', gender: 'female', age: '5 Tuổi', weight: '2.3kg' }],
+    //     sourceOrder: '2141333',
+    //     serviceSummary: '64 Hug × 08 Hug',
+    //     totalAmount: '368.000đ',
+    //     paymentEnabled: false,
+    //     hideSource: false,
+    //     avatar: 'https://placehold.co/80x80/e0f2ef/209D80?text=HAH'
+    // },
+    // {
+    //     id: 6,
+    //     customerName: 'Phạm Ngọc Vy',
+    //     phone: '0933338899',
+    //     ticketId: '2141880',
+    //     status: ORDER_STATUS.PAID,
+    //     statusLabel: 'Đã thanh toán',
+    //     createdAt: 'Thanh toán lúc 13:25 - 20/03/2026',
+    //     date: 20,
+    //     species: 'meo',
+    //     hasAdvance: true,
+    //     pets: [{ name: 'Bông', breed: 'Mèo Ba Tư', gender: 'female', age: '3 Tuổi', weight: '3.2kg' }],
+    //     sourceOrder: null,
+    //     serviceSummary: '31 Hug × 06 Hug',
+    //     totalAmount: '205.000đ',
+    //     paymentEnabled: false,
+    //     hideSource: false,
+    //     avatar: 'https://placehold.co/80x80/e0f2ef/209D80?text=PNV'
+    // }
 ];
 
 const TodayOrders = () => {
+    const navigate = useNavigate();
     const [activeStatus, setActiveStatus] = useState(ORDER_STATUS.RECEIVED);
     const [calendarExpanded, setCalendarExpanded] = useState(false);
     const [showNewCustomerModal, setShowNewCustomerModal] = useState(false);
@@ -223,7 +226,8 @@ const TodayOrders = () => {
         return [
             { key: ORDER_STATUS.RECEIVED, label: 'Đã tiếp đón', count: count(ORDER_STATUS.RECEIVED) },
             { key: ORDER_STATUS.WAITING_PAYMENT, label: 'Chờ thanh toán', count: count(ORDER_STATUS.WAITING_PAYMENT) },
-            { key: ORDER_STATUS.PAID, label: 'Đã thanh toán', count: count(ORDER_STATUS.PAID) }
+            { key: ORDER_STATUS.PAID, label: 'Đã thanh toán', count: count(ORDER_STATUS.PAID) },
+            { key: ORDER_STATUS.ALL, label: 'Tất cả', count: filteredByDate.length }
         ];
     }, [filteredByDate]);
 
@@ -238,6 +242,10 @@ const TodayOrders = () => {
     );
 
     const shouldUseSimpleReceptionCard = activeStatus === ORDER_STATUS.RECEIVED;
+
+    const handleGoToNewReception = () => {
+        navigate('/receptionists/new-reception');
+    };
 
     const handleCreateCustomer = () => {
         if (!newCustomer.name || !newCustomer.phone || !newCustomer.petName || !newCustomer.species || !newCustomer.breed) {
@@ -289,19 +297,21 @@ const TodayOrders = () => {
         <ReceptionistLayout>
             <div className="today-orders-page">
                 {/* Header */}
-                <div className="to-header">
-                    <div className="to-header-user">
-                        <div className="to-header-avatar">
-                            <img src="https://placehold.co/80x80/e0f2ef/209D80?text=TT" alt="Thu Trang" />
+                <div className="to-header-area">
+                    <div className="to-header">
+                        <div className="to-header-user">
+                            <div className="to-header-avatar">
+                                <img src="https://placehold.co/80x80/e0f2ef/209D80?text=TT" alt="Thu Trang" />
+                            </div>
+                            <div className="to-header-texts">
+                                <p className="to-header-greeting">Xin chào</p>
+                                <h1 className="to-header-name">Lê tân Thu Trang</h1>
+                            </div>
                         </div>
-                        <div className="to-header-texts">
-                            <p className="to-header-greeting">Xin chào</p>
-                            <h1 className="to-header-name">Lê tân Thu Trang</h1>
-                        </div>
+                        <button className="to-header-bell-btn" type="button" aria-label="Thông báo">
+                            <Bell size={20} color="#1a1a1a" strokeWidth={2} />
+                        </button>
                     </div>
-                    <button className="to-header-bell-btn" type="button" aria-label="Thông báo">
-                        <Bell size={20} color="#1a1a1a" strokeWidth={2} />
-                    </button>
                 </div>
 
                 {/* Calendar Strip */}
@@ -442,8 +452,10 @@ const TodayOrders = () => {
                                     <UserRound size={32} color="#a1a1aa" />
                                 </div>
                                 <p className="to-empty-text">Không tìm thấy khách hàng</p>
-                                <button className="to-empty-add-btn" onClick={() => setShowNewCustomerModal(true)}>
-                                    <PlusCircle size={18} color="#209D80" />
+                                <button className="to-empty-add-btn" onClick={handleGoToNewReception}>
+                                    <span className="to-empty-add-icon-wrap">
+                                        <PlusCircle size={16} color="#209D80" strokeWidth={2.25} />
+                                    </span>
                                     <span>Tạo mới khách hàng</span>
                                 </button>
                             </div>
@@ -482,6 +494,12 @@ const TodayOrders = () => {
                             <UserRound size={32} color="#a1a1aa" />
                         </div>
                         <p className="to-empty-text">Không có đơn phù hợp bộ lọc</p>
+                        <button className="to-empty-add-btn" onClick={handleGoToNewReception}>
+                            <span className="to-empty-add-icon-wrap">
+                                <PlusCircle size={32} color="#209D80" />
+                            </span>
+                            <span>Tạo mới khách hàng</span>
+                        </button>
                     </div>
                 )}
             </div>

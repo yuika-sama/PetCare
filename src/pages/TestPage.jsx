@@ -83,37 +83,17 @@ const TestPage = () => {
         >
           Receptionist New Reception
         </Link>
-        <Link 
-          to="/receptionists/clinical-queue" 
+        <Link
+          to="/receptionists/notifications"
           style={{ padding: '10px 15px', backgroundColor: '#f0f4f8', borderRadius: '8px', textDecoration: 'none', color: '#1e40af', fontWeight: '500', border: '1px solid #d1d5db' }}
         >
-          Receptionist Clinical Queue
+          Receptionist Notifications
         </Link>
-
-        <h2 style={{ color: '#333', marginTop: '16px', borderTop: '1px solid #d1d5db', paddingTop: '16px' }}>Staff Pages</h2>
-        <Link 
-          to="/staffs/receptions" 
+        <Link
+          to="/receptionists/payment"
           style={{ padding: '10px 15px', backgroundColor: '#f0f4f8', borderRadius: '8px', textDecoration: 'none', color: '#1e40af', fontWeight: '500', border: '1px solid #d1d5db' }}
         >
-          Staff Reception List
-        </Link>
-        <Link 
-          to="/staffs/notifications" 
-          style={{ padding: '10px 15px', backgroundColor: '#f0f4f8', borderRadius: '8px', textDecoration: 'none', color: '#1e40af', fontWeight: '500', border: '1px solid #d1d5db' }}
-        >
-          Staff Notifications
-        </Link>
-        <Link 
-          to="/staffs/payment" 
-          style={{ padding: '10px 15px', backgroundColor: '#f0f4f8', borderRadius: '8px', textDecoration: 'none', color: '#1e40af', fontWeight: '500', border: '1px solid #d1d5db' }}
-        >
-          Staff Payment
-        </Link>
-        <Link 
-          to="/staffs/receipt-list" 
-          style={{ padding: '10px 15px', backgroundColor: '#f0f4f8', borderRadius: '8px', textDecoration: 'none', color: '#1e40af', fontWeight: '500', border: '1px solid #d1d5db' }}
-        >
-          Staff Receipt List
+          Receptionist Payment
         </Link>
 
         <h2 style={{ color: '#333', marginTop: '16px', borderTop: '1px solid #d1d5db', paddingTop: '16px' }}>Tech Staff Pages</h2>

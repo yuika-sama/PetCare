@@ -1,8 +1,14 @@
 .staff-top-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 14px 0 10px;
+    display: block;
+    width: 100vw;
+    height: 76px;
+    background: #ffffff;
+    margin: -10px calc(50% - 50vw) 0;
+    padding: 0;
+    border: none;
+    border-radius: 0;
+    box-shadow: 0 1px 4px 0 rgba(28, 155, 132, 0.06),
+        0 2px 12px 0 rgba(28, 155, 132, 0.10);
 }
 
 .staff-top-header-main {

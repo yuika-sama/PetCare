@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ChevronLeft, ChevronDown, Phone, PawPrint, Plus, Cake, Weight, Mars, PenSquare } from 'lucide-react';
+import { ChevronLeft, ChevronDown, Phone, PawPrint, CirclePlus, Cake, Weight, Mars, PenSquare } from 'lucide-react';
 import './NewReception.css';
 
 const NewReception = () => {
@@ -20,6 +20,7 @@ const NewReception = () => {
     const [assignee, setAssignee] = useState('');
     const [birthDate, setBirthDate] = useState('');
     const [assignedDoctor, setAssignedDoctor] = useState('');
+    const [assignedCases, setAssignedCases] = useState('--');
     const [notes, setNotes] = useState('');
 
     const handleCreatePet = () => {
@@ -36,14 +37,6 @@ const NewReception = () => {
         setNewPetBreed('');
     };
 
-    const petInfo = {
-        name: 'Kuro',
-        breed: 'Chó Poodle',
-        gender: 'male',
-        age: '3 Tuổi',
-        weight: '4.5kg',
-    };
-
     return (
         <div className="new-reception-page">
             {/* Header */}
@@ -52,9 +45,9 @@ const NewReception = () => {
                     <ChevronLeft size={24} color="#1a1a1a" />
                 </button>
                 <h1 className="nr-title">Tiếp đón mới</h1>
-                <div className="nr-header-avatar">
+                {/* <div className="nr-header-avatar">
                     <img src="https://placehold.co/36x36/e0f2ef/209D80?text=Dr" alt="avatar" />
-                </div>
+                </div> */}
             </header>
 
             <div className="nr-content">
@@ -62,16 +55,15 @@ const NewReception = () => {
                 <div className="nr-customer-section">
                     <div className="nr-customer-row">
                         <h2 className="nr-customer-name">Nguyễn Anh Đức</h2>
-                        <div className="nr-customer-debt">
+                        {/* <div className="nr-customer-debt">
                             <span className="nr-debt-amount">10.000.000đ</span>
-                        </div>
+                        </div> */}
                     </div>
                     <div className="nr-customer-sub-row">
                         <div className="nr-customer-phone">
                             <Phone size={14} color="#209D80" />
                             <span>0912345678</span>
                         </div>
-                        <span className="nr-order-count">/35 đơn</span>
                     </div>
                 </div>
 
@@ -88,7 +80,7 @@ const NewReception = () => {
                         </button>
                     ))}
                     <button type="button" className="nr-pet-chip-add" onClick={() => setShowAddPetModal(true)}>
-                        <Plus size={18} color="#209D80" />
+                        <CirclePlus size={36} color="#209D80" />
                     </button>
                 </div>
 
@@ -97,7 +89,7 @@ const NewReception = () => {
                     <h3 className="nr-form-title">Thông tin tiếp đón</h3>
 
                     {/* Pet Info Bar */}
-                    <div className="nr-pet-info-bar">
+                    {/* <div className="nr-pet-info-bar">
                         <div className="nr-pet-info-details">
                             <span className="nr-pet-info-name">{petInfo.name}</span>
                             <span className="nr-pet-info-breed">
@@ -116,7 +108,7 @@ const NewReception = () => {
                         <button className="nr-pet-edit-btn">
                             <PenSquare size={16} color="#209D80" />
                         </button>
-                    </div>
+                    </div> */}
 
                     {/* Weight */}
                     <div className="nr-field">
@@ -195,14 +187,20 @@ const NewReception = () => {
                     </div>
 
                     {/* Assigned Doctor */}
-                    <div style={{ display: 'flex', gap: '10px', alignItems: 'flex-start' }}>
-                        <div className="nr-field" style={{ flex: 1, marginBottom: '20px' }}>
+                    <div className="nr-assigned-row">
+                        <div className="nr-field nr-assigned-field">
                             <label className="nr-field-label">Bác sĩ phụ trách <span className="nr-required">*</span></label>
                             <div className="nr-select-wrapper">
                                 <select
                                     className="nr-select"
                                     value={assignedDoctor}
-                                    onChange={(e) => setAssignedDoctor(e.target.value)}
+                                    onChange={(e) => {
+                                        const selectedDoctor = e.target.value;
+                                        setAssignedDoctor(selectedDoctor);
+                                        if (!selectedDoctor) {
+                                            setAssignedCases('--');
+                                        }
+                                    }}
                                 >
                                     <option value="" disabled></option>
                                     <option value="bshauyan">Bs. Hà Huy An</option>
@@ -211,8 +209,21 @@ const NewReception = () => {
                                 <ChevronDown size={18} color="#888" className="nr-select-icon" />
                             </div>
                         </div>
-                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#FFFBEB', color: '#D97706', padding: '0 16px', borderRadius: '8px', border: '1px solid #FDE68A', height: '48px', fontSize: '14px', fontWeight: '500' }}>
-                            02 ca
+                        <div className={`nr-shift-select-wrapper ${assignedDoctor ? 'active' : ''} ${assignedCases === '--' ? 'is-empty' : 'has-value'}`}>
+                            <select
+                                className="nr-shift-select"
+                                value={assignedCases}
+                                onChange={(e) => setAssignedCases(e.target.value)}
+                                disabled={!assignedDoctor}
+                            >
+                                <option value="--">--</option>
+                                <option value="01">01 ca</option>
+                                <option value="02">02 ca</option>
+                                <option value="03">03 ca</option>
+                                <option value="04">04 ca</option>
+                                <option value="05">05 ca</option>
+                            </select>
+                            <ChevronDown size={16} className="nr-shift-select-icon" />
                         </div>
                     </div>
 

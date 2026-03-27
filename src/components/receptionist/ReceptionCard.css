@@ -37,7 +37,8 @@
 
 .reception-card-name {
     font-size: 15px;
-    font-weight: 700;
+    font-family: "Roboto", sans-serif !important;
+    font-weight: 500;
     color: #1a1a1a;
     margin: 0;
 }

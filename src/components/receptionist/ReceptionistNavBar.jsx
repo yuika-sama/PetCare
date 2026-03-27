@@ -7,7 +7,13 @@ const ReceptionistNavBar = () => {
     const navigate = useNavigate();
     const { pathname } = useLocation();
     const [activeTab, setActiveTab] = useState(
-        pathname.includes('/clinical-queue') ? 'thongbao' : pathname.includes('/new-reception') ? 'khac' : 'donhom'
+        pathname.includes('/receptionists/payment')
+            ? 'thanhtoan'
+            : pathname.includes('/receptionists/notifications')
+                ? 'thongbao'
+                : pathname.includes('/receptionists/new-reception')
+                    ? 'khac'
+                    : 'donhom'
     );
 
     const go = (tab, path) => {
@@ -28,7 +34,7 @@ const ReceptionistNavBar = () => {
 
                 <div
                     className={`rc-nav-item ${activeTab === 'thanhtoan' ? 'active' : ''}`}
-                    onClick={() => go('thanhtoan', '/receptionists/today-orders')}
+                    onClick={() => go('thanhtoan', '/receptionists/payment')}
                 >
                     <CreditCard size={26} strokeWidth={1.8} />
                     <span>Thanh toán</span>
@@ -43,7 +49,7 @@ const ReceptionistNavBar = () => {
 
                 <div
                     className={`rc-nav-item ${activeTab === 'thongbao' ? 'active' : ''}`}
-                    onClick={() => go('thongbao', '/receptionists/clinical-queue')}
+                    onClick={() => go('thongbao', '/receptionists/notifications')}
                 >
                     <Bell size={26} strokeWidth={1.8} />
                     <span>Thông báo</span>
