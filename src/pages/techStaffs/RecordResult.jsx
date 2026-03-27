@@ -1,80 +1,180 @@
 import React, { useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { Cake, Mars, Phone, Weight } from 'lucide-react';
-import TechRecordHeader from '../../components/techStaffs/TechRecordHeader';
-import TechAttachmentPanel from '../../components/techStaffs/TechAttachmentPanel';
-import TechMedicinePanel from '../../components/techStaffs/TechMedicinePanel';
-import TechExecutionCard from '../../components/techStaffs/TechExecutionCard';
+import { ChevronLeft, ChevronUp, ChevronDown, Plus, PencilLine } from 'lucide-react';
 import './RecordResult.css';
+import '@fontsource/roboto/400.css';
+import '@fontsource/roboto/500.css';
+import '@fontsource/roboto/600.css';
 
-const medicineItems = [
-    { id: 1, name: 'Dai trang Truong Phuc', price: '120.000d', unit: 'hop', qty: 1, morning: '1 vien', evening: '1 vien', note: 'Uong truoc khi an' },
-    { id: 2, name: 'Dai trang Truong Phuc', price: '120.000d', unit: 'hop', qty: 1, morning: '1 vien', evening: '1 vien', note: 'Uong truoc khi an' },
-    { id: 3, name: 'Dai trang Truong Phuc', price: '120.000d', unit: 'hop', qty: 1, morning: '1 vien', evening: '1 vien', note: 'Uong truoc khi an' }
+const detailSections = [
+    {
+        id: 1,
+        title: 'Xét nghiệm máu',
+        subtitle: 'Phiếu kỹ thuật #',
+        summary: 'Ho có đờm, khò khè. Vòm họng sưng tấy.',
+        hasUploads: true
+    },
+    {
+        id: 2,
+        title: 'Siêu âm ổ bụng',
+        subtitle: 'Phiếu kỹ thuật #',
+        summary: 'Các chỉ số xét nghiệm bình thường.',
+        hasUploads: true
+    }
 ];
 
-const imageMock = [
-    'https://images.unsplash.com/photo-1583511655826-05700d52f4d9?auto=format&fit=crop&w=720&q=80',
-    null
+const usedMedicine = [
+    {
+        id: 1,
+        name: 'Đại tràng Trương Phúc',
+        price: '120.000đ',
+        unit: '/hộp',
+        qty: 1,
+        selectedUnit: 'hộp',
+        dosage: [
+            { time: 'Sáng', count: '1 viên' },
+            { time: 'Tối', count: '1 viên' }
+        ],
+        note: 'Uống thuốc trước khi ăn'
+    },
+    {
+        id: 2,
+        name: 'Kháng sinh A',
+        price: '80.000đ',
+        unit: '/hộp',
+        qty: 2,
+        selectedUnit: 'hộp',
+        dosage: [
+            { time: 'Sáng', count: '1 viên' },
+            { time: 'Chiều', count: '1 viên' }
+        ],
+        note: 'Uống sau bữa ăn'
+    }
 ];
-
-const fileMock = ['PKQ-2147175.pdf', 'PKQ-2147175.pdf'];
 
 const TechRecordResult = () => {
     const navigate = useNavigate();
     const { id } = useParams();
-    const [resultText, setResultText] = useState('Ho co dom, kho khe. Vom hong sung tay');
+    const [expandedSections, setExpandedSections] = useState(() =>
+        detailSections.reduce((state, section) => ({ ...state, [section.id]: true }), {})
+    );
+
+    const toggleSectionMeds = (sectionId) => {
+        setExpandedSections((prev) => ({ ...prev, [sectionId]: !prev[sectionId] }));
+    };
 
     return (
-        <div className="tech-record-page">
-            <TechRecordHeader onBack={() => navigate(-1)} />
+        <div className="trs-page">
+            <header className="trs-header">
+                <button className="trs-icon-btn" type="button" onClick={() => navigate(-1)} aria-label="Quay lai">
+                    <ChevronLeft size={24} />
+                </button>
+                <h1>Ghi nhận kết quả</h1>
+            </header>
 
-            <main className="tech-record-content">
-                <section className="tech-patient-section">
-                    <h2>Nguyen Anh Duc</h2>
-                    <div className="tech-phone"><Phone size={14} /> 0912345678</div>
-                    <div className="tech-ticket-id">Phieu ky thuat #{id}</div>
+            <main className="trs-content">
+                {detailSections.map((section) => (
+                    <article className="trs-card" key={section.id}>
+                        <div className="trs-card-title-row">
+                            <div>
+                                <h3>{section.title}</h3>
+                                <p className="trs-subtitle">
+                                    {section.subtitle}
+                                    {id}
+                                </p>
+                            </div>
+                            <ChevronUp size={18} color="#606b67" />
+                        </div>
 
-                    <div className="tech-pet-line">
-                        <strong>Kuro</strong>
-                        <span>Cho Poodle <Mars size={12} color="#3b82f6" /></span>
-                        <span><Cake size={13} /> 3 Tuoi</span>
-                        <span><Weight size={13} /> 4.5kg</span>
-                    </div>
-                </section>
+                        <div className="trs-divider" />
 
-                <section className="tech-result-block">
-                    <h3>Ket qua chung <span>*</span></h3>
-                    <div className="tech-result-input-wrap">
-                        <textarea
-                            value={resultText}
-                            onChange={(event) => setResultText(event.target.value)}
-                            rows={5}
-                        />
-                        <small>2000</small>
-                    </div>
-                </section>
+                        <div className="trs-block">
+                            <h4>Kết quả chung</h4>
+                            <p>{section.summary}</p>
+                        </div>
 
-                <TechAttachmentPanel images={imageMock} files={fileMock} />
+                        {section.hasUploads && (
+                            <>
+                                <div className="trs-block">
+                                    <h4 className="trs-block-files-title">File và ảnh tải lên</h4>
+                                    <div className="trs-images">
+                                        <div className="trs-image-card">
+                                            <strong>Ảnh kết quả 1</strong>
+                                            <img src="https://images.unsplash.com/photo-1583512603806-077998240c7a?w=600&auto=format&fit=crop&q=60" alt="Anh ket qua 1" />
+                                        </div>
+                                        <div className="trs-image-card">
+                                            <strong>Ảnh kết quả 2</strong>
+                                            <img src="https://images.unsplash.com/photo-1583512603806-077998240c7a?w=600&auto=format&fit=crop&q=60" alt="Anh ket qua 2" />
+                                        </div>
+                                    </div>
+                                    <div className="trs-files">
+                                        <div>PKQ-{id || '2147175'}.pdf</div>
+                                        <div className="trs-divider" />
+                                        <div>PKQ-{id || '2147175'}-2.pdf</div>
+                                    </div>
+                                </div>
 
-                <TechMedicinePanel items={medicineItems} />
+                                <div className="trs-accordion">
+                                    <div className="trs-accordion-header" onClick={() => toggleSectionMeds(section.id)}>
+                                        <h3>THUỐC & VẬT TƯ ĐI KÈM</h3>
+                                        {expandedSections[section.id] ? <ChevronUp size={20} color="#666" /> : <ChevronDown size={20} color="#666" />}
+                                    </div>
 
-                <TechExecutionCard
-                    title="Xet nghiem mau"
-                    status="Dang thuc hien"
-                    requester="Nguyen Van An"
-                    operator="Trinh Ha Trang"
-                    startTime="12:01 - 02/03/2026"
-                    endTime="Chua ket thuc"
-                />
+                                    {expandedSections[section.id] && (
+                                        <div className={`trs-accordion-content ${usedMedicine.length === 0 ? 'trs-meds-empty' : 'trs-meds-list-container'}`}>
+                                            {usedMedicine.length === 0 ? (
+                                                <button type="button" className="trs-add-btn" aria-label="Thêm thuốc">
+                                                    <Plus size={24} color="#fff" />
+                                                </button>
+                                            ) : (
+                                                <div className="trs-meds-list-minimal">
+                                                    {usedMedicine.map((med) => (
+                                                        <div key={`${section.id}-${med.id}`} className="trs-med-item-minimal">
+                                                            <div className="trs-med-row-header">
+                                                                <h4 className="trs-med-name-min">{med.name}</h4>
+                                                                <PencilLine size={16} color="#209D80" className="trs-med-edit-icon" />
+                                                            </div>
+
+                                                            <div className="trs-med-row-price">
+                                                                <div>
+                                                                    <span className="trs-med-price-min">{med.price}</span>
+                                                                    <span className="trs-med-unit-min"> {med.unit}</span>
+                                                                </div>
+                                                                <span className="trs-med-qty-min">
+                                                                    {med.qty} {med.selectedUnit}
+                                                                </span>
+                                                            </div>
+
+                                                            {med.dosage.map((dosage, dosageIndex) => (
+                                                                <div key={dosageIndex} className="trs-med-row-dosage">
+                                                                    <span className="trs-dosage-lbl">{dosage.time}</span>
+                                                                    <span className="trs-dosage-val">{dosage.count}</span>
+                                                                </div>
+                                                            ))}
+
+                                                            <div className="trs-med-row-note">
+                                                                <span className="trs-note-lbl">Chỉ định khác</span>
+                                                                <span className="trs-note-val">{med.note}</span>
+                                                            </div>
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            )}
+                                        </div>
+                                    )}
+                                </div>
+                            </>
+                        )}
+                    </article>
+                ))}
             </main>
 
-            <footer className="tech-record-footer">
-                <button type="button" className="tech-btn-outline" onClick={() => navigate('/techs/home')}>
-                    Huy bo
+            <footer className="trs-footer">
+                <button type="button" className="trs-btn-outline" onClick={() => navigate(-1)}>
+                    Trở lại
                 </button>
-                <button type="button" className="tech-btn-primary" onClick={() => navigate('/techs/home')}>
-                    Xac nhan
+                <button type="button" className="trs-btn-primary" onClick={() => navigate('/techs/home')}>
+                    Xác nhận
                 </button>
             </footer>
         </div>

@@ -3,10 +3,9 @@
     align-items: center;
     justify-content: space-between;
     background: #ffffff;
-    border-radius: 22px;
-    padding: 16px;
-    border: 1px solid #e7eeec;
-    box-shadow: 0 2px 8px rgba(15, 23, 42, 0.04);
+    border-radius: 16px;
+    padding: 14px 16px;
+    border: 1px solid #e6eeeb;
 }
 
 .tech-top-user {
@@ -16,8 +15,8 @@
 }
 
 .tech-top-avatar {
-    width: 74px;
-    height: 74px;
+    width: 44px;
+    height: 44px;
     border-radius: 50%;
     overflow: hidden;
     flex-shrink: 0;
@@ -32,23 +31,24 @@
 
 .tech-top-texts p {
     margin: 0;
-    color: #374151;
-    font-size: 15px;
-    font-weight: 500;
+    color: #1f2937;
+    font-size: 13px;
+    font-weight: 400;
     line-height: 1.2;
 }
 
 .tech-top-texts h1 {
-    margin: 4px 0 0;
-    color: #1f2937;
-    font-size: 48px;
+    font-family: "Roboto", sans-serif;
+    margin: 2px 0 0;
+    color: #111827;
+    font-size: 17px;
     font-weight: 700;
-    line-height: 1.25;
+    line-height: 1.15;
 }
 
 .tech-top-bell {
-    width: 40px;
-    height: 40px;
+    width: 36px;
+    height: 36px;
     border: none;
     border-radius: 50%;
     background: transparent;
@@ -70,6 +70,6 @@
     }
 
     .tech-top-texts h1 {
-        font-size: 24px;
+        font-size: 18px;
     }
 }

@@ -9,12 +9,12 @@ const statusColor = {
 };
 
 const statusLabel = {
-    queued: 'Cho thuc hien',
-    processing: 'Dang thuc hien',
-    done: 'Da hoan thanh'
+    queued: 'Chờ thực hiện',
+    processing: 'Đang thực hiện',
+    done: 'Đã hoàn thành'
 };
 
-const TechTaskCard = ({ task, onOpen }) => {
+const TechTaskCard = ({ task, onOpen, isProcessingTab = false, onRecordResult }) => {
     return (
         <article className="tech-task-card" onClick={() => onOpen && onOpen(task)}>
             <div className="tech-task-head">
@@ -22,20 +22,37 @@ const TechTaskCard = ({ task, onOpen }) => {
                     <h3>{task.title}</h3>
                 </div>
                 <span className="tech-task-status" style={{ color: statusColor[task.status] || '#6b7280' }}>
-                    {statusLabel[task.status] || 'Khac'}
+                    {statusLabel[task.status] || 'Khác'}
                 </span>
             </div>
 
             <div className="tech-task-body-grid">
-                <span>Nguoi chi dinh</span>
+                <span>Người chỉ định</span>
                 <strong>{task.requester}</strong>
 
-                <span>Thu cung</span>
+                <span>Thú cưng</span>
                 <strong className="tech-pet-info">
                     {task.petName}
                     <Info size={16} color="#14a085" />
                 </strong>
             </div>
+
+            {isProcessingTab && (
+                <div className="tech-task-action-wrap">
+                    <button
+                        type="button"
+                        className="tech-task-action-btn"
+                        onClick={(event) => {
+                            event.stopPropagation();
+                            if (onRecordResult) {
+                                onRecordResult(task);
+                            }
+                        }}
+                    >
+                        Ghi nhận kết quả
+                    </button>
+                </div>
+            )}
         </article>
     );
 };
