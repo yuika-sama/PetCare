@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import './NavBar.css';
 import { ClipboardList, Package, Scan, Bell, Menu } from 'lucide-react';
@@ -6,13 +6,15 @@ import { ClipboardList, Package, Scan, Bell, Menu } from 'lucide-react';
 const NavBar = () => {
     const navigate = useNavigate();
     const { pathname } = useLocation();
-    // Default active tab is 'phieu'
-    const [activeTab, setActiveTab] = useState(
-        pathname.includes('/medicine-selector') ? 'kho' : pathname.includes('/notifications') ? 'thongbao' : pathname.includes('/home') ? 'khac' : 'phieu'
-    );
+    const activeTab = pathname.includes('/medicine-selector')
+        ? 'kho'
+        : pathname.includes('/notifications')
+            ? 'thongbao'
+            : pathname.includes('/home')
+                ? 'khac'
+                : 'phieu';
 
-    const go = (tab, path) => {
-        setActiveTab(tab);
+    const go = (path) => {
         navigate(path);
     };
 
@@ -21,7 +23,7 @@ const NavBar = () => {
             <div className="nav-content">
                 <div
                     className={`nav-item ${activeTab === 'phieu' ? 'active' : ''}`}
-                    onClick={() => go('phieu', '/doctors/tickets')}
+                    onClick={() => go('/doctors/tickets')}
                 >
                     <ClipboardList size={28} strokeWidth={1.8} />
                     <span>Phiếu</span>
@@ -29,7 +31,7 @@ const NavBar = () => {
 
                 <div
                     className={`nav-item ${activeTab === 'kho' ? 'active' : ''}`}
-                    onClick={() => go('kho', '/doctors/medicine-selector')}
+                    onClick={() => go('/doctors/medicine-selector')}
                 >
                     <Package size={28} strokeWidth={1.8} />
                     <span>Kho</span>
@@ -43,7 +45,7 @@ const NavBar = () => {
 
                 <div
                     className={`nav-item ${activeTab === 'thongbao' ? 'active' : ''}`}
-                    onClick={() => go('thongbao', '/doctors/notifications')}
+                    onClick={() => go('/doctors/notifications')}
                 >
                     <Bell size={28} strokeWidth={1.8} />
                     <span>Thông báo</span>
@@ -51,7 +53,7 @@ const NavBar = () => {
 
                 <div
                     className={`nav-item ${activeTab === 'khac' ? 'active' : ''}`}
-                    onClick={() => go('khac', '/doctors/home')}
+                    onClick={() => go('/doctors/home')}
                 >
                     <Menu size={28} strokeWidth={1.8} />
                     <span>Khác</span>

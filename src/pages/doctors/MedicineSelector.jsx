@@ -1,9 +1,12 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { ChevronLeft, Search, SlidersHorizontal, Minus, Plus, ChevronDown } from 'lucide-react';
 import MedicineCard from '../../components/doctor/MedicineCard';
 import './MedicineSelector.css';
+import medicineService from '../../api/medicineService';
 
 const MedicineSelector = () => {
+    const navigate = useNavigate();
     const [showDosageModal, setShowDosageModal] = useState(false);
     const [activeDosageMedId, setActiveDosageMedId] = useState(null);
     const [dosageDraft, setDosageDraft] = useState({
@@ -13,90 +16,23 @@ const MedicineSelector = () => {
         evening: 0,
         note: ''
     });
+    const [searchTerm, setSearchTerm] = useState('');
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
-    // Thêm trường qty (số lượng) và unit (đơn vị)
-    const [medsList, setMedsList] = useState([
-        {
-            id: 1,
-            name: 'Đại tràng Trường Phúc',
-            desc: 'Điều trị viêm loét đại tràng, rối loạn tiêu hóa (3 vỉ x 10 viên)',
-            price: '120.000đ',
-            unit: '/hộp',
-            stock: '2.000',
-            image: 'https://placehold.co/80x80/f4f4f5/a1a1aa?text=Med',
-            selected: true, // Item đầu tiên được chọn mẫu
-            qty: 0,
-            selectedUnit: 'Hộp',
-            expanded: true,
-            dosage: {
-                morning: 1,
-                noon: 0,
-                afternoon: 0,
-                evening: 1,
-                note: 'Uống thuốc trước khi ăn'
-            }
-        },
-        {
-            id: 2,
-            name: 'Đại tràng Trường Phúc',
-            desc: 'Điều trị viêm loét đại tràng, rối loạn tiêu hóa (3 vỉ x 10 viên)',
-            price: '120.000đ',
-            unit: '/hộp',
-            stock: '2.000',
-            image: 'https://placehold.co/80x80/f4f4f5/a1a1aa?text=Med',
-            selected: false,
-            qty: 0,
-            selectedUnit: 'Hộp',
-            expanded: false,
-            dosage: {
-                morning: 0,
-                noon: 0,
-                afternoon: 0,
-                evening: 0,
-                note: ''
-            }
-        },
-        {
-            id: 3,
-            name: 'Đại tràng Trường Phúc',
-            desc: 'Điều trị viêm loét đại tràng, rối loạn tiêu hóa (3 vỉ x 10 viên)',
-            price: '120.000đ',
-            unit: '/hộp',
-            stock: '2.000',
-            image: 'https://placehold.co/80x80/f4f4f5/a1a1aa?text=Med',
-            selected: false,
-            qty: 0,
-            selectedUnit: 'Hộp',
-            expanded: false,
-            dosage: {
-                morning: 0,
-                noon: 0,
-                afternoon: 0,
-                evening: 0,
-                note: ''
-            }
-        },
-        {
-            id: 4,
-            name: 'Đại tràng Trường Phúc',
-            desc: 'Điều trị viêm loét đại tràng, rối loạn tiêu hóa (3 vỉ x 10 viên)',
-            price: '120.000đ',
-            unit: '/hộp',
-            stock: '2.000',
-            image: 'https://placehold.co/80x80/f4f4f5/a1a1aa?text=Med',
-            selected: false,
-            qty: 0,
-            selectedUnit: 'Hộp',
-            expanded: false,
-            dosage: {
-                morning: 0,
-                noon: 0,
-                afternoon: 0,
-                evening: 0,
-                note: ''
-            }
-        }
-    ]);
+    const [medsList, setMedsList] = useState([]);
+
+    useEffect(() => {
+        let isMounted = true;
+        const fetchMedicines = async () => {
+            const response = await medicineService.listMedicines();
+            if (!isMounted) return;
+            setMedsList(response?.data || []);
+        };
+        fetchMedicines();
+        return () => {
+            isMounted = false;
+        };
+    }, []);
 
     const toggleSelection = (id) => {
         setMedsList(prevList => 
@@ -163,11 +99,29 @@ const MedicineSelector = () => {
         setActiveDosageMedId(null);
     };
 
+    const filteredMeds = medsList.filter((med) => {
+        const keyword = searchTerm.trim().toLowerCase();
+        if (!keyword) return true;
+        return `${med.name} ${med.desc}`.toLowerCase().includes(keyword);
+    });
+
+    const handleConfirm = async () => {
+        if (isSubmitting) return;
+        setIsSubmitting(true);
+        try {
+            const selectedMedicines = medsList.filter((med) => med.selected);
+            await medicineService.saveSelection(selectedMedicines);
+            navigate(-1);
+        } finally {
+            setIsSubmitting(false);
+        }
+    };
+
     return (
         <div className="med-selector-page">
             {/* Header */}
             <header className="ms-header">
-                <button className="ms-btn-icon"><ChevronLeft size={24} color="#1a1a1a" /></button>
+                <button className="ms-btn-icon" onClick={() => navigate(-1)}><ChevronLeft size={24} color="#1a1a1a" /></button>
                 <h1 className="ms-title">Thuốc & Vật tư đi kèm</h1>
                 <div style={{ width: 32 }}></div>
             </header>
@@ -176,7 +130,7 @@ const MedicineSelector = () => {
             <div className="ms-search-container">
                 <div className="ms-search-box">
                     <Search size={20} color="#209D80" className="ms-search-icon" />
-                    <input type="text" placeholder="Search" className="ms-search-input" />
+                    <input type="text" placeholder="Search" className="ms-search-input" value={searchTerm} onChange={(event) => setSearchTerm(event.target.value)} />
                 </div>
                 {/* <button className="ms-filter-btn">
                     <SlidersHorizontal size={20} color="#209D80" />
@@ -186,7 +140,7 @@ const MedicineSelector = () => {
             {/* Meds List */}
             <div className="ms-content">
                 <div className="ms-meds-list">
-                    {medsList.map(med => (
+                    {filteredMeds.map(med => (
                         <MedicineCard
                             key={med.id}
                             med={med}
@@ -201,8 +155,8 @@ const MedicineSelector = () => {
 
             {/* Bottom Actions */}
             <div className="ms-bottom-actions">
-                <button className="ms-btn-skip">Bỏ qua</button>
-                <button className="ms-btn-confirm">Xác nhận</button>
+                <button className="ms-btn-skip" onClick={() => navigate(-1)}>Bỏ qua</button>
+                <button className="ms-btn-confirm" onClick={handleConfirm}>{isSubmitting ? 'Đang lưu...' : 'Xác nhận'}</button>
             </div>
 
             {/* Dosage Modal Bottom Sheet */}

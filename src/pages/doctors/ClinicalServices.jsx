@@ -111,7 +111,14 @@ const ClinicalServices = () => {
 
             <div className="cs-bottom-bar">
                 <button className="cs-btn-skip" type="button" onClick={() => navigate(-1)}>Bỏ qua</button>
-                <button className="cs-btn-confirm" type="button" disabled={selectedIds.size === 0}>Xác nhận</button>
+                <button
+                    className="cs-btn-confirm"
+                    type="button"
+                    disabled={selectedIds.size === 0}
+                    onClick={() => navigate(-1)}
+                >
+                    Xác nhận
+                </button>
             </div>
         </div>
     );

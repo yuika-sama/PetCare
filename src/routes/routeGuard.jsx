@@ -9,18 +9,18 @@ function getUserRole(){
 }
 
 export function RequireAuth(){
-    // const location = useLocation();
-    // const token = getAccessToken();
-    // if(!token){
-    //     return <Navigate to="/login" state={{from: location}} replace />
-    // }
+    const location = useLocation();
+    const token = getAccessToken();
+    if(!token){
+        return <Navigate to="/login" state={{from: location}} replace />
+    }
     return <Outlet />;
 }
 
 export function RequireRole({allowedRoles}){
-    // const role = getUserRole();
-    // if(!allowedRoles.includes(role)){
-    //     return <Navigate to="/login" replace />
-    // }
+    const role = getUserRole();
+    if(!allowedRoles.includes(role)){
+        return <Navigate to="/login" replace />
+    }
     return <Outlet />;
 }

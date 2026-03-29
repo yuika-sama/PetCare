@@ -31,10 +31,22 @@ const TicketCard = ({
     // paidAmount,
     // totalAmount,
     pet,
-    services
+    services,
+    onClick
 }) => {
     return (
-        <div className="ticket-card">
+        <div
+            className="ticket-card"
+            onClick={onClick}
+            role={onClick ? 'button' : undefined}
+            tabIndex={onClick ? 0 : undefined}
+            onKeyDown={onClick ? (event) => {
+                if (event.key === 'Enter' || event.key === ' ') {
+                    event.preventDefault();
+                    onClick();
+                }
+            } : undefined}
+        >
             <div className="ticket-header">
                 <div className="ticket-info-left">
                     <h3 className="customer-name">{customerName}</h3>

@@ -22,6 +22,24 @@
     margin-bottom: 16px;
 }
 
+.tickets-title-wrap {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.tickets-back-btn {
+    width: 30px;
+    height: 30px;
+    border: none;
+    background: transparent;
+    border-radius: 8px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+}
+
 .tickets-page-title-group {
     display: flex;
     flex-direction: column;

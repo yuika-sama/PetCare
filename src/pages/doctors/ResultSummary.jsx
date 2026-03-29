@@ -1,34 +1,12 @@
-import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useEffect, useMemo, useState } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { ChevronLeft, ChevronUp } from 'lucide-react';
 import './ResultSummary.css';
 import "@fontsource/roboto/400.css";
 import "@fontsource/roboto/500.css";
 import "@fontsource/roboto/600.css";
-
-const detailSections = [
-    {
-        id: 1,
-        title: 'Khám lâm sàng',
-        subtitle: '',
-        summary: 'Các chỉ số xét nghiệm bình thường',
-        hasUploads: false
-    },
-    {
-        id: 2,
-        title: 'Cận lâm sàng',
-        subtitle: 'Siêu âm ổ bụng',
-        summary: 'Các chỉ số xét nghiệm bình thường',
-        hasUploads: true
-    },
-    {
-        id: 3,
-        title: 'Cận lâm sàng',
-        subtitle: 'Chụp X-Quang chi sau',
-        summary: 'Bình thường',
-        hasUploads: true
-    }
-];
+import receptionService from '../../api/receptionService';
+import treatmentService from '../../api/treatmentService';
 
 const usedMedicine = [
     {
@@ -51,6 +29,61 @@ const usedMedicine = [
 
 const ResultSummary = () => {
     const navigate = useNavigate();
+    const location = useLocation();
+    const receptionId = location.state?.receptionId;
+    const treatmentSlipId = location.state?.treatmentSlipId;
+    const [receptionDetail, setReceptionDetail] = useState(null);
+    const [treatmentDetail, setTreatmentDetail] = useState(null);
+
+    useEffect(() => {
+        let isMounted = true;
+
+        const fetchData = async () => {
+            const [receptionResponse, treatmentResponse] = await Promise.allSettled([
+                receptionId ? receptionService.getReceptionById(receptionId) : Promise.resolve(null),
+                treatmentSlipId
+                    ? treatmentService.getTreatmentSlipById(treatmentSlipId)
+                    : receptionId
+                        ? treatmentService.getTreatmentDetailFlexible(receptionId)
+                        : Promise.resolve(null),
+            ]);
+
+            if (!isMounted) return;
+
+            if (receptionResponse.status === 'fulfilled') {
+                setReceptionDetail(receptionResponse.value?.data?.data || null);
+            }
+
+            if (treatmentResponse.status === 'fulfilled') {
+                setTreatmentDetail(treatmentResponse.value?.data?.data || null);
+            }
+        };
+
+        fetchData();
+        return () => {
+            isMounted = false;
+        };
+    }, [receptionId, treatmentSlipId]);
+
+    const detailSections = useMemo(() => {
+        const examType = receptionDetail?.examForm?.examType || 'Khám lâm sàng';
+        return [
+            {
+                id: 1,
+                title: examType,
+                subtitle: '',
+                summary: treatmentDetail?.plan || receptionDetail?.symptomDescription || 'Chưa có dữ liệu kết quả.',
+                hasUploads: false
+            },
+            {
+                id: 2,
+                title: 'Kết luận điều trị',
+                subtitle: treatmentDetail?.type || 'Điều trị ngoại trú',
+                summary: treatmentDetail?.plan || 'Chưa có dữ liệu kết luận.',
+                hasUploads: true
+            }
+        ];
+    }, [receptionDetail, treatmentDetail]);
 
     return (
         <div className="rs-page">
@@ -125,7 +158,7 @@ const ResultSummary = () => {
             </main>
 
             <footer className="rs-footer">
-                <button type="button">Xác nhận</button>
+                <button type="button" onClick={() => navigate(-1)}>Xác nhận</button>
             </footer>
         </div>
     );

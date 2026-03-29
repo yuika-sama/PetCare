@@ -52,6 +52,29 @@
     color: #475467;
 }
 
+.home-quick-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.home-quick-btn {
+    width: 34px;
+    height: 34px;
+    border-radius: 10px;
+    border: 1px solid #dce7e4;
+    background: #f8fefd;
+    color: #23685d;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+}
+
+.home-quick-btn:active {
+    transform: translateY(1px);
+}
+
 .home-tabs {
     display: flex;
     background-color: #E8F5F3;

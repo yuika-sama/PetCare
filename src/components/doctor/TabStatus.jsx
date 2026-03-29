@@ -8,12 +8,12 @@ const tabsConfig = [
     { id: 'all', label: 'Tất cả', count: 43 },
 ];
 
-const TabStatus = ({ activeTab, onTabChange }) => {
+const TabStatus = ({ activeTab, onTabChange, tabs = tabsConfig }) => {
     
     return (
         <div className="tab-status-wrapper">
             <div className="tab-status-container">
-                {tabsConfig.map((tab) => {
+                {tabs.map((tab) => {
                     const isActive = activeTab === tab.id;
                     return (
                         <div

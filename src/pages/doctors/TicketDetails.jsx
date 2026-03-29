@@ -1,7 +1,9 @@
-import React, { useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
 import './TicketDetails.css';
 import '../../components/doctor/TicketCard.css';
 import "@fontsource/roboto/600.css";
+import receptionService from '../../api/receptionService';
 
 import { ChevronLeft, MoreVertical, Phone, TriangleAlert, Cake, Weight, Mars } from 'lucide-react';
 
@@ -42,32 +44,73 @@ const NoteModal = ({ note, onClose }) => {
 };
 
 const TicketDetails = ({ note = "Khách hàng khó tính, yêu cầu không gọi điện, pet hung dữ nên cần nhẹ nhàng khi thực hiện dịch vụ" }) => {
+    const navigate = useNavigate();
+    const { id } = useParams();
     const [showModal, setShowModal] = useState(false);
+    const [ticketDetail, setTicketDetail] = useState(null);
+    const [isLoading, setIsLoading] = useState(true);
 
-    // Two supported pet-info cases:
-    // 1) with alert icon (hasAlert = true)
-    // 2) without alert icon (hasAlert = false)
-    const petInfo = {
-        name: 'Kuro',
-        breed: 'Chó Poodle',
-        gender: 'male',
-        age: '3 Tuổi',
-        weight: '4.5kg',
-        hasAlert: true
-    };
+    useEffect(() => {
+        let isMounted = true;
+
+        const fetchDetail = async () => {
+            setIsLoading(true);
+            try {
+                const response = await receptionService.getReceptionById(id);
+                if (!isMounted) return;
+                setTicketDetail(response?.data?.data || null);
+            } catch {
+                if (!isMounted) return;
+                setTicketDetail(null);
+            } finally {
+                if (isMounted) {
+                    setIsLoading(false);
+                }
+            }
+        };
+
+        if (id) {
+            fetchDetail();
+        }
+
+        return () => {
+            isMounted = false;
+        };
+    }, [id]);
+
+    const petInfo = useMemo(() => {
+        const pet = ticketDetail?.pet;
+        return {
+            name: pet?.name || '---',
+            breed: pet?.breed || pet?.species || '---',
+            gender: (pet?.gender || '').toLowerCase() === 'female' ? 'female' : 'male',
+            age: pet?.dateOfBirth ? '-- Tuổi' : '-- Tuổi',
+            weight: pet?.weight ? `${pet.weight}kg` : '---',
+            hasAlert: Boolean(ticketDetail?.note)
+        };
+    }, [ticketDetail]);
+
+    const displayNote = ticketDetail?.note || note;
 
     const handleStartClick = () => {
-        if (note) {
+        if (displayNote) {
             setShowModal(true);
+            return;
         }
+        navigate(`/doctors/service-order/${id ?? 1}`);
+    };
+
+    const handleCloseModal = () => {
+        setShowModal(false);
+        navigate(`/doctors/service-order/${id ?? 1}`);
     };
 
     return (
         <div className="ticket-details-page">
-            {showModal && <NoteModal note={note} onClose={() => setShowModal(false)} />}
+            {showModal && <NoteModal note={displayNote} onClose={handleCloseModal} />}
             {/* Header */}
             <div className="details-header">
-                <button className="icon-btn-back"><BackIcon /></button>
+                <button className="icon-btn-back" onClick={() => navigate('/doctors/tickets')}><BackIcon /></button>
                 <h1 className="details-title">Chi tiết phiếu khám</h1>
                 {/* <button className="icon-btn-more"><MoreVerticalIcon /></button> */}
             </div>
@@ -79,10 +122,10 @@ const TicketDetails = ({ note = "Khách hàng khó tính, yêu cầu không gọ
                     {/* Customer Info */}
                     <div className="card-header-row">
                         <div className="customer-info">
-                            <h2 className="customer-name-lg">Nguyễn Anh Đức</h2>
+                            <h2 className="customer-name-lg">{ticketDetail?.client?.fullName || '---'}</h2>
                             <div className="customer-phone">
                                 <PhoneIcon />
-                                <span>0912345678</span>
+                                <span>{ticketDetail?.client?.phoneNumber || '---'}</span>
                             </div>
                         </div>
                         {/* <div className="payment-info">
@@ -92,14 +135,14 @@ const TicketDetails = ({ note = "Khách hàng khó tính, yêu cầu không gọ
                     </div>
 
                     {/* Customer Alert */}
-                    {note && (
+                    {displayNote && (
                         <div className="customer-alert-box">
                             <div className="alert-box-title">
                                 <WarningIcon />
                                 <span>Lưu ý</span>
                             </div>
                             <p className="alert-box-text">
-                                {note}
+                                {displayNote}
                             </p>
                         </div>
                     )}
@@ -146,23 +189,23 @@ const TicketDetails = ({ note = "Khách hàng khó tính, yêu cầu không gọ
                     <div className="exam-info-list">
                         <div className="exam-info-row">
                             <span className="exam-info-label">Lý do khám:</span>
-                            <span className="exam-info-value text-right">Co giật, thở yếu</span>
+                            <span className="exam-info-value text-right">{ticketDetail?.examReason || '---'}</span>
                         </div>
                         <div className="exam-info-row">
                             <span className="exam-info-label">Hình thức khám</span>
-                            <span className="exam-info-value text-right">--</span>
+                            <span className="exam-info-value text-right">{ticketDetail?.examForm?.examType || '--'}</span>
                         </div>
                         <div className="exam-info-row align-top">
                             <span className="exam-info-label">Mô tả</span>
                             <span className="exam-info-value text-right multi-line">
-                                Chó bị ngã từ tầng 4 xuống nên có thể bị gãy chân. Ngã từ ngày hôm qua, nằm im một chỗ cả ngày
+                                {ticketDetail?.symptomDescription || '---'}
                             </span>
                         </div>
                     </div>
 
                     {/* Footer divider & text */}
                     <div className="card-footer-info">
-                        Nguyễn Văn An thực hiện lúc 10:03 - 20/03/2026
+                        {isLoading ? 'Đang tải dữ liệu...' : `Mã phiếu #${ticketDetail?.id || id || '--'}`}
                     </div>
                 </div>
             </div>
