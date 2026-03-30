@@ -5,6 +5,8 @@ import './Login.css';
 import bgImage from '../assets/LoginBG.png';
 import logoImage from '../assets/petical_logo.png';
 import authService from '../api/authService';
+import { RECEPTIONIST_PATHS } from '../routes/receptionistPaths';
+import { TECH_PATHS } from '../routes/techPaths';
 
 import { Eye, EyeOff } from 'lucide-react';
 
@@ -25,8 +27,8 @@ const Login = () => {
 
     const getRoleHomePath = (role) => {
         if (role === 'DOCTOR') return '/doctors/home';
-        if (role === 'RECEPTIONIST' || role === 'STAFF') return '/receptionists/today-orders';
-        if (role === 'TECH') return '/techs/home';
+        if (role === 'RECEPTIONIST' || role === 'STAFF') return RECEPTIONIST_PATHS.TODAY_ORDERS;
+        if (role === 'TECH') return TECH_PATHS.HOME;
         return '/';
     };
 

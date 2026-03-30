@@ -1,48 +1,67 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Bell } from 'lucide-react';
+import ReceptionistLayout from '../../layouts/ReceptionistLayout';
+import { RECEPTIONIST_PATHS } from '../../routes/receptionistPaths';
+import notificationService from '../../api/notificationService';
 import './Notifications.css';
 
-const notifications = [
-    {
-        id: 1,
-        title: 'Thực hiện thanh toán!',
-        time: '3 phút',
-        orderCode: '25REC573275',
-        customerName: 'Nguyễn Anh Đức'
-    },
-    {
-        id: 2,
-        title: 'Thực hiện thanh toán!',
-        time: '3 phút',
-        orderCode: '25REC573275',
-        customerName: 'Nguyễn Anh Đức'
-    },
-    {
-        id: 3,
-        title: 'Thực hiện thanh toán!',
-        time: '3 phút',
-        orderCode: '25REC573275',
-        customerName: 'Nguyễn Anh Đức'
-    },
-    {
-        id: 4,
-        title: 'Thực hiện thanh toán!',
-        time: '3 phút',
-        orderCode: '25REC573275',
-        customerName: 'Nguyễn Anh Đức'
-    }
-];
-
 const Notifications = () => {
+    const navigate = useNavigate();
+    const [notifications, setNotifications] = useState([]);
+    const [isLoading, setIsLoading] = useState(true);
+
+    useEffect(() => {
+        let isMounted = true;
+
+        const fetchNotifications = async () => {
+            setIsLoading(true);
+            try {
+                const response = await notificationService.listReceptionistNotifications();
+                if (!isMounted) return;
+                setNotifications(response?.data || []);
+            } catch {
+                if (!isMounted) return;
+                setNotifications([]);
+            } finally {
+                if (isMounted) {
+                    setIsLoading(false);
+                }
+            }
+        };
+
+        fetchNotifications();
+
+        return () => {
+            isMounted = false;
+        };
+    }, []);
+
+    const handleOpenPayment = (item) => {
+        navigate(RECEPTIONIST_PATHS.PAYMENT, {
+            state: {
+                receptionId: item?.receptionId,
+                customerName: item?.customerName,
+            },
+        });
+    };
+
     return (
+        <ReceptionistLayout>
         <div className="rnotif-page">
             <header className="rnotif-header">
                 <h1 className="rnotif-title">Thông báo</h1>
             </header>
 
             <div className="rnotif-list">
+                {isLoading && <p className="rnotif-time">Đang tải thông báo...</p>}
                 {notifications.map((item) => (
-                    <div key={item.id} className="rnotif-card">
+                    <button
+                        key={item.id}
+                        type="button"
+                        className="rnotif-card"
+                        onClick={() => handleOpenPayment(item)}
+                    >
                         <div className="rnotif-icon-wrap">
                             <Bell size={18} color="#24C7A9" fill="#24C7A9" />
                         </div>
@@ -55,10 +74,11 @@ const Notifications = () => {
                                 Phiếu tiếp đón <strong>{item.orderCode}</strong> của khách hàng <strong>{item.customerName}</strong> đã hoàn thành. Hãy tiến hành thanh toán ngay!
                             </p>
                         </div>
-                    </div>
+                    </button>
                 ))}
             </div>
         </div>
+        </ReceptionistLayout>
     );
 };
 

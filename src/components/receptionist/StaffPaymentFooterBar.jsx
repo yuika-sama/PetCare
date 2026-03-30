@@ -2,12 +2,15 @@ import React, { useState } from 'react';
 import './StaffPaymentFooterBar.css';
 import { Button } from 'semantic-ui-react';
 
-const StaffPaymentFooterBar = ({ onPayClick }) => {
+const StaffPaymentFooterBar = ({ onPayClick, onBackClick, remainAmount = '0đ' }) => {
     const [pressed, setPressed] = useState('');
 
     const handlePress = (value) => {
         setPressed(value);
         window.setTimeout(() => setPressed(''), 140);
+        if (value === 'back' && onBackClick) {
+            onBackClick();
+        }
         if (value === 'pay' && onPayClick) {
             onPayClick();
         }
@@ -18,7 +21,7 @@ const StaffPaymentFooterBar = ({ onPayClick }) => {
             <div className="staff-payment-footer-shell">
                 <div className="remain-row">
                     <span>Còn lại phải thu</span>
-                    <strong>750.000đ</strong>
+                    <strong>{remainAmount}</strong>
                 </div>
                 <div className="footer-actions">
                     <Button

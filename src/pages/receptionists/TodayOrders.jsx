@@ -1,9 +1,11 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { Search, Bell, ChevronDown, ChevronUp, ChevronLeft, ChevronRight, UserRound, PlusCircle } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import ReceptionistLayout from '../../layouts/ReceptionistLayout';
 import ReceptionCard from '../../components/receptionist/ReceptionCard';
 import ReceivedCard from '../../components/receptionist/ReceivedCard';
+import { RECEPTIONIST_PATHS } from '../../routes/receptionistPaths';
+import receptionService from '../../api/receptionService';
 import './TodayOrders.css';
 
 const MONTH_NAMES = [
@@ -139,6 +141,8 @@ const TodayOrders = () => {
     const [showNewCustomerModal, setShowNewCustomerModal] = useState(false);
     const [searchTerm, setSearchTerm] = useState('');
     const [orders, setOrders] = useState(initialOrders);
+    const [isLoadingOrders, setIsLoadingOrders] = useState(false);
+    const [ordersError, setOrdersError] = useState('');
     const [newCustomer, setNewCustomer] = useState({
         name: '', phone: '', petName: '', species: '', breed: '', appointmentDate: ''
     });
@@ -153,6 +157,106 @@ const TodayOrders = () => {
     const [viewYear, setViewYear] = useState(today.getFullYear());
     const [viewMonth, setViewMonth] = useState(today.getMonth()); // 0-indexed
     const [selectedDate, setSelectedDate] = useState(defaultSelectedDate);
+
+    const selectedDateIso = useMemo(() => {
+        const date = new Date(viewYear, viewMonth, selectedDate || 1);
+        const year = date.getFullYear();
+        const month = `${date.getMonth() + 1}`.padStart(2, '0');
+        const day = `${date.getDate()}`.padStart(2, '0');
+        return `${year}-${month}-${day}`;
+    }, [viewYear, viewMonth, selectedDate]);
+
+    useEffect(() => {
+        let isMounted = true;
+
+        const mapStatus = (rawStatus) => {
+            const status = String(rawStatus || '').toLowerCase();
+            if (status.includes('paid') || status.includes('da_thanh_toan')) {
+                return ORDER_STATUS.PAID;
+            }
+            if (status.includes('cho_thanh_toan') || status.includes('waiting') || status.includes('payment')) {
+                return ORDER_STATUS.WAITING_PAYMENT;
+            }
+            return ORDER_STATUS.RECEIVED;
+        };
+
+        const mapOrder = (record) => {
+            const mappedStatus = mapStatus(record?.status);
+            const dateObj = record?.receptionTime ? new Date(record.receptionTime) : new Date();
+            const statusLabel =
+                mappedStatus === ORDER_STATUS.PAID
+                    ? 'Đã thanh toán'
+                    : mappedStatus === ORDER_STATUS.WAITING_PAYMENT
+                        ? 'Chờ thanh toán'
+                        : 'Đã tiếp đón';
+            const initials = (record?.client?.fullName || 'KH')
+                .split(' ')
+                .filter(Boolean)
+                .slice(0, 2)
+                .map((part) => part[0]?.toUpperCase())
+                .join('');
+
+            return {
+                id: record?.id,
+                customerId: record?.client?.id,
+                customerName: record?.client?.fullName || 'Khách hàng',
+                phone: record?.client?.phoneNumber || '--',
+                ticketId: `REC${record?.id || ''}`,
+                status: mappedStatus,
+                statusLabel,
+                createdAt: dateObj.toLocaleString('vi-VN', {
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    day: '2-digit',
+                    month: '2-digit',
+                    year: 'numeric',
+                }).replace(',', ' -'),
+                date: dateObj.getDate(),
+                species: record?.pet?.species || '',
+                hasAdvance: false,
+                pets: [
+                    {
+                        id: record?.pet?.id,
+                        name: record?.pet?.name || 'Chưa có tên',
+                        breed: record?.pet?.breed || record?.pet?.species || '--',
+                        gender: String(record?.pet?.gender || '').toLowerCase() === 'female' ? 'female' : 'male',
+                        age: record?.pet?.dateOfBirth ? '-- Tuổi' : '-- Tuổi',
+                        weight: record?.pet?.weight ? `${record?.pet?.weight}kg` : '--',
+                    },
+                ],
+                sourceOrder: null,
+                paymentEnabled: mappedStatus !== ORDER_STATUS.PAID,
+                hideSource: false,
+                avatar: `https://placehold.co/80x80/e0f2ef/209D80?text=${initials || 'KH'}`,
+                receptionRecord: record,
+            };
+        };
+
+        const fetchOrders = async () => {
+            setIsLoadingOrders(true);
+            setOrdersError('');
+            try {
+                const response = await receptionService.getReceptions({ date: selectedDateIso });
+                const records = response?.data?.data || [];
+                if (!isMounted) return;
+                setOrders(records.map(mapOrder));
+            } catch {
+                if (!isMounted) return;
+                setOrders([]);
+                setOrdersError('Không thể tải dữ liệu tiếp đón từ hệ thống.');
+            } finally {
+                if (isMounted) {
+                    setIsLoadingOrders(false);
+                }
+            }
+        };
+
+        fetchOrders();
+
+        return () => {
+            isMounted = false;
+        };
+    }, [selectedDateIso]);
 
     // Build the full month grid
     const monthGrid = useMemo(() => {
@@ -232,7 +336,7 @@ const TodayOrders = () => {
     }, [filteredByDate]);
 
     const activeOrders = useMemo(() => {
-        if (activeStatus === 'all') return filteredBySearchAndFilters;
+        if (activeStatus === ORDER_STATUS.ALL) return filteredBySearchAndFilters;
         return filteredBySearchAndFilters.filter((order) => order.status === activeStatus);
     }, [activeStatus, filteredBySearchAndFilters]);
 
@@ -243,8 +347,22 @@ const TodayOrders = () => {
 
     const shouldUseSimpleReceptionCard = activeStatus === ORDER_STATUS.RECEIVED;
 
-    const handleGoToNewReception = () => {
-        navigate('/receptionists/new-reception');
+    const handleGoToNewReception = (customer = null) => {
+        navigate(RECEPTIONIST_PATHS.NEW_RECEPTION, { state: customer ? { customer } : undefined });
+    };
+
+    const handleGoToNotifications = () => {
+        navigate(RECEPTIONIST_PATHS.NOTIFICATIONS);
+    };
+
+    const handleGoToPayment = (order) => {
+        navigate(RECEPTIONIST_PATHS.PAYMENT, {
+            state: {
+                receptionId: order?.id,
+                customerName: order?.customerName,
+                customerPhone: order?.phone,
+            },
+        });
     };
 
     const handleCreateCustomer = () => {
@@ -308,7 +426,12 @@ const TodayOrders = () => {
                                 <h1 className="to-header-name">Lê tân Thu Trang</h1>
                             </div>
                         </div>
-                        <button className="to-header-bell-btn" type="button" aria-label="Thông báo">
+                        <button
+                            className="to-header-bell-btn"
+                            type="button"
+                            aria-label="Thông báo"
+                            onClick={handleGoToNotifications}
+                        >
                             <Bell size={20} color="#1a1a1a" strokeWidth={2} />
                         </button>
                     </div>
@@ -417,6 +540,9 @@ const TodayOrders = () => {
                     </div>
                 </div>
 
+                {ordersError && <p className="to-empty-text">{ordersError}</p>}
+                {isLoadingOrders && <p className="to-empty-text">Đang tải danh sách tiếp đón...</p>}
+
                 {/* Status Tabs */}
                 <div className="to-status-tabs">
                     {statusTabs.map(tab => (
@@ -442,7 +568,14 @@ const TodayOrders = () => {
                                         name={c.customerName}
                                         phone={c.phone}
                                         avatar={c.avatar}
-                                        onAdd={() => console.log('Add', c.id)}
+                                        onAdd={() =>
+                                            handleGoToNewReception({
+                                                id: c.customerId,
+                                                name: c.customerName,
+                                                phone: c.phone,
+                                                pets: c.pets || [],
+                                            })
+                                        }
                                     />
                                 ))}
                             </div>
@@ -482,7 +615,7 @@ const TodayOrders = () => {
                                     order.status === ORDER_STATUS.PAID ? 'Đã thanh toán' : 'Thanh toán'
                                 }
                                 hideSource={order.hideSource}
-                                onPayment={() => console.log('Payment', order.id)}
+                                onPayment={() => handleGoToPayment(order)}
                             />
                         ))}
                     </div>

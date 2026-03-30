@@ -1,23 +1,22 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { CalendarCheck, CreditCard, PlusCircle, Bell, Menu } from 'lucide-react';
+import { RECEPTIONIST_PATHS } from '../../routes/receptionistPaths';
 import './ReceptionistNavBar.css';
 
 const ReceptionistNavBar = () => {
     const navigate = useNavigate();
     const { pathname } = useLocation();
-    const [activeTab, setActiveTab] = useState(
+    const activeTab =
         pathname.includes('/receptionists/payment')
             ? 'thanhtoan'
             : pathname.includes('/receptionists/notifications')
                 ? 'thongbao'
                 : pathname.includes('/receptionists/new-reception')
                     ? 'khac'
-                    : 'donhom'
-    );
+                    : 'donhom';
 
-    const go = (tab, path) => {
-        setActiveTab(tab);
+    const go = (path) => {
         navigate(path);
     };
 
@@ -26,7 +25,7 @@ const ReceptionistNavBar = () => {
             <div className="rc-nav-content">
                 <div
                     className={`rc-nav-item ${activeTab === 'donhom' ? 'active' : ''}`}
-                    onClick={() => go('donhom', '/receptionists/today-orders')}
+                    onClick={() => go(RECEPTIONIST_PATHS.TODAY_ORDERS)}
                 >
                     <CalendarCheck size={26} strokeWidth={1.8} />
                     <span>Đơn hôm nay</span>
@@ -34,14 +33,14 @@ const ReceptionistNavBar = () => {
 
                 <div
                     className={`rc-nav-item ${activeTab === 'thanhtoan' ? 'active' : ''}`}
-                    onClick={() => go('thanhtoan', '/receptionists/payment')}
+                    onClick={() => go(RECEPTIONIST_PATHS.PAYMENT)}
                 >
                     <CreditCard size={26} strokeWidth={1.8} />
                     <span>Thanh toán</span>
                 </div>
 
                 <div className="rc-nav-fab-placeholder">
-                    <button className="rc-nav-fab" onClick={() => navigate('/receptionists/new-reception')}>
+                    <button className="rc-nav-fab" onClick={() => navigate(RECEPTIONIST_PATHS.NEW_RECEPTION)}>
                         <PlusCircle size={28} color="#fff" strokeWidth={2} />
                     </button>
                     <span className="rc-nav-fab-label">Tạo đơn</span>
@@ -49,7 +48,7 @@ const ReceptionistNavBar = () => {
 
                 <div
                     className={`rc-nav-item ${activeTab === 'thongbao' ? 'active' : ''}`}
-                    onClick={() => go('thongbao', '/receptionists/notifications')}
+                    onClick={() => go(RECEPTIONIST_PATHS.NOTIFICATIONS)}
                 >
                     <Bell size={26} strokeWidth={1.8} />
                     <span>Thông báo</span>
@@ -57,7 +56,7 @@ const ReceptionistNavBar = () => {
 
                 <div
                     className={`rc-nav-item ${activeTab === 'khac' ? 'active' : ''}`}
-                    onClick={() => go('khac', '/receptionists/new-reception')}
+                    onClick={() => go(RECEPTIONIST_PATHS.NEW_RECEPTION)}
                 >
                     <Menu size={26} strokeWidth={1.8} />
                     <span>Khác</span>

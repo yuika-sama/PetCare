@@ -2,7 +2,7 @@ import React from 'react';
 import './StaffCostSummaryCard.css';
 import { Mars, Calendar, Weight, ChevronDown } from 'lucide-react';
 
-const feeRows = [
+const defaultFeeRows = [
     {
         name: 'Khám lâm sàng',
         unit: '01/lượt',
@@ -26,25 +26,45 @@ const feeRows = [
     }
 ];
 
-const StaffCostSummaryCard = () => {
+const formatCurrency = (value) => {
+    if (value === null || value === undefined || Number.isNaN(Number(value))) return '0đ';
+    return `${Number(value).toLocaleString('vi-VN')}đ`;
+};
+
+const StaffCostSummaryCard = ({
+    petInfo = {
+        name: 'Kuro',
+        breed: 'Chó Poodle',
+        age: '3 Tuổi',
+        weight: '4.5kg',
+    },
+    feeRows = defaultFeeRows,
+    paymentSummary = {
+        subtotal: 950000,
+        discount: 50000,
+        insurance: 200000,
+        total: 750000,
+    },
+    paymentHistoryAmount = 0,
+}) => {
     return (
         <section className="staff-cost-card">
             <h2 className="cost-card-title">Tổng hợp chi phí</h2>
 
             <div className="pet-chip">
                 <span className="pet-chip-details">
-                    <span className="pet-chip-name">Kuro</span>
+                    <span className="pet-chip-name">{petInfo?.name || 'Thú cưng'}</span>
                     <span className="pet-chip-breed">
-                        Chó Poodle
+                        {petInfo?.breed || '--'}
                         <Mars size={12} color="#3b82f6" style={{ marginLeft: '4px' }} />
                     </span>
                     <span className="pet-chip-stat">
                         <Calendar size={14} color="#888" />
-                        3 Tuổi
+                        {petInfo?.age || '--'}
                     </span>
                     <span className="pet-chip-stat">
                         <Weight size={14} color="#888" />
-                        4.5kg
+                        {petInfo?.weight || '--'}
                     </span>
                 </span>
             </div>
@@ -61,7 +81,7 @@ const StaffCostSummaryCard = () => {
                     <ChevronDown size={20} />
                     <span>Tổng cộng</span>
                 </div>
-                <strong>2.650.000đ</strong>
+                <strong>{formatCurrency(paymentSummary?.subtotal)}</strong>
             </div>
 
             <div className="cost-group">
@@ -74,8 +94,8 @@ const StaffCostSummaryCard = () => {
                         <small className="group-sub">Bảo hiểm bồi thường</small>
                     </div>
                     <div className="group-amounts">
-                        <strong>2.650.000VND</strong>
-                        <small>200.000đ</small>
+                        <strong>{formatCurrency(paymentSummary?.subtotal)}</strong>
+                        <small>{formatCurrency(paymentSummary?.insurance)}</small>
                     </div>
                 </div>
 
@@ -83,38 +103,10 @@ const StaffCostSummaryCard = () => {
                     <div className="fee-item" key={row.name}>
                         <strong className="fee-item-name">{row.name}</strong>
                         <div className="fee-row">
-                            <span className="fee-unit">{row.unit}</span>
-                            <span>{row.price}</span>
-                            <span>{row.discount}</span>
-                            <span>{row.amount}</span>
-                        </div>
-                    </div>
-                ))}
-            </div>
-
-            <div className="cost-group">
-                <div className="cost-group-header">
-                    <div className="group-meta">
-                        <div className="group-title">
-                            <ChevronDown size={20} />
-                            <span>Điều trị nội trú</span>
-                        </div>
-                        <small className="group-sub">Bảo hiểm bồi thường</small>
-                    </div>
-                    <div className="group-amounts">
-                        <strong>550.000VND</strong>
-                        <small>200.000đ</small>
-                    </div>
-                </div>
-
-                {feeRows.map((row) => (
-                    <div className="fee-item" key={`${row.name}-internal`}>
-                        <strong className="fee-item-name">{row.name}</strong>
-                        <div className="fee-row">
-                            <span className="fee-unit">{row.unit}</span>
-                            <span>{row.price}</span>
-                            <span>{row.discount}</span>
-                            <span>{row.amount}</span>
+                            <span className="fee-unit">{row.unit || '--'}</span>
+                            <span>{row.price || '--'}</span>
+                            <span>{row.discount || '--'}</span>
+                            <span>{row.amount || '--'}</span>
                         </div>
                     </div>
                 ))}
@@ -122,16 +114,16 @@ const StaffCostSummaryCard = () => {
 
             <div className="payment-summary">
                 <h3>Thanh toán</h3>
-                <div className="payment-row"><span>Tổng thành tiền</span>950.000đ</div>
-                <div className="payment-row"><span>Chiết khấu</span>50.000đ</div>
-                <div className="payment-row"><span>Bảo hiểm bồi thường</span>200.000đ</div>
-                <div className="payment-total"><span>Tổng thanh toán</span>750.000đ</div>
+                <div className="payment-row"><span>Tổng thành tiền</span>{formatCurrency(paymentSummary?.subtotal)}</div>
+                <div className="payment-row"><span>Chiết khấu</span>{formatCurrency(paymentSummary?.discount)}</div>
+                <div className="payment-row"><span>Bảo hiểm bồi thường</span>{formatCurrency(paymentSummary?.insurance)}</div>
+                <div className="payment-total"><span>Tổng thanh toán</span>{formatCurrency(paymentSummary?.total)}</div>
             </div>
 
             <div className="payment-history">
                 <div className="history-head">
                     <span>Lịch sử thanh toán</span>
-                    <strong>0đ</strong>
+                    <strong>{formatCurrency(paymentHistoryAmount)}</strong>
                 </div>
                 <div className="history-empty">Chưa có dữ liệu</div>
             </div>

@@ -1,6 +1,5 @@
 import React from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
-import TestPage from './pages/TestPage';
 import Login from './pages/Login';
 import DoctorHome from './pages/doctors/Home';
 import DoctorTickets from './pages/doctors/Tickets';
@@ -18,13 +17,34 @@ import ReceptionistPayment from './pages/receptionists/Payment';
 import TechHome from './pages/techStaffs/Home';
 import TechRecordResult from './pages/techStaffs/RecordResult';
 import {RequireAuth, RequireRole} from './routes/routeGuard';
+import { RECEPTIONIST_PATHS } from './routes/receptionistPaths';
+import { TECH_PATHS } from './routes/techPaths';
+import NotFound from './pages/NotFound';
+
+const getDefaultPathByRole = (role) => {
+  if (role === 'DOCTOR') return '/doctors/home';
+  if (role === 'RECEPTIONIST' || role === 'STAFF') return RECEPTIONIST_PATHS.TODAY_ORDERS;
+  if (role === 'TECH') return TECH_PATHS.HOME;
+  return '/login';
+};
+
+const RootRedirect = () => {
+  const token = localStorage.getItem('access_token');
+  const role = localStorage.getItem('user_role');
+
+  if (!token || !role) {
+    return <Navigate to="/login" replace />;
+  }
+
+  return <Navigate to={getDefaultPathByRole(role)} replace />;
+};
 
 function App() {
   return (
     <Routes>
-      <Route path="*" element={<Navigate to="/" replace />} />
-      <Route path="/" element={<TestPage />} />
+      <Route path="/" element={<RootRedirect />} />
       <Route path="/login" element={<Login />} />
+      <Route path="/404" element={<NotFound />} />
 
       <Route element={<RequireAuth />}>
         <Route element={<RequireRole allowedRoles={['DOCTOR']} />}>
@@ -39,16 +59,18 @@ function App() {
           <Route path="/doctors/notifications" element={<Notifications />} />
         </Route>
         <Route element={<RequireRole allowedRoles={['RECEPTIONIST', 'STAFF']} />}>
-          <Route path="/receptionists/today-orders" element={<TodayOrders />} />
-          <Route path="/receptionists/new-reception" element={<NewReception />} />
-          <Route path="/receptionists/notifications" element={<ReceptionistNotifications />} />
-          <Route path="/receptionists/payment" element={<ReceptionistPayment />} />
+          <Route path={RECEPTIONIST_PATHS.TODAY_ORDERS} element={<TodayOrders />} />
+          <Route path={RECEPTIONIST_PATHS.NEW_RECEPTION} element={<NewReception />} />
+          <Route path={RECEPTIONIST_PATHS.NOTIFICATIONS} element={<ReceptionistNotifications />} />
+          <Route path={RECEPTIONIST_PATHS.PAYMENT} element={<ReceptionistPayment />} />
         </Route>
         <Route element={<RequireRole allowedRoles={['TECH']} />}>
-          <Route path="/techs/home" element={<TechHome />} />
-          <Route path="/techs/record-result/:id" element={<TechRecordResult />} />
+          <Route path={TECH_PATHS.HOME} element={<TechHome />} />
+          <Route path={`${TECH_PATHS.RECORD_RESULT}/:id`} element={<TechRecordResult />} />
         </Route>
       </Route>
+
+      <Route path="*" element={<NotFound />} />
     </Routes>
   );
 }

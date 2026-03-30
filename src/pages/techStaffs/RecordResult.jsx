@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { ChevronLeft, ChevronUp, ChevronDown, Plus, PencilLine } from 'lucide-react';
+import { TECH_PATHS } from '../../routes/techPaths';
 import './RecordResult.css';
 import '@fontsource/roboto/400.css';
 import '@fontsource/roboto/500.css';
@@ -66,7 +67,7 @@ const TechRecordResult = () => {
     return (
         <div className="trs-page">
             <header className="trs-header">
-                <button className="trs-icon-btn" type="button" onClick={() => navigate(-1)} aria-label="Quay lai">
+                <button className="trs-icon-btn" type="button" onClick={() => navigate(TECH_PATHS.HOME)} aria-label="Quay lai">
                     <ChevronLeft size={24} />
                 </button>
                 <h1>Ghi nhận kết quả</h1>
@@ -170,10 +171,10 @@ const TechRecordResult = () => {
             </main>
 
             <footer className="trs-footer">
-                <button type="button" className="trs-btn-outline" onClick={() => navigate(-1)}>
+                <button type="button" className="trs-btn-outline" onClick={() => navigate(TECH_PATHS.HOME)}>
                     Trở lại
                 </button>
-                <button type="button" className="trs-btn-primary" onClick={() => navigate('/techs/home')}>
+                <button type="button" className="trs-btn-primary" onClick={() => navigate(TECH_PATHS.HOME)}>
                     Xác nhận
                 </button>
             </footer>

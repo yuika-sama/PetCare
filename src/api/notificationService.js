@@ -1,3 +1,5 @@
+import { authApi } from './baseApi';
+
 const MOCK_NOTIFICATIONS = [
     {
         id: 1,
@@ -31,6 +33,30 @@ const MOCK_NOTIFICATIONS = [
 const notificationService = {
     async listDoctorNotifications() {
         return Promise.resolve({ data: MOCK_NOTIFICATIONS });
+    },
+    async listReceptionistNotifications(params = {}) {
+        try {
+            const response = await authApi.get('/reception-slips', {
+                params: {
+                    status: 'cho_thanh_toan',
+                    ...params,
+                },
+            });
+
+            const records = response?.data?.data || [];
+            const mapped = records.map((record) => ({
+                id: record?.id,
+                title: 'Thực hiện thanh toán!',
+                time: record?.receptionTime || '',
+                orderCode: `REC${record?.id || ''}`,
+                customerName: record?.client?.fullName || 'Khách hàng',
+                receptionId: record?.id,
+            }));
+
+            return { data: mapped };
+        } catch {
+            return Promise.resolve({ data: MOCK_NOTIFICATIONS });
+        }
     },
     async markAsRead(notificationId) {
         return Promise.resolve({ data: { id: notificationId, read: true } });

@@ -1,13 +1,21 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { ChevronLeft, ChevronDown, Phone, PawPrint, CirclePlus, Cake, Weight, Mars, PenSquare } from 'lucide-react';
+import { useLocation, useNavigate } from 'react-router-dom';
+import ReceptionistLayout from '../../layouts/ReceptionistLayout';
+import { RECEPTIONIST_PATHS } from '../../routes/receptionistPaths';
+import customerService from '../../api/customerService';
+import petService from '../../api/petService';
+import receptionService from '../../api/receptionService';
 import './NewReception.css';
 
 const NewReception = () => {
-    const [selectedPet, setSelectedPet] = useState('Kuro');
-    const [pets, setPets] = useState([
-        { name: 'Kuro' },
-        { name: 'Katy' },
-    ]);
+    const navigate = useNavigate();
+    const location = useLocation();
+    const [selectedPet, setSelectedPet] = useState('');
+    const [pets, setPets] = useState([]);
+    const [customerId, setCustomerId] = useState(null);
+    const [customerName, setCustomerName] = useState('');
+    const [customerPhone, setCustomerPhone] = useState('');
     const [showAddPetModal, setShowAddPetModal] = useState(false);
     const [newPetName, setNewPetName] = useState('');
     const [newPetSpecies, setNewPetSpecies] = useState('');
@@ -22,26 +30,184 @@ const NewReception = () => {
     const [assignedDoctor, setAssignedDoctor] = useState('');
     const [assignedCases, setAssignedCases] = useState('--');
     const [notes, setNotes] = useState('');
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [submitError, setSubmitError] = useState('');
 
-    const handleCreatePet = () => {
+    useEffect(() => {
+        const customer = location.state?.customer;
+        if (!customer) return;
+
+        setCustomerId(customer?.id || null);
+        setCustomerName(customer?.name || '');
+        setCustomerPhone(customer?.phone || '');
+
+        const incomingPets = (customer?.pets || []).map((pet, index) => ({
+            id: pet?.id || `temp-${index}`,
+            name: pet?.name || 'Thú cưng',
+            species: pet?.species || '',
+            breed: pet?.breed || '',
+        }));
+
+        setPets(incomingPets);
+        if (incomingPets.length > 0) {
+            setSelectedPet(incomingPets[0].id);
+        }
+    }, [location.state]);
+
+    const hydrateCustomerPets = async (id) => {
+        const petsResponse = await customerService.getCustomerPets(id);
+        const petItems = petsResponse?.data?.data || [];
+        const mappedPets = petItems.map((pet) => ({
+            id: pet?.id,
+            name: pet?.name || 'Thú cưng',
+            species: pet?.species || '',
+            breed: pet?.breed || '',
+        }));
+        setPets(mappedPets);
+        if (mappedPets.length > 0) {
+            setSelectedPet(mappedPets[0].id);
+        }
+    };
+
+    const goToTodayOrders = () => {
+        navigate(RECEPTIONIST_PATHS.TODAY_ORDERS);
+    };
+
+    const handleCreatePet = async () => {
         if (!newPetName.trim() || !newPetSpecies || !newPetBreed.trim()) {
             return;
         }
 
-        const createdPet = { name: newPetName.trim() };
+        let createdPet = {
+            id: `tmp-${Date.now()}`,
+            name: newPetName.trim(),
+            species: newPetSpecies,
+            breed: newPetBreed.trim(),
+        };
+
+        if (customerId) {
+            try {
+                const response = await petService.createPet({
+                    client: { id: customerId },
+                    name: createdPet.name,
+                    species: createdPet.species,
+                    breed: createdPet.breed,
+                    gender: 'male',
+                    dateOfBirth: birthDate || undefined,
+                    weight: weight ? Number(weight) : undefined,
+                });
+                const pet = response?.data?.data;
+                if (pet?.id) {
+                    createdPet = {
+                        id: pet.id,
+                        name: pet.name || createdPet.name,
+                        species: pet.species || createdPet.species,
+                        breed: pet.breed || createdPet.breed,
+                    };
+                }
+            } catch {
+                setSubmitError('Không thể tạo thú cưng mới. Vui lòng thử lại.');
+                return;
+            }
+        }
+
         setPets((prev) => [...prev, createdPet]);
-        setSelectedPet(createdPet.name);
+        setSelectedPet(createdPet.id);
         setShowAddPetModal(false);
         setNewPetName('');
         setNewPetSpecies('');
         setNewPetBreed('');
     };
 
+    const resolveCustomer = async () => {
+        const phone = customerPhone.trim();
+        const name = customerName.trim();
+
+        if (!phone || !name) {
+            throw new Error('Vui lòng nhập họ tên và số điện thoại khách hàng.');
+        }
+
+        const foundResponse = await customerService.findCustomerByPhone(phone);
+        const foundCustomer = foundResponse?.data?.data;
+
+        if (foundCustomer?.id) {
+            setCustomerId(foundCustomer.id);
+            setCustomerName(foundCustomer.fullName || name);
+            setCustomerPhone(foundCustomer.phoneNumber || phone);
+            await hydrateCustomerPets(foundCustomer.id);
+            return foundCustomer.id;
+        }
+
+        const createResponse = await customerService.createCustomer({
+            fullName: name,
+            phoneNumber: phone,
+            pet: null,
+        });
+        const createdCustomer = createResponse?.data?.data;
+        if (!createdCustomer?.id) {
+            throw new Error('Không thể tạo mới khách hàng.');
+        }
+
+        setCustomerId(createdCustomer.id);
+        return createdCustomer.id;
+    };
+
+    const handleCreateReception = async () => {
+        if (isSubmitting) return;
+
+        setSubmitError('');
+        setIsSubmitting(true);
+        try {
+            const resolvedCustomerId = customerId || await resolveCustomer();
+
+            let finalPetId = selectedPet;
+            if (!finalPetId) {
+                if (!newPetName.trim() || !newPetSpecies || !newPetBreed.trim()) {
+                    throw new Error('Vui lòng thêm thông tin thú cưng trước khi tạo phiếu.');
+                }
+                const petResponse = await petService.createPet({
+                    client: { id: resolvedCustomerId },
+                    name: newPetName.trim(),
+                    species: newPetSpecies,
+                    breed: newPetBreed.trim(),
+                    gender: 'male',
+                    dateOfBirth: birthDate || undefined,
+                    weight: weight ? Number(weight) : undefined,
+                });
+                finalPetId = petResponse?.data?.data?.id;
+            }
+
+            if (!finalPetId) {
+                throw new Error('Không tìm thấy thú cưng hợp lệ để tạo phiếu tiếp đón.');
+            }
+
+            await receptionService.createReception({
+                client: { id: resolvedCustomerId },
+                pet: { id: finalPetId },
+                examForm: {
+                    examType: examType || 'khammoi',
+                    emergency: isEmergency,
+                },
+                examReason: reason || '',
+                symptomDescription: description || '',
+                note: notes || '',
+                status: 'da_tiep_don',
+            });
+
+            navigate(RECEPTIONIST_PATHS.TODAY_ORDERS);
+        } catch (error) {
+            setSubmitError(error?.message || 'Không thể tạo phiếu tiếp đón. Vui lòng thử lại.');
+        } finally {
+            setIsSubmitting(false);
+        }
+    };
+
     return (
+        <ReceptionistLayout>
         <div className="new-reception-page">
             {/* Header */}
             <header className="nr-header">
-                <button className="nr-btn-icon">
+                <button className="nr-btn-icon" type="button" onClick={goToTodayOrders}>
                     <ChevronLeft size={24} color="#1a1a1a" />
                 </button>
                 <h1 className="nr-title">Tiếp đón mới</h1>
@@ -54,7 +220,7 @@ const NewReception = () => {
                 {/* Customer Info */}
                 <div className="nr-customer-section">
                     <div className="nr-customer-row">
-                        <h2 className="nr-customer-name">Nguyễn Anh Đức</h2>
+                        <h2 className="nr-customer-name">Khách hàng</h2>
                         {/* <div className="nr-customer-debt">
                             <span className="nr-debt-amount">10.000.000đ</span>
                         </div> */}
@@ -62,8 +228,23 @@ const NewReception = () => {
                     <div className="nr-customer-sub-row">
                         <div className="nr-customer-phone">
                             <Phone size={14} color="#209D80" />
-                            <span>0912345678</span>
+                            <input
+                                type="text"
+                                className="nr-customer-input"
+                                placeholder="Số điện thoại"
+                                value={customerPhone}
+                                onChange={(e) => setCustomerPhone(e.target.value)}
+                            />
                         </div>
+                    </div>
+                    <div className="nr-customer-sub-row">
+                        <input
+                            type="text"
+                            className="nr-customer-input"
+                            placeholder="Họ tên khách hàng"
+                            value={customerName}
+                            onChange={(e) => setCustomerName(e.target.value)}
+                        />
                     </div>
                 </div>
 
@@ -71,9 +252,9 @@ const NewReception = () => {
                 <div className="nr-pet-chips">
                     {pets.map(pet => (
                         <button
-                            key={pet.name}
-                            className={`nr-pet-chip ${selectedPet === pet.name ? 'active' : ''}`}
-                            onClick={() => setSelectedPet(pet.name)}
+                            key={pet.id || pet.name}
+                            className={`nr-pet-chip ${selectedPet === (pet.id || pet.name) ? 'active' : ''}`}
+                            onClick={() => setSelectedPet(pet.id || pet.name)}
                         >
                             <PawPrint size={14} />
                             <span>{pet.name}</span>
@@ -271,9 +452,13 @@ const NewReception = () => {
 
             {/* Bottom Actions */}
             <div className="nr-bottom-actions">
-                <button className="nr-btn-cancel">Hủy bỏ</button>
-                <button className="nr-btn-submit">Tạo phiếu</button>
+                <button className="nr-btn-cancel" type="button" onClick={goToTodayOrders}>Hủy bỏ</button>
+                <button className="nr-btn-submit" type="button" onClick={handleCreateReception} disabled={isSubmitting}>
+                    {isSubmitting ? 'Đang tạo...' : 'Tạo phiếu'}
+                </button>
             </div>
+
+            {submitError && <p className="nr-submit-error">{submitError}</p>}
 
             {showAddPetModal && (
                 <>
@@ -337,6 +522,7 @@ const NewReception = () => {
                 </>
             )}
         </div>
+        </ReceptionistLayout>
     );
 };
 

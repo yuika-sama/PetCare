@@ -1,5 +1,4 @@
 import React from 'react';
-import ReceptionistNavBar from '../components/receptionist/ReceptionistNavBar';
 import './ReceptionistLayout.css';
 
 const ReceptionistLayout = ({ children }) => {
@@ -8,7 +7,6 @@ const ReceptionistLayout = ({ children }) => {
             <div className="receptionist-main-content">
                 {children}
             </div>
-            {/* <ReceptionistNavBar /> */}
         </div>
     );
 };

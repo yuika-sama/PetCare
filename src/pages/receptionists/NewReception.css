@@ -96,6 +96,21 @@
     color: #209D80;
 }
 
+.nr-customer-input {
+    width: 100%;
+    border: 1px solid #dbe4e1;
+    border-radius: 8px;
+    padding: 8px 10px;
+    font-size: 14px;
+    color: #1f2937;
+    outline: none;
+    margin-top: 8px;
+}
+
+.nr-customer-input:focus {
+    border-color: #209d80;
+}
+
 .nr-order-count {
     font-size: 13px;
     color: #888;
@@ -453,6 +468,18 @@
 .nr-btn-submit {
     background-color: #209D80;
     color: #fff;
+}
+
+.nr-btn-submit:disabled {
+    opacity: 0.65;
+    cursor: not-allowed;
+}
+
+.nr-submit-error {
+    color: #c62828;
+    font-size: 13px;
+    text-align: center;
+    margin: 8px 16px 0;
 }
 
 /* Add Pet Modal */

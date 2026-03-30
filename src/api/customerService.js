@@ -4,7 +4,13 @@ const customerService = {
     getCustomers(params) {
         return authApi.get('/customers', {params});
     },
+    findCustomerByPhone(phone) {
+        return authApi.get('/customers', { params: { phone } });
+    },
     createCustomers(payload) {
+        return authApi.post('/customers', payload);
+    },
+    createCustomer(payload) {
         return authApi.post('/customers', payload);
     },
     getCustomerPets(customerId) {

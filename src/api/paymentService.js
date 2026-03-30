@@ -7,6 +7,9 @@ const paymentService = {
     createPrepPayment(payload){
         return authApi.post('/prepayments', payload);
     },
+    createPrePayment(payload){
+        return authApi.post('/prepayments', payload);
+    },
     createInvoice(payload){
         return authApi.post('/invoices', payload);
     },
@@ -16,8 +19,8 @@ const paymentService = {
     patchInvoiceById(invoiceId, payload){
         return authApi.patch(`/invoices/${invoiceId}`, payload);
     },
-    getInvoicePreview(invoiceId, payload){
-        return authApi.post(`/reception-slips/${invoiceId}/invoice`, payload);
+    getInvoicePreview(receptionSlipId){
+        return authApi.get(`/reception-slips/${receptionSlipId}/invoice`);
     },
     getPaymentMethods(){
         return authApi.get('/payment-methods');

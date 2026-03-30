@@ -4,6 +4,7 @@ import { Search } from 'lucide-react';
 import TechTopHeader from '../../components/techStaffs/TechTopHeader';
 import TechStatusTabs from '../../components/techStaffs/TechStatusTabs';
 import TechTaskCard from '../../components/techStaffs/TechTaskCard';
+import { TECH_PATHS, buildTechRecordResultPath } from '../../routes/techPaths';
 import './Home.css';
 
 const tasksSeed = [
@@ -97,11 +98,19 @@ const TechHome = () => {
         });
     }, [activeTab, searchTerm]);
 
+    const handleOpenTask = (selectedTask) => {
+        navigate(buildTechRecordResultPath(selectedTask.id));
+    };
+
     return (
         <div className="tech-home-page">
             <div className="tech-home-shell">
                 <div className="tech-home-header-area">
-                    <TechTopHeader title="Xin chào" name="Kỹ thuật viên Quốc Đạt" />
+                    <TechTopHeader
+                        title="Xin chào"
+                        name="Kỹ thuật viên Quốc Đạt"
+                        onBellClick={() => navigate(TECH_PATHS.HOME)}
+                    />
                 </div>
 
                 <div className="tech-search-box">
@@ -122,8 +131,8 @@ const TechHome = () => {
                             key={task.id}
                             task={task}
                             isProcessingTab={activeTab === 'processing'}
-                            onOpen={(selectedTask) => navigate(`/techs/record-result/${selectedTask.id}`)}
-                            onRecordResult={(selectedTask) => navigate(`/techs/record-result/${selectedTask.id}`)}
+                            onOpen={handleOpenTask}
+                            onRecordResult={handleOpenTask}
                         />
                     ))}
                     {filteredTasks.length === 0 && (

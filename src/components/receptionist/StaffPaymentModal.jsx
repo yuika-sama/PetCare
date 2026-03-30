@@ -2,11 +2,28 @@ import React, { useState } from 'react';
 import './StaffPaymentModal.css';
 import { Button } from 'semantic-ui-react';
 
-const StaffPaymentModal = ({ open, onClose, onConfirm, remainAmount = '750.000đ' }) => {
+const StaffPaymentModal = ({
+    open,
+    onClose,
+    onConfirm,
+    remainAmount = '0đ',
+    paymentMethods = [],
+    isSubmitting = false,
+    defaultNote = 'Thanh toán tiền khám',
+}) => {
     // const [actionType, setActionType] = useState('thu_tien'); // 'thu_tien', 'tam_ung', 'hoan_tien'
-    const [amount, setAmount] = useState('750.000');
-    const [note, setNote] = useState('Thanh toán tiền khám');
-    const [paymentMethod, setPaymentMethod] = useState(''); // 'the', 'qr', 'tm', 'ck'
+    const [amount, setAmount] = useState('');
+    const [note, setNote] = useState(defaultNote);
+    const [paymentMethod, setPaymentMethod] = useState('');
+
+    const handleConfirm = () => {
+        if (!onConfirm) return;
+        onConfirm({
+            amount,
+            note,
+            paymentMethodId: paymentMethod,
+        });
+    };
 
     if (!open) return null;
 
@@ -65,6 +82,7 @@ const StaffPaymentModal = ({ open, onClose, onConfirm, remainAmount = '750.000đ
                             type="text"
                             value={amount}
                             onChange={(e) => setAmount(e.target.value)}
+                            placeholder="Nhập số tiền"
                         />
                         <div className="currency-selector">
                             <span>VND</span>
@@ -86,54 +104,26 @@ const StaffPaymentModal = ({ open, onClose, onConfirm, remainAmount = '750.000đ
                 </div>
 
                 <div className="staff-modal-radio-group payment-method-group">
-                    <label className="radio-label">
-                        <input
-                            type="radio"
-                            name="paymentMethod"
-                            checked={paymentMethod === 'the'}
-                            onChange={() => setPaymentMethod('the')}
-                        />
-                        <span className="custom-radio" />
-                        Thẻ
-                    </label>
-                    {/* <label className="radio-label">
-                        <input
-                            type="radio"
-                            name="paymentMethod"
-                            checked={paymentMethod === 'qr'}
-                            onChange={() => setPaymentMethod('qr')}
-                        />
-                        <span className="custom-radio" />
-                        QR
-                    </label> */}
-                    <label className="radio-label">
-                        <input
-                            type="radio"
-                            name="paymentMethod"
-                            checked={paymentMethod === 'tm'}
-                            onChange={() => setPaymentMethod('tm')}
-                        />
-                        <span className="custom-radio" />
-                        Tiền mặt
-                    </label>
-                    <label className="radio-label">
-                        <input
-                            type="radio"
-                            name="paymentMethod"
-                            checked={paymentMethod === 'ck'}
-                            onChange={() => setPaymentMethod('ck')}
-                        />
-                        <span className="custom-radio" />
-                        Chuyển khoản
-                    </label>
+                    {paymentMethods.map((method) => (
+                        <label className="radio-label" key={method.id}>
+                            <input
+                                type="radio"
+                                name="paymentMethod"
+                                checked={paymentMethod === String(method.id)}
+                                onChange={() => setPaymentMethod(String(method.id))}
+                            />
+                            <span className="custom-radio" />
+                            {method.name}
+                        </label>
+                    ))}
                 </div>
 
                 <div className="staff-modal-actions">
                     <Button className="btn-cancel" onClick={onClose}>
                         Hủy bỏ
                     </Button>
-                    <Button className="btn-confirm" onClick={onConfirm}>
-                        Xác nhận
+                    <Button className="btn-confirm" onClick={handleConfirm} disabled={isSubmitting}>
+                        {isSubmitting ? 'Đang xử lý...' : 'Xác nhận'}
                     </Button>
                 </div>
             </div>

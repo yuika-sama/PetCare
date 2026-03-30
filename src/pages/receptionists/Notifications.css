@@ -37,6 +37,14 @@
     border: 1px solid rgba(28, 155, 132, 0.18);
     box-shadow: 0 1px 4px 0 rgba(28, 155, 132, 0.06),
         0 2px 12px 0 rgba(28, 155, 132, 0.10);
+    width: 100%;
+    text-align: left;
+    cursor: pointer;
+}
+
+.rnotif-card:focus-visible {
+    outline: 2px solid #209d80;
+    outline-offset: 2px;
 }
 
 .rnotif-icon-wrap {
