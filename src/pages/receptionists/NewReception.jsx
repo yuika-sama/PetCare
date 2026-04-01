@@ -38,8 +38,8 @@ const NewReception = () => {
         if (!customer) return;
 
         setCustomerId(customer?.id || null);
-        setCustomerName(customer?.name || '');
-        setCustomerPhone(customer?.phone || '');
+        setCustomerName(customer?.name || customer?.fullName || '');
+        setCustomerPhone(customer?.phone || customer?.phoneNumber || '');
 
         const incomingPets = (customer?.pets || []).map((pet, index) => ({
             id: pet?.id || `temp-${index}`,
@@ -88,13 +88,10 @@ const NewReception = () => {
         if (customerId) {
             try {
                 const response = await petService.createPet({
-                    client: { id: customerId },
+                    clientId: customerId,
                     name: createdPet.name,
                     species: createdPet.species,
                     breed: createdPet.breed,
-                    gender: 'male',
-                    dateOfBirth: birthDate || undefined,
-                    weight: weight ? Number(weight) : undefined,
                 });
                 const pet = response?.data?.data;
                 if (pet?.id) {
@@ -139,9 +136,8 @@ const NewReception = () => {
         }
 
         const createResponse = await customerService.createCustomer({
-            fullName: name,
-            phoneNumber: phone,
-            pet: null,
+            name,
+            phone,
         });
         const createdCustomer = createResponse?.data?.data;
         if (!createdCustomer?.id) {
@@ -158,6 +154,13 @@ const NewReception = () => {
         setSubmitError('');
         setIsSubmitting(true);
         try {
+            const currentUser = JSON.parse(localStorage.getItem('user_info') || '{}');
+            const receptionistId = Number(currentUser?.id) || 1;
+            const doctorId = Number(assignedDoctor);
+            if (!doctorId) {
+                throw new Error('Vui lòng chọn bác sĩ phụ trách.');
+            }
+
             const resolvedCustomerId = customerId || await resolveCustomer();
 
             let finalPetId = selectedPet;
@@ -166,13 +169,10 @@ const NewReception = () => {
                     throw new Error('Vui lòng thêm thông tin thú cưng trước khi tạo phiếu.');
                 }
                 const petResponse = await petService.createPet({
-                    client: { id: resolvedCustomerId },
+                    clientId: resolvedCustomerId,
                     name: newPetName.trim(),
                     species: newPetSpecies,
                     breed: newPetBreed.trim(),
-                    gender: 'male',
-                    dateOfBirth: birthDate || undefined,
-                    weight: weight ? Number(weight) : undefined,
                 });
                 finalPetId = petResponse?.data?.data?.id;
             }
@@ -182,16 +182,16 @@ const NewReception = () => {
             }
 
             await receptionService.createReception({
-                client: { id: resolvedCustomerId },
-                pet: { id: finalPetId },
-                examForm: {
-                    examType: examType || 'khammoi',
-                    emergency: isEmergency,
-                },
+                clientId: resolvedCustomerId,
+                petId: Number(finalPetId),
+                receptionistId,
+                doctorId,
                 examReason: reason || '',
                 symptomDescription: description || '',
                 note: notes || '',
-                status: 'da_tiep_don',
+                weight: weight ? Number(weight) : 0,
+                examType: examType === 'taikham' ? 'ngoại trú' : 'lâm sàng',
+                emergency: isEmergency,
             });
 
             navigate(RECEPTIONIST_PATHS.TODAY_ORDERS);
@@ -384,8 +384,8 @@ const NewReception = () => {
                                     }}
                                 >
                                     <option value="" disabled></option>
-                                    <option value="bshauyan">Bs. Hà Huy An</option>
-                                    <option value="bsbinh">Bs. Bình</option>
+                                    <option value="4">Bs. Hà Huy An</option>
+                                    <option value="5">Bs. Bình</option>
                                 </select>
                                 <ChevronDown size={18} color="#888" className="nr-select-icon" />
                             </div>

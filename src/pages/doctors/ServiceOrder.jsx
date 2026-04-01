@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { ChevronLeft, MoreVertical, Phone, Eye, Mars, Calendar, Weight, Plus, TriangleAlert } from 'lucide-react';
 import ServiceAccordion from '../../components/doctor/ServiceAccordion';
 import TreatmentHistoryTimeline from '../../components/doctor/TreatmentHistoryTimeline';
@@ -15,8 +15,17 @@ import treatmentService from '../../api/treatmentService';
 
 const AlertBadgeIcon = () => <TriangleAlert size={24} color="#ef4444" strokeWidth={2} />;
 
+const toArray = (raw) => {
+    if (Array.isArray(raw)) return raw;
+    if (Array.isArray(raw?.items)) return raw.items;
+    if (Array.isArray(raw?.content)) return raw.content;
+    if (Array.isArray(raw?.results)) return raw.results;
+    return [];
+};
+
 export default function ServiceOrder() {
     const navigate = useNavigate();
+    const location = useLocation();
     const { id } = useParams();
     const [activeTab, setActiveTab] = useState('Dịch vụ');
     const [selectedConclusion, setSelectedConclusion] = useState('');
@@ -25,26 +34,38 @@ export default function ServiceOrder() {
     const [conclusionText, setConclusionText] = useState('Ho có đờm, khó khè. Vòm họng sung tấy');
     const [receptionDetail, setReceptionDetail] = useState(null);
     const [treatmentDetail, setTreatmentDetail] = useState(null);
-    const [isLoading, setIsLoading] = useState(true);
+    const [paraclinicalServices, setParaclinicalServices] = useState([]);
+
+    const mapParaclinicalItem = (item) => ({
+        id: item?.id || item?.serviceId || item?.service?.id || item?.paraclinicalServiceId,
+        name: item?.serviceName || item?.service?.name || 'Dịch vụ cận lâm sàng',
+        status: 'pending',
+        technicianName: item?.technicianName || item?.technician?.fullName || item?.technician?.name || 'Chưa gán',
+        quantity: item?.quantity || 1,
+        price: item?.price ?? item?.service?.price ?? item?.unitPrice ?? 0,
+    });
 
     useEffect(() => {
         let isMounted = true;
 
         const fetchData = async () => {
-            setIsLoading(true);
             try {
                 const [receptionResponse, treatmentResponse] = await Promise.allSettled([
                     receptionService.getReceptionById(id),
-                    treatmentService.getTreatmentDetailFlexible(id),
+                    Promise.resolve(null),
                 ]);
+
+                const paraclinicalResponse = await receptionService.getSelectedParaclinicalServices(id).catch(() => null);
 
                 if (!isMounted) return;
 
                 const receptionData = receptionResponse.status === 'fulfilled' ? receptionResponse.value?.data?.data : null;
                 const treatmentData = treatmentResponse.status === 'fulfilled' ? treatmentResponse.value?.data?.data : null;
+                const selectedServices = toArray(paraclinicalResponse?.data?.data);
 
                 setReceptionDetail(receptionData || null);
                 setTreatmentDetail(treatmentData || null);
+                setParaclinicalServices(selectedServices.map(mapParaclinicalItem));
 
                 if (typeof treatmentData?.plan === 'string' && treatmentData.plan.trim()) {
                     setConclusionText(treatmentData.plan);
@@ -56,10 +77,6 @@ export default function ServiceOrder() {
                 if (!isMounted) return;
                 setReceptionDetail(null);
                 setTreatmentDetail(null);
-            } finally {
-                if (isMounted) {
-                    setIsLoading(false);
-                }
             }
         };
 
@@ -71,6 +88,19 @@ export default function ServiceOrder() {
             isMounted = false;
         };
     }, [id]);
+
+    useEffect(() => {
+        if (location.state?.refreshParaclinical && id) {
+            receptionService.getSelectedParaclinicalServices(id)
+                .then((response) => {
+                    const selected = toArray(response?.data?.data);
+                    setParaclinicalServices(selected.map(mapParaclinicalItem));
+                })
+                .catch(() => {
+                    setParaclinicalServices([]);
+                });
+        }
+    }, [location.state?.refreshParaclinical, id]);
 
     const petInfo = useMemo(() => {
         const pet = receptionDetail?.pet;
@@ -84,8 +114,21 @@ export default function ServiceOrder() {
         };
     }, [receptionDetail]);
 
-    const serviceName = receptionDetail?.examForm?.examType || 'Khám lâm sàng';
-    const executorName = treatmentDetail?.createdBy?.fullName || 'Người thực hiện';
+    const primaryService = useMemo(() => {
+        const examForm = receptionDetail?.examForm || {};
+        const rawStatus = String(receptionDetail?.status || '').toLowerCase();
+        const statusLabel = rawStatus || 'chờ thực hiện';
+        const price = Number(examForm?.price ?? receptionDetail?.examPrice ?? 0);
+        const quantity = Number(examForm?.quantity ?? 1);
+
+        return {
+            name: examForm?.examType || 'Khám lâm sàng',
+            status: statusLabel,
+            price,
+            quantity,
+            executor: treatmentDetail?.createdBy?.fullName || receptionDetail?.doctor?.fullName || 'Người thực hiện',
+        };
+    }, [receptionDetail, treatmentDetail]);
 
     const saveTreatmentConclusion = async () => {
         const payload = {
@@ -144,7 +187,7 @@ export default function ServiceOrder() {
                         <span>
                             Được tạo từ đơn tiếp đón lúc <span className="so-time">{receptionDetail?.receptionTime ? new Date(receptionDetail.receptionTime).toLocaleString('vi-VN') : '--:-- --/--/----'}</span>
                         </span>
-                        <Eye size={16} className="so-icon-eye" />
+                        {/* <Eye size={16} className="so-icon-eye" /> */}
                     </div>
 
                     {/* Pet Info Box - TicketCard design with 2 cases */}
@@ -198,32 +241,60 @@ export default function ServiceOrder() {
                             <ServiceAccordion title="KHÁM BỆNH" defaultExpanded>
                                 <div className="so-service-item">
                                     <div className="so-service-row">
-                                        <span className="so-service-name">{serviceName}</span>
-                                        <span className="so-service-status pending">Chờ thực hiện</span>
+                                        <span className="so-service-name">{primaryService.name}</span>
+                                        <span className="so-service-status pending">{primaryService.status}</span>
                                     </div>
                                     <div className="so-service-price">
-                                        <span className="so-price-val">0đ</span>
-                                        <span className="so-price-unit"> /lượt x1</span>
+                                        <span className="so-price-val">{primaryService.price.toLocaleString('vi-VN')}đ</span>
+                                        <span className="so-price-unit"> /lượt x{primaryService.quantity}</span>
                                     </div>
                                     <div className="so-service-executor">
                                         <span className="so-exec-label">Người thực hiện</span>
-                                        <span className="so-exec-name">{executorName}</span>
+                                        <span className="so-exec-name">{primaryService.executor}</span>
                                     </div>
                                 </div>
                             </ServiceAccordion>
+
+                            {paraclinicalServices.length > 0 && (
+                                <ServiceAccordion title="DỊCH VỤ" defaultExpanded>
+                                    {paraclinicalServices.map((service, index) => (
+                                        <div
+                                            className="so-service-item"
+                                            key={`paraclinical-${service.id || service.name}-${service.technicianName || 'unknown'}-${index}`}
+                                        >
+                                            <div className="so-service-row">
+                                                <span className="so-service-name">{service.name}</span>
+                                                <span className="so-service-status pending">Chờ thực hiện</span>
+                                            </div>
+                                            <div className="so-service-price">
+                                                <span className="so-price-val">{Number(service.price || 0).toLocaleString('vi-VN')}đ</span>
+                                                <span className="so-price-unit"> /lượt x{service.quantity}</span>
+                                            </div>
+                                            <div className="so-service-executor">
+                                                <span className="so-exec-label">Người thực hiện</span>
+                                                <span className="so-exec-name">{service.technicianName}</span>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </ServiceAccordion>
+                            )}
 
                             <button
                                 className="so-add-service-card"
                                 type="button"
                                 aria-label="Thêm dịch vụ"
-                                onClick={() => navigate('/doctors/clinical-services')}
+                                onClick={() => navigate('/doctors/clinical-services', {
+                                    state: {
+                                        receptionId: id,
+                                    },
+                                })}
                             >
                                 <span className="so-add-service-icon"><Plus size={40} strokeWidth={1.6} /></span>
                             </button>
                         </>
                     )}
 
-                    {activeTab === 'Lịch sử điều trị' && <TreatmentHistoryTimeline />}
+                    {activeTab === 'Lịch sử điều trị' && <TreatmentHistoryTimeline petId={receptionDetail?.pet?.id} />}
 
                     {activeTab === 'Kết luận phiếu khám' && (
                         <div className="so-conclusion-wrap">
@@ -286,7 +357,16 @@ export default function ServiceOrder() {
             ) : (
                 <div className="so-bottom-actions">
                     <button className="so-btn-cancel" onClick={() => navigate(`/doctors/tickets/${id ?? 1}`)}>Hủy bỏ</button>
-                    <button className="so-btn-execute" onClick={() => navigate(`/doctors/record-result/${id ?? 1}`)}>Thực hiện</button>
+                    <button
+                        className="so-btn-execute"
+                        onClick={() => navigate(`/doctors/record-result/${id ?? 1}`, {
+                            state: {
+                                treatmentSlipId: treatmentDetail?.id || null,
+                            },
+                        })}
+                    >
+                        Thực hiện
+                    </button>
                 </div>
             )}
 

@@ -23,11 +23,27 @@ const Tickets = () => {
     useEffect(() => {
         let isMounted = true;
 
+        const toDoctorTabStatus = (rawStatus) => {
+            const status = String(rawStatus || '').toLowerCase();
+            if (status.includes('đã thanh toán')) return 'completed';
+            if (status.includes('chờ thanh toán')) return 'in_progress';
+            if (status.includes('chờ kết luận')) return 'in_progress';
+            if (status.includes('đang thực hiện')) return 'in_progress';
+            return 'pending';
+        };
+
         const fetchTickets = async () => {
             setIsLoading(true);
             try {
-                const params = activeTab === 'all' ? {} : { status: activeTab };
-                const response = await receptionService.getReceptions(params);
+                const response = activeTab === 'all'
+                    ? await receptionService.getReceptions({})
+                    : await receptionService.getReceptionsByStates(
+                        activeTab === 'pending'
+                            ? ['chờ thực hiện']
+                            : activeTab === 'in_progress'
+                                ? ['đang thực hiện', 'chờ kết luận', 'chờ thanh toán']
+                                : ['đã thanh toán']
+                    );
                 const records = response?.data?.data || [];
                 if (!isMounted) return;
 
@@ -38,13 +54,8 @@ const Tickets = () => {
                         : '--:-- - --/--/----';
                     const petName = record?.pet?.name || 'Chưa có tên';
                     const serviceName = record?.examForm?.examType || 'Khám lâm sàng';
-                    const status = (record?.status || '').toLowerCase();
-                    const mappedStatus = status.includes('complete')
-                        ? 'completed'
-                        : status.includes('progress')
-                            ? 'in_progress'
-                            : 'pending';
-                    const response = {
+                    const mappedStatus = toDoctorTabStatus(record?.status);
+                    return {
                         id: record?.id,
                         code: `PK${record?.id || ''}`,
                         customerName: record?.client?.fullName || 'Khách hàng',
@@ -59,10 +70,7 @@ const Tickets = () => {
                         },
                         services: [{ name: serviceName, status: mappedStatus }],
                     };
-                    return response;
                 });
-
-                console.log(mapped)
 
                 setTickets(mapped);
             } catch {

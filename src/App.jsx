@@ -5,7 +5,7 @@ import DoctorHome from './pages/doctors/Home';
 import DoctorTickets from './pages/doctors/Tickets';
 import DoctorTicketDetails from './pages/doctors/TicketDetails';
 import ServiceOrder from './pages/doctors/ServiceOrder';
-import RecordResult from './pages/doctors/RecordResult';
+import { RecordResult } from './pages/doctors/RecordResult';
 import MedicineSelector from './pages/doctors/MedicineSelector';
 import ClinicalServices from './pages/doctors/ClinicalServices';
 import ResultSummary from './pages/doctors/ResultSummary';

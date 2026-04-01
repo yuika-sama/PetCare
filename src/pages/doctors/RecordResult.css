@@ -318,8 +318,16 @@
 
 .rr-meds-empty {
     display: flex;
+    flex-direction: column;
     justify-content: center;
     align-items: center;
+}
+
+.rr-add-btn-wrapper {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    margin-top: 12px;
 }
 
 .rr-add-btn {
@@ -458,6 +466,16 @@
 }
 
 .rr-med-edit-icon {
+    cursor: pointer;
+}
+
+.rr-med-edit-btn {
+    border: none;
+    background: transparent;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     cursor: pointer;
 }
 

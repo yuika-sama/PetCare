@@ -1,126 +1,15 @@
-import React, { useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { Eye, ChevronDown, ChevronUp } from 'lucide-react';
 import './TreatmentHistoryTimeline.css';
+import petService from '../../api/petService';
 
-const historyData = [
-    {
-        id: 'outpatient',
-        time: '14/07 10:45',
-        title: 'Điều trị ngoại trú',
-        status: 'Đang thực hiện',
-        statusType: 'in-progress',
-        doctors: {
-            main: 'Nguyen Thanh Thao',
-            support: 'Duong Quang Tung'
-        },
-        detailsLabel: 'Danh sách dịch vụ - thuốc và vật tư chỉ định (2)',
-        services: [
-            {
-                id: 'cast-broken-leg',
-                name: 'Bó bột gãy chân cho thú cưng',
-                status: 'Đang thực hiện',
-                statusType: 'in-progress',
-                prescriber: 'Nguyen Huy Linh',
-                performer: 'Le Duy An',
-                supplies: [
-                    { name: 'Thuốc tê', quantity: 'x2 liều' },
-                    { name: 'Vải băng bó dày dặn, cotton thấm hút mồ hôi đã sát khuẩn', quantity: 'x2 gói' }
-                ]
-            },
-            {
-                id: 'anti-anxiety',
-                name: 'Thuốc an thần cho chó mèo Buspiron HCl',
-                status: 'Đang thực hiện',
-                statusType: 'in-progress',
-                prescriber: 'Nguyen Huy Linh',
-                prescription: { name: 'Kê', quantity: 'x2 viên' }
-            },
-            {
-                id: 'stool-test',
-                name: 'Xét nghiệm tìm chất ăn trong phân',
-                status: 'Chờ thực hiện',
-                statusType: 'pending',
-                prescriber: 'Nguyen Huy Linh',
-                performer: 'Le Duy An'
-            }
-        ],
-        showResultButton: true
-    },
-    {
-        id: 'inpatient',
-        time: '13/07 10:45',
-        title: 'Điều trị nội trú',
-        status: 'Hoàn thành',
-        statusType: 'done',
-        doctors: {
-            main: 'Nguyen Thanh Thao',
-            support: 'Duong Quang Tung'
-        },
-        detailsLabel: 'Danh sách dịch vụ - thuốc và vật tư chỉ định (5)',
-        services: [
-            {
-                id: 'checkup',
-                name: 'Dịch vụ thăm khám',
-                status: 'Hoàn thành',
-                statusType: 'done',
-                prescriber: 'Nguyen Huy Linh',
-                performer: 'Le Duy An'
-            },
-            {
-                id: 'vaccine',
-                name: 'Tiêm vaccine phòng dại cho chó',
-                status: 'Hoàn thành',
-                statusType: 'done',
-                prescriber: 'Nguyen Huy Linh',
-                performer: 'Le Duy An',
-                supplies: [
-                    { name: 'Thuốc tê', quantity: 'x2 liều' },
-                    { name: 'Vải băng bó dày dặn, cotton thấm hút mồ hôi đã sát khuẩn', quantity: 'x2 gói' }
-                ]
-            },
-            {
-                id: 'fungus-med',
-                name: 'Thuốc trị nấm SHD',
-                status: 'Hoàn thành',
-                statusType: 'done',
-                prescriber: 'Nguyen Huy Linh',
-                prescription: { name: 'Kê', quantity: 'x2 viên' }
-            }
-        ],
-        showResultButton: true
-    },
-    {
-        id: 'exam-sheet',
-        time: '13/07 10:45',
-        title: 'Phiếu khám',
-        status: 'Hoàn thành',
-        statusType: 'done',
-        doctors: {
-            main: 'Nguyen Thanh Thao',
-            support: 'Duong Quang Tung'
-        },
-        detailsLabel: 'Danh sách dịch vụ - thuốc và vật tư chỉ định (5)',
-        services: [
-            {
-                id: 'clinical-exam',
-                name: 'Khám lâm sàng',
-                status: 'Hoàn thành',
-                statusType: 'done',
-                prescriber: 'Nguyen Huy Linh',
-                performer: 'Le Duy An'
-            },
-            {
-                id: 'blood-test',
-                name: 'Xét nghiệm máu',
-                status: 'Hoàn thành',
-                statusType: 'done',
-                prescriber: 'Nguyen Huy Linh',
-                performer: 'Le Duy An'
-            }
-        ],
-        showResultButton: true
-    }
-];
+const toArray = (raw) => {
+    if (Array.isArray(raw)) return raw;
+    if (Array.isArray(raw?.items)) return raw.items;
+    if (Array.isArray(raw?.content)) return raw.content;
+    if (Array.isArray(raw?.results)) return raw.results;
+    return [];
+};
 
 const statusClassName = (type) => {
     if (type === 'done') return 'th-status done';
@@ -128,8 +17,103 @@ const statusClassName = (type) => {
     return 'th-status in-progress';
 };
 
-const TreatmentHistoryTimeline = () => {
-    const [expandedIds, setExpandedIds] = useState(() => new Set(['inpatient', 'exam-sheet']));
+const mapStatusType = (status) => {
+    const value = String(status || '').toLowerCase();
+    if (value.includes('hoàn thành') || value.includes('đã thanh toán') || value.includes('done')) return 'done';
+    if (value.includes('chờ') || value.includes('pending')) return 'pending';
+    return 'in-progress';
+};
+
+const formatDateTime = (value) => {
+    if (!value) return '--/-- --:--';
+    const date = new Date(value);
+    if (Number.isNaN(date.getTime())) return '--/-- --:--';
+    return date.toLocaleString('vi-VN', {
+        hour: '2-digit',
+        minute: '2-digit',
+        day: '2-digit',
+        month: '2-digit',
+    }).replace(',', '');
+};
+
+const mapHistoryBlock = (item, index) => {
+    const services = toArray(item?.services || item?.serviceDetails || item?.items).map((service, serviceIndex) => {
+        const status = service?.status || item?.status || 'Đang thực hiện';
+        return {
+            id: service?.id || `${item?.id || index}-service-${serviceIndex}`,
+            name: service?.name || service?.serviceName || 'Dịch vụ',
+            status,
+            statusType: mapStatusType(status),
+            prescriber: service?.prescriber?.fullName || service?.prescriberName || item?.doctor?.fullName || '---',
+            performer: service?.performer?.fullName || service?.performerName || service?.technicianName || '---',
+            supplies: toArray(service?.supplies || service?.materials).map((supply) => ({
+                name: supply?.name || 'Vật tư',
+                quantity: supply?.quantity ? `x${supply.quantity}` : '--',
+            })),
+        };
+    });
+
+    const blockStatus = item?.status || 'Đang thực hiện';
+
+    return {
+        id: item?.id || `history-${index}`,
+        time: formatDateTime(item?.examDate || item?.createdAt || item?.updatedAt),
+        title: item?.type || item?.title || 'Phiếu khám',
+        status: blockStatus,
+        statusType: mapStatusType(blockStatus),
+        doctors: {
+            main: item?.doctor?.fullName || item?.mainDoctorName || '---',
+            support: item?.supportDoctor?.fullName || item?.supportDoctorName || '---',
+        },
+        detailsLabel: `Danh sách dịch vụ (${services.length})`,
+        services,
+        showResultButton: false,
+    };
+};
+
+const TreatmentHistoryTimeline = ({ petId }) => {
+    const [expandedIds, setExpandedIds] = useState(() => new Set());
+    const [historyData, setHistoryData] = useState([]);
+    const [isLoading, setIsLoading] = useState(false);
+
+    useEffect(() => {
+        let isMounted = true;
+
+        const fetchHistory = async () => {
+            if (!petId) {
+                setHistoryData([]);
+                return;
+            }
+
+            setIsLoading(true);
+            try {
+                const response = await petService.getExamHistory(petId);
+                if (!isMounted) return;
+
+                const blocks = toArray(response?.data?.data).map(mapHistoryBlock);
+                setHistoryData(blocks);
+                setExpandedIds(new Set(blocks.slice(0, 1).map((block) => block.id)));
+            } catch {
+                if (!isMounted) return;
+                setHistoryData([]);
+            } finally {
+                if (isMounted) {
+                    setIsLoading(false);
+                }
+            }
+        };
+
+        fetchHistory();
+
+        return () => {
+            isMounted = false;
+        };
+    }, [petId]);
+
+    const summaryText = useMemo(() => {
+        const totalServices = historyData.reduce((acc, block) => acc + block.services.length, 0);
+        return `${historyData.length} hồ sơ • ${totalServices} dịch vụ`;
+    }, [historyData]);
 
     const toggleExpand = (id) => {
         setExpandedIds((prev) => {
@@ -147,10 +131,13 @@ const TreatmentHistoryTimeline = () => {
         <section className="th-wrapper">
             <div className="th-header">
                 <h3>Quá trình khám và điều trị</h3>
-                <span className="th-header-status">Đang thực hiện</span>
+                <span className="th-header-status">{historyData[0]?.status || 'Đang thực hiện'}</span>
             </div>
-            <p className="th-date-range">13/07/2024 - 19/07/2024</p>
-            <p className="th-summary">3 dịch vụ • 3 thuốc - vật tư đi kèm • 3 thuốc - vật tư mang về</p>
+            <p className="th-date-range">Lịch sử khám của thú cưng</p>
+            <p className="th-summary">{summaryText}</p>
+
+            {isLoading && <p className="th-summary">Đang tải lịch sử điều trị...</p>}
+            {!isLoading && historyData.length === 0 && <p className="th-summary">Chưa có dữ liệu lịch sử điều trị.</p>}
 
             <div className="th-timeline">
                 {historyData.map((block) => (

@@ -15,10 +15,10 @@ const MONTH_NAMES = [
 const DAY_LABELS = ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
 
 const ORDER_STATUS = {
-    RECEIVED: 'da_tiep_don',
-    WAITING_PAYMENT: 'cho_thanh_toan',
-    PAID: 'da_thanh_toan',
-    ALL: 'tat_ca'
+    RECEIVED: 'chờ thực hiện',
+    WAITING_PAYMENT: 'chờ thanh toán',
+    PAID: 'đã thanh toán',
+    ALL: 'tất cả'
 };
 
 const initialOrders = [
@@ -171,11 +171,14 @@ const TodayOrders = () => {
 
         const mapStatus = (rawStatus) => {
             const status = String(rawStatus || '').toLowerCase();
-            if (status.includes('paid') || status.includes('da_thanh_toan')) {
+            if (status.includes('đã thanh toán') || status.includes('paid')) {
                 return ORDER_STATUS.PAID;
             }
-            if (status.includes('cho_thanh_toan') || status.includes('waiting') || status.includes('payment')) {
+            if (status.includes('chờ thanh toán') || status.includes('waiting') || status.includes('payment')) {
                 return ORDER_STATUS.WAITING_PAYMENT;
+            }
+            if (status.includes('đang thực hiện') || status.includes('chờ kết luận')) {
+                return ORDER_STATUS.RECEIVED;
             }
             return ORDER_STATUS.RECEIVED;
         };

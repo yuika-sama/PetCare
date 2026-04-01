@@ -1,5 +1,5 @@
-import React, { useEffect, useMemo, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { ChevronLeft, Phone, Mars, Cake, Weight, ChevronUp, ChevronDown, Plus, Upload, Minus, PencilLine } from 'lucide-react';
 import FeatureDevelopingModal from '../../components/common/FeatureDevelopingModal';
 import receptionService from '../../api/receptionService';
@@ -13,17 +13,77 @@ const RADIO_OPTIONS = [
     { id: 4, label: 'Kết thúc cho về' },
 ];
 
-const RecordResult = () => {
+const toArray = (raw) => {
+    if (Array.isArray(raw)) return raw;
+    if (Array.isArray(raw?.items)) return raw.items;
+    if (Array.isArray(raw?.content)) return raw.content;
+    if (Array.isArray(raw?.results)) return raw.results;
+    return [];
+};
+
+const getPriceNumber = (item) => {
+    const rawPrice = item?.price
+        ?? item?.unitPrice
+        ?? item?.sellingPrice
+        ?? item?.retailPrice
+        ?? item?.cost
+        ?? item?.amount;
+
+    if (rawPrice == null || rawPrice === '') return 0;
+    if (typeof rawPrice === 'number') return rawPrice;
+
+    const normalized = String(rawPrice).replace(/[^\d.-]/g, '');
+    const parsed = Number(normalized);
+    return Number.isFinite(parsed) ? parsed : 0;
+};
+
+const formatVnd = (value) => `${Number(value || 0).toLocaleString('vi-VN')}đ`;
+
+const mapMedicineToUi = (item) => ({
+    id: item?.id || item?.medicineId,
+    name: item?.name || item?.medicineName || 'Thuốc/Vật tư',
+    desc: item?.description || '',
+    price: formatVnd(getPriceNumber(item)),
+    unit: item?.unit ? (String(item.unit).startsWith('/') ? item.unit : `/${item.unit}`) : '/đơn vị',
+    stock: item?.stock ?? item?.stockQuantity ?? '--',
+    image: item?.imageUrl || 'https://placehold.co/80x80/f4f4f5/a1a1aa?text=Med',
+    selected: true,
+    qty: item?.qty || item?.quantity || 1,
+    selectedUnit: item?.unit || 'Đơn vị',
+    expanded: false,
+    dosage: {
+        morning: item?.dosage?.morning || 0,
+        noon: item?.dosage?.noon || 0,
+        afternoon: item?.dosage?.afternoon || 0,
+        evening: item?.dosage?.evening || 0,
+        note: item?.dosage?.note || item?.note || '',
+    },
+});
+
+export const RecordResult = () => {
     const navigate = useNavigate();
+    const location = useLocation();
     const { id } = useParams();
+    const treatmentSlipId = location.state?.treatmentSlipId;
+    const fileInputRef = useRef(null);
     const [isMedsExpanded, setIsMedsExpanded] = useState(true);
     const [conclusionText, setConclusionText] = useState('Ho có đờm, khò khè. Vòm họng sưng tấy');
     const [selectedConclusion, setSelectedConclusion] = useState(null);
-    const [medsList] = useState([]);
+    const [medsList, setMedsList] = useState([]);
     const [showDosageModal, setShowDosageModal] = useState(false);
+    const [activeDosageMedId, setActiveDosageMedId] = useState(null);
+    const [dosageDraft, setDosageDraft] = useState({
+        morning: 0,
+        noon: 0,
+        afternoon: 0,
+        evening: 0,
+        note: '',
+    });
     const [showFeatureModal, setShowFeatureModal] = useState(false);
     const [receptionDetail, setReceptionDetail] = useState(null);
     const [treatmentDetail, setTreatmentDetail] = useState(null);
+    const [selectedParaclinical, setSelectedParaclinical] = useState([]);
+    const [uploadedFiles, setUploadedFiles] = useState([]);
     const [isSaving, setIsSaving] = useState(false);
 
     useEffect(() => {
@@ -31,18 +91,30 @@ const RecordResult = () => {
 
         const fetchData = async () => {
             try {
-                const [receptionResponse, treatmentResponse] = await Promise.allSettled([
+                const [receptionResponse, treatmentResponse, paraclinicalResponse] = await Promise.allSettled([
                     receptionService.getReceptionById(id),
-                    treatmentService.getTreatmentDetailFlexible(id),
+                    treatmentSlipId ? treatmentService.getTreatmentSlipById(treatmentSlipId) : Promise.resolve(null),
+                    id ? receptionService.getSelectedParaclinicalServices(id) : Promise.resolve(null),
                 ]);
 
                 if (!isMounted) return;
 
                 const receptionData = receptionResponse.status === 'fulfilled' ? receptionResponse.value?.data?.data : null;
                 const treatmentData = treatmentResponse.status === 'fulfilled' ? treatmentResponse.value?.data?.data : null;
+                const paraclinicalData = paraclinicalResponse.status === 'fulfilled'
+                    ? toArray(paraclinicalResponse.value?.data?.data)
+                    : [];
+                const medicinesFromApi = toArray(
+                    treatmentData?.medicines
+                    || treatmentData?.medicineItems
+                    || treatmentData?.prescriptions
+                ).map(mapMedicineToUi);
+                const medicinesFromState = toArray(location.state?.selectedMedicines).map(mapMedicineToUi);
 
                 setReceptionDetail(receptionData || null);
                 setTreatmentDetail(treatmentData || null);
+                setSelectedParaclinical(paraclinicalData);
+                setMedsList(medicinesFromState.length > 0 ? medicinesFromState : medicinesFromApi);
 
                 if (typeof treatmentData?.plan === 'string' && treatmentData.plan.trim()) {
                     setConclusionText(treatmentData.plan);
@@ -67,7 +139,7 @@ const RecordResult = () => {
         return () => {
             isMounted = false;
         };
-    }, [id]);
+    }, [id, treatmentSlipId, location.state?.selectedMedicines]);
 
     const handleCloseFeatureModal = () => {
         setShowFeatureModal(false);
@@ -89,15 +161,33 @@ const RecordResult = () => {
         setIsSaving(true);
         try {
             const payload = {
-                type: RADIO_OPTIONS.find((option) => option.id === selectedConclusion)?.label || 'Điều trị ngoại trú',
-                plan: conclusionText,
-                medicalRecord: { id: Number(id) || undefined },
+                conclusionType: RADIO_OPTIONS.find((option) => option.id === selectedConclusion)?.label || 'Điều trị ngoại trú',
+                summary: conclusionText,
+                medicines: medsList
+                    .filter((item) => item?.selected)
+                    .map((item) => ({
+                        medicineId: item?.id,
+                        quantity: item?.qty || 1,
+                        unit: item?.selectedUnit,
+                        dosage: {
+                            ...item?.dosage,
+                        },
+                    })),
+                paraclinicalServices: selectedParaclinical.map((item) => ({
+                    serviceId: item?.serviceId || item?.service?.id,
+                    technicianId: item?.technicianId || item?.technician?.id,
+                    quantity: item?.quantity || 1,
+                })),
             };
 
-            if (treatmentDetail?.id) {
-                await treatmentService.patchTreatmentSlipById(treatmentDetail.id, payload);
+            if (id) {
+                await treatmentService.recordExamResult(id, payload, uploadedFiles);
             } else {
-                await treatmentService.createTreatmentSlip(payload);
+                await treatmentService.createTreatmentSlip({
+                    type: payload.conclusionType,
+                    plan: payload.summary,
+                    medicalRecord: { id: Number(id) || undefined },
+                });
             }
         } catch {
             // Keep UX flow while backend contract for this form is being finalized.
@@ -105,6 +195,59 @@ const RecordResult = () => {
             setIsSaving(false);
             setShowFeatureModal(true);
         }
+    };
+
+    const handleOpenUpload = () => {
+        fileInputRef.current?.click();
+    };
+
+    const handleSelectFiles = (event) => {
+        const files = Array.from(event.target.files || []);
+        if (files.length === 0) return;
+        setUploadedFiles((prev) => [...prev, ...files]);
+        event.target.value = '';
+    };
+
+    const openDosageModal = (medicine) => {
+        if (!medicine?.id) return;
+        setActiveDosageMedId(medicine.id);
+        setDosageDraft({
+            morning: Number(medicine?.dosage?.morning) || 0,
+            noon: Number(medicine?.dosage?.noon) || 0,
+            afternoon: Number(medicine?.dosage?.afternoon) || 0,
+            evening: Number(medicine?.dosage?.evening) || 0,
+            note: medicine?.dosage?.note || medicine?.note || '',
+        });
+        setShowDosageModal(true);
+    };
+
+    const updateDosageValue = (field, delta) => {
+        setDosageDraft((prev) => ({
+            ...prev,
+            [field]: Math.max(0, Number(prev?.[field] || 0) + delta),
+        }));
+    };
+
+    const saveDosage = () => {
+        if (activeDosageMedId == null) return;
+        setMedsList((prev) =>
+            prev.map((medicine) =>
+                medicine.id === activeDosageMedId
+                    ? {
+                        ...medicine,
+                        dosage: {
+                            morning: dosageDraft.morning,
+                            noon: dosageDraft.noon,
+                            afternoon: dosageDraft.afternoon,
+                            evening: dosageDraft.evening,
+                            note: dosageDraft.note,
+                        },
+                    }
+                    : medicine
+            )
+        );
+        setShowDosageModal(false);
+        setActiveDosageMedId(null);
     };
 
     return (
@@ -173,10 +316,25 @@ const RecordResult = () => {
                     </div>
                 </div>
 
-                <button className="rr-upload-btn">
+                <button className="rr-upload-btn" type="button" onClick={handleOpenUpload}>
                     <Upload size={18} color="#666" />
                     <span>Tải lên file kết quả khám bệnh</span>
                 </button>
+                <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept="image/*"
+                    multiple
+                    style={{ display: 'none' }}
+                    onChange={handleSelectFiles}
+                />
+                {uploadedFiles.length > 0 && (
+                    <div className="rr-uploaded-files">
+                        {uploadedFiles.map((file, index) => (
+                            <div key={`${file.name}-${index}`}>{file.name}</div>
+                        ))}
+                    </div>
+                )}
 
                 <div className="rr-accordion">
                     <div className="rr-accordion-header" onClick={() => setIsMedsExpanded(!isMedsExpanded)}>
@@ -185,46 +343,74 @@ const RecordResult = () => {
                     </div>
                     {isMedsExpanded && (
                         <div className={`rr-accordion-content ${medsList.length === 0 ? 'rr-meds-empty' : 'rr-meds-list-container'}`}>
-                            <button
-                                className="rr-add-btn"
-                                type="button"
-                                aria-label="Thêm thuốc và vật tư"
-                                onClick={() => navigate('/doctors/medicine-selector')}
-                            >
-                                <Plus size={24} color="#fff" />
-                            </button>
-
-                            {medsList.length > 0 && (
+                            {medsList.length > 0 ? (
                                 <div className="rr-meds-list-minimal">
-                                    {medsList.map((med) => (
-                                        <div key={med.id} className="rr-med-item-minimal">
+                                    {medsList.map((med, index) => {
+                                        const quantity = Number(med?.qty ?? med?.quantity ?? 1) || 1;
+                                        const quantityUnit = med?.selectedUnit || med?.unit?.replace('/', '') || 'Đơn vị';
+                                        return (
+                                        <div key={`${med?.id || med?.medicineId || med?.name || 'medicine'}-${index}`} className="rr-med-item-minimal">
                                             <div className="rr-med-row-header">
                                                 <h4 className="rr-med-name-min">{med.name}</h4>
-                                                <PencilLine size={16} color="#209D80" className="rr-med-edit-icon" />
+                                                <button
+                                                    type="button"
+                                                    className="rr-med-edit-btn"
+                                                    onClick={() => openDosageModal(med)}
+                                                    aria-label={`Chỉnh liều dùng cho ${med.name}`}
+                                                >
+                                                    <PencilLine size={16} color="#209D80" className="rr-med-edit-icon" />
+                                                </button>
                                             </div>
                                             <div className="rr-med-row-price">
                                                 <div>
                                                     <span className="rr-med-price-min">{med.price}</span>
                                                     <span className="rr-med-unit-min"> {med.unit}</span>
                                                 </div>
-                                                <span className="rr-med-qty-min">{med.qty} {med.selectedUnit}</span>
                                             </div>
 
-                                            {med.dosage.map((dosage, index) => (
-                                                <div key={index} className="rr-med-row-dosage">
-                                                    <span className="rr-dosage-lbl">{dosage.time}</span>
-                                                    <span className="rr-dosage-val">{dosage.count}</span>
+                                            <div className="rr-med-row-note">
+                                                <span className="rr-note-lbl">Số lượng</span>
+                                                <span className="rr-note-val">{quantity} {quantityUnit}</span>
+                                            </div>
+
+                                            {[
+                                                { label: 'Sáng', value: med?.dosage?.morning || 0 },
+                                                { label: 'Trưa', value: med?.dosage?.noon || 0 },
+                                                { label: 'Chiều', value: med?.dosage?.afternoon || 0 },
+                                                { label: 'Tối', value: med?.dosage?.evening || 0 },
+                                            ].filter((dosage) => dosage.value > 0).map((dosage) => (
+                                                <div key={`${med.id}-${dosage.label}`} className="rr-med-row-dosage">
+                                                    <span className="rr-dosage-lbl">{dosage.label}</span>
+                                                    <span className="rr-dosage-val">{dosage.value}</span>
                                                 </div>
                                             ))}
 
                                             <div className="rr-med-row-note">
                                                 <span className="rr-note-lbl">Chỉ định khác</span>
-                                                <span className="rr-note-val">{med.note}</span>
+                                                <span className="rr-note-val">{med?.dosage?.note || med?.note || '---'}</span>
                                             </div>
                                         </div>
-                                    ))}
+                                    )})}
                                 </div>
-                            )}
+                            ) : null}
+
+                            <div className="rr-add-btn-wrapper">
+                                <button
+                                    className="rr-add-btn"
+                                    type="button"
+                                    aria-label="Thêm thuốc và vật tư"
+                                    onClick={() => navigate('/doctors/medicine-selector', {
+                                        state: {
+                                            receptionId: id,
+                                            treatmentSlipId,
+                                            selectedMedicines: medsList,
+                                            returnPath: `/doctors/record-result/${id ?? 1}`,
+                                        },
+                                    })}
+                                >
+                                    <Plus size={24} color="#fff" />
+                                </button>
+                            </div>
                         </div>
                     )}
                 </div>
@@ -267,11 +453,33 @@ const RecordResult = () => {
                                     <span className="rr-dosage-label">{time}</span>
                                     <div className="rr-dosage-controls">
                                         <div className="rr-dosage-stepper">
-                                            <button className="rr-dosage-step-btn">
+                                            <button
+                                                className="rr-dosage-step-btn"
+                                                type="button"
+                                                onClick={() => updateDosageValue(
+                                                    idx === 0 ? 'morning' : idx === 1 ? 'noon' : idx === 2 ? 'afternoon' : 'evening',
+                                                    -1
+                                                )}
+                                            >
                                                 <Minus size={16} color="#666" />
                                             </button>
-                                            <span className="rr-dosage-step-val">{idx % 2 === 0 ? 1 : 0}</span>
-                                            <button className="rr-dosage-step-btn">
+                                            <span className="rr-dosage-step-val">
+                                                {idx === 0
+                                                    ? dosageDraft.morning
+                                                    : idx === 1
+                                                        ? dosageDraft.noon
+                                                        : idx === 2
+                                                            ? dosageDraft.afternoon
+                                                            : dosageDraft.evening}
+                                            </span>
+                                            <button
+                                                className="rr-dosage-step-btn"
+                                                type="button"
+                                                onClick={() => updateDosageValue(
+                                                    idx === 0 ? 'morning' : idx === 1 ? 'noon' : idx === 2 ? 'afternoon' : 'evening',
+                                                    1
+                                                )}
+                                            >
                                                 <Plus size={16} color="#666" />
                                             </button>
                                         </div>
@@ -286,14 +494,18 @@ const RecordResult = () => {
                             <div className="rr-dosage-note-row">
                                 <span className="rr-dosage-label">Chỉ định khác</span>
                                 <div className="rr-dosage-textarea-box">
-                                    <textarea className="rr-dosage-textarea" defaultValue="Uống thuốc trước khi ăn"></textarea>
+                                    <textarea
+                                        className="rr-dosage-textarea"
+                                        value={dosageDraft.note}
+                                        onChange={(event) => setDosageDraft((prev) => ({ ...prev, note: event.target.value }))}
+                                    ></textarea>
                                     <span className="rr-dosage-char-count">2000</span>
                                 </div>
                             </div>
                         </div>
 
                         <div className="rr-dosage-bottom-action">
-                            <button className="rr-dosage-btn-confirm-final" onClick={() => setShowDosageModal(false)}>
+                            <button className="rr-dosage-btn-confirm-final" onClick={saveDosage}>
                                 Xác nhận
                             </button>
                         </div>

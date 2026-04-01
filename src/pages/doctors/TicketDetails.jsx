@@ -43,7 +43,7 @@ const NoteModal = ({ note, onClose }) => {
     );
 };
 
-const TicketDetails = ({ note = "Khách hàng khó tính, yêu cầu không gọi điện, pet hung dữ nên cần nhẹ nhàng khi thực hiện dịch vụ" }) => {
+const TicketDetails = () => {
     const navigate = useNavigate();
     const { id } = useParams();
     const [showModal, setShowModal] = useState(false);
@@ -90,10 +90,11 @@ const TicketDetails = ({ note = "Khách hàng khó tính, yêu cầu không gọ
         };
     }, [ticketDetail]);
 
-    const displayNote = ticketDetail?.note || note;
+    const hasWarningNote = ticketDetail?.note !== null && ticketDetail?.note !== undefined;
+    const displayNote = hasWarningNote ? ticketDetail?.note : '';
 
     const handleStartClick = () => {
-        if (displayNote) {
+        if (hasWarningNote) {
             setShowModal(true);
             return;
         }
@@ -135,7 +136,7 @@ const TicketDetails = ({ note = "Khách hàng khó tính, yêu cầu không gọ
                     </div>
 
                     {/* Customer Alert */}
-                    {displayNote && (
+                    {hasWarningNote && (
                         <div className="customer-alert-box">
                             <div className="alert-box-title">
                                 <WarningIcon />

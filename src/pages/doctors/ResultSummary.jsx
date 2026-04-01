@@ -8,54 +8,65 @@ import "@fontsource/roboto/600.css";
 import receptionService from '../../api/receptionService';
 import treatmentService from '../../api/treatmentService';
 
-const usedMedicine = [
-    {
-        id: 1,
-        name: 'Nexgard Spectra 0.5G',
-        pack: '3 vỉ x 10 viên',
-        expected: '2 viên',
-        actual: '3 viên',
-        image: 'https://placehold.co/80x80/e7f3ef/1a9c82?text=Med'
-    },
-    {
-        id: 2,
-        name: 'Nexgard Spectra 0.5G',
-        pack: '3 vỉ x 10 viên',
-        expected: '2 viên',
-        actual: '3 viên',
-        image: 'https://placehold.co/80x80/e7f3ef/1a9c82?text=Med'
-    }
-];
+const toArray = (raw) => {
+    if (Array.isArray(raw)) return raw;
+    if (Array.isArray(raw?.items)) return raw.items;
+    if (Array.isArray(raw?.content)) return raw.content;
+    if (Array.isArray(raw?.results)) return raw.results;
+    return [];
+};
+
+const mapUsedItem = (item) => ({
+    id: item?.id || item?.serviceId || item?.service?.id,
+    name: item?.serviceName || item?.service?.name || 'Dịch vụ cận lâm sàng',
+    description: item?.service?.description || item?.description || 'Dịch vụ đã chọn',
+    expected: `${item?.quantity || 1} lượt`,
+    actual: `${item?.quantity || 1} lượt`,
+    image: 'https://placehold.co/80x80/e7f3ef/1a9c82?text=Svc',
+});
 
 const ResultSummary = () => {
     const navigate = useNavigate();
     const location = useLocation();
     const receptionId = location.state?.receptionId;
     const treatmentSlipId = location.state?.treatmentSlipId;
+
     const [receptionDetail, setReceptionDetail] = useState(null);
     const [treatmentDetail, setTreatmentDetail] = useState(null);
+    const [usedServices, setUsedServices] = useState([]);
+    const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
         let isMounted = true;
 
         const fetchData = async () => {
-            const [receptionResponse, treatmentResponse] = await Promise.allSettled([
-                receptionId ? receptionService.getReceptionById(receptionId) : Promise.resolve(null),
-                treatmentSlipId
-                    ? treatmentService.getTreatmentSlipById(treatmentSlipId)
-                    : receptionId
-                        ? treatmentService.getTreatmentDetailFlexible(receptionId)
-                        : Promise.resolve(null),
-            ]);
+            setIsLoading(true);
+            try {
+                const [receptionResponse, treatmentResponse, selectedServicesResponse] = await Promise.allSettled([
+                    receptionId ? receptionService.getReceptionById(receptionId) : Promise.resolve(null),
+                    treatmentSlipId ? treatmentService.getTreatmentSlipById(treatmentSlipId) : Promise.resolve(null),
+                    receptionId ? receptionService.getSelectedParaclinicalServices(receptionId) : Promise.resolve(null),
+                ]);
 
-            if (!isMounted) return;
+                if (!isMounted) return;
 
-            if (receptionResponse.status === 'fulfilled') {
-                setReceptionDetail(receptionResponse.value?.data?.data || null);
-            }
+                const receptionData = receptionResponse.status === 'fulfilled'
+                    ? receptionResponse.value?.data?.data || null
+                    : null;
+                const treatmentData = treatmentResponse.status === 'fulfilled'
+                    ? treatmentResponse.value?.data?.data || null
+                    : null;
+                const selectedServicesData = selectedServicesResponse.status === 'fulfilled'
+                    ? toArray(selectedServicesResponse.value?.data?.data)
+                    : [];
 
-            if (treatmentResponse.status === 'fulfilled') {
-                setTreatmentDetail(treatmentResponse.value?.data?.data || null);
+                setReceptionDetail(receptionData);
+                setTreatmentDetail(treatmentData);
+                setUsedServices(selectedServicesData.map(mapUsedItem));
+            } finally {
+                if (isMounted) {
+                    setIsLoading(false);
+                }
             }
         };
 
@@ -67,23 +78,27 @@ const ResultSummary = () => {
 
     const detailSections = useMemo(() => {
         const examType = receptionDetail?.examForm?.examType || 'Khám lâm sàng';
+        const hasSummaryData = Boolean(
+            treatmentDetail?.plan || receptionDetail?.symptomDescription || usedServices.length > 0
+        );
+
         return [
             {
                 id: 1,
                 title: examType,
                 subtitle: '',
                 summary: treatmentDetail?.plan || receptionDetail?.symptomDescription || 'Chưa có dữ liệu kết quả.',
-                hasUploads: false
+                hasUploads: false,
             },
             {
                 id: 2,
                 title: 'Kết luận điều trị',
                 subtitle: treatmentDetail?.type || 'Điều trị ngoại trú',
                 summary: treatmentDetail?.plan || 'Chưa có dữ liệu kết luận.',
-                hasUploads: true
-            }
+                hasUploads: hasSummaryData,
+            },
         ];
-    }, [receptionDetail, treatmentDetail]);
+    }, [receptionDetail, treatmentDetail, usedServices]);
 
     return (
         <div className="rs-page">
@@ -95,7 +110,9 @@ const ResultSummary = () => {
             </header>
 
             <main className="rs-content">
-                {detailSections.map((section) => (
+                {isLoading && <article className="rs-card"><p>Đang tải dữ liệu tổng hợp...</p></article>}
+
+                {!isLoading && detailSections.map((section) => (
                     <article className="rs-card" key={section.id}>
                         <div className="rs-card-title-row">
                             <div>
@@ -115,7 +132,7 @@ const ResultSummary = () => {
                         {section.hasUploads && (
                             <>
                                 <div className="rs-block">
-                                    <h4 className='rs-block-files-title'>File và ảnh tải lên</h4>
+                                    <h4 className="rs-block-files-title">File và ảnh tải lên</h4>
                                     <div className="rs-images">
                                         <div className="rs-image-card">
                                             <strong>Ảnh kết quả 1</strong>
@@ -126,22 +143,22 @@ const ResultSummary = () => {
                                             <img src="https://images.unsplash.com/photo-1583512603806-077998240c7a?w=600&auto=format&fit=crop&q=60" alt="Ảnh kết quả 2" />
                                         </div>
                                     </div>
-                                    <div className="rs-files">
-                                        <div>PKQ-2147175.pdf</div>
-                                        <div className="rs-divider" />
-                                        <div>PKQ-2147175.pdf</div>
-                                    </div>
+                                    {usedServices.length === 0 && (
+                                        <div className="rs-files">
+                                            <div>Chưa có file đính kèm</div>
+                                        </div>
+                                    )}
                                 </div>
 
                                 <div className="rs-block">
-                                    <h4 className='rs-block-title'>Danh sách thuốc và vật tư thực tế sử dụng</h4>
+                                    <h4 className="rs-block-title">Danh sách thuốc và vật tư thực tế sử dụng</h4>
                                     <div className="rs-med-list">
-                                        {usedMedicine.map((item) => (
-                                            <div className="rs-med-item" key={`${section.id}-${item.id}`}>
+                                        {usedServices.map((item, index) => (
+                                            <div className="rs-med-item" key={`${section.id}-${item.id || item.name}-${index}`}>
                                                 <img src={item.image} alt={item.name} />
                                                 <div className="rs-med-info">
                                                     <strong>{item.name}</strong>
-                                                    <p>{item.pack}</p>
+                                                    <p>{item.description}</p>
                                                     <div className="rs-med-stats">
                                                         <span>Dự kiến: <b>{item.expected}</b></span>
                                                         <span>Thực tế: <b>{item.actual}</b></span>
@@ -149,6 +166,9 @@ const ResultSummary = () => {
                                                 </div>
                                             </div>
                                         ))}
+                                        {usedServices.length === 0 && (
+                                            <p>Chưa có dữ liệu dịch vụ/thuốc sử dụng.</p>
+                                        )}
                                     </div>
                                 </div>
                             </>

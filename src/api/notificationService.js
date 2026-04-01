@@ -3,42 +3,58 @@ import { authApi } from './baseApi';
 const MOCK_NOTIFICATIONS = [
     {
         id: 1,
-        title: 'Co phieu kham moi can thuc hien!',
+        title: 'Có phiếu khám mới cần thực hiện!',
         petName: 'Kuro',
-        customerName: 'Nguyen Anh Duc',
-        message: 'da duoc tiep don. Hay bat dau kham ngay!',
-        time: '3 phut',
+        customerName: 'Nguyễn Anh Đức',
+        message: 'đã được tiếp đón. Hãy bắt đầu khám ngay!',
+        time: '3 phút',
         receptionId: 1,
     },
     {
         id: 2,
-        title: 'Can cap nhat ket luan phieu kham',
+        title: 'Cần cập nhật kết luận phiếu khám',
         petName: 'Milo',
-        customerName: 'Le Huyen Linh',
-        message: 'dang cho bac si ket luan.',
-        time: '10 phut',
+        customerName: 'Lê Huyền Linh',
+        message: 'đang chờ bác sĩ kết luận.',
+        time: '10 phút',
         receptionId: 2,
     },
     {
         id: 3,
-        title: 'Co phieu can uu tien xu ly',
+        title: 'Có phiếu cần ưu tiên xử lý',
         petName: 'Bim',
-        customerName: 'Tran Tuan Kiet',
-        message: 'co ghi chu cap cuu tu le tan.',
-        time: '15 phut',
+        customerName: 'Trần Tuấn Kiệt',
+        message: 'có ghi chú cấp cứu từ lễ tân.',
+        time: '15 phút',
         receptionId: 3,
     },
 ];
 
 const notificationService = {
     async listDoctorNotifications() {
-        return Promise.resolve({ data: MOCK_NOTIFICATIONS });
+        try {
+            const response = await authApi.get('/doctors/waiting-cases');
+            const records = response?.data?.data || [];
+            const mapped = records.map((record, index) => ({
+                id: record?.doctorId || record?.id || index + 1,
+                title: 'Có phiếu khám mới cần thực hiện!',
+                petName: record?.petName || 'Thú cưng',
+                customerName: record?.clientName || record?.doctorName || 'Khách hàng',
+                message: 'đang chờ bác sĩ xử lý.',
+                time: record?.updatedAt || '',
+                receptionId: record?.receptionSlipId || record?.receptionId || record?.id,
+            }));
+
+            return { data: mapped };
+        } catch {
+            return Promise.resolve({ data: MOCK_NOTIFICATIONS });
+        }
     },
     async listReceptionistNotifications(params = {}) {
         try {
             const response = await authApi.get('/reception-slips', {
                 params: {
-                    status: 'cho_thanh_toan',
+                    status: 'chờ thanh toán',
                     ...params,
                 },
             });

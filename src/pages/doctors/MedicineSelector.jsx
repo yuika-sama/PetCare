@@ -1,12 +1,67 @@
-import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useEffect, useMemo, useState } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { ChevronLeft, Search, SlidersHorizontal, Minus, Plus, ChevronDown } from 'lucide-react';
 import MedicineCard from '../../components/doctor/MedicineCard';
 import './MedicineSelector.css';
 import medicineService from '../../api/medicineService';
 
+const toArray = (raw) => {
+    if (Array.isArray(raw)) return raw;
+    if (Array.isArray(raw?.items)) return raw.items;
+    if (Array.isArray(raw?.content)) return raw.content;
+    if (Array.isArray(raw?.results)) return raw.results;
+    return [];
+};
+
+const getPriceNumber = (item) => {
+    const rawPrice = item?.price
+        ?? item?.unitPrice
+        ?? item?.sellingPrice
+        ?? item?.retailPrice
+        ?? item?.cost
+        ?? item?.amount;
+
+    if (rawPrice == null || rawPrice === '') return 0;
+    if (typeof rawPrice === 'number') return rawPrice;
+
+    const normalized = String(rawPrice).replace(/[^\d.-]/g, '');
+    const parsed = Number(normalized);
+    return Number.isFinite(parsed) ? parsed : 0;
+};
+
+const formatVnd = (value) => `${Number(value || 0).toLocaleString('vi-VN')}đ`;
+
+const normalizeMedicine = (item) => ({
+    ...item,
+    desc: item?.desc || item?.description || item?.type || '',
+    price: typeof item?.price === 'string' && item.price.includes('đ')
+        ? item.price
+        : formatVnd(getPriceNumber(item)),
+    unit: item?.unit
+        ? (String(item.unit).startsWith('/') ? item.unit : `/${item.unit}`)
+        : '/đơn vị',
+    stock: item?.stock ?? item?.stockQuantity ?? item?.availableStock ?? '--',
+    qty: Number(item?.qty ?? item?.quantity ?? 0),
+    selectedUnit: item?.selectedUnit || item?.unit || 'Đơn vị',
+    dosage: {
+        morning: Number(item?.dosage?.morning || 0),
+        noon: Number(item?.dosage?.noon || 0),
+        afternoon: Number(item?.dosage?.afternoon || 0),
+        evening: Number(item?.dosage?.evening || 0),
+        note: item?.dosage?.note || item?.note || '',
+    },
+});
+
 const MedicineSelector = () => {
     const navigate = useNavigate();
+    const location = useLocation();
+    const selectedFromState = useMemo(
+        () => toArray(location.state?.selectedMedicines).map(normalizeMedicine),
+        [location.state?.selectedMedicines]
+    );
+    const returnPath = location.state?.returnPath;
+    const treatmentSlipId = location.state?.treatmentSlipId;
+    const receptionId = location.state?.receptionId;
     const [showDosageModal, setShowDosageModal] = useState(false);
     const [activeDosageMedId, setActiveDosageMedId] = useState(null);
     const [dosageDraft, setDosageDraft] = useState({
@@ -26,13 +81,34 @@ const MedicineSelector = () => {
         const fetchMedicines = async () => {
             const response = await medicineService.listMedicines();
             if (!isMounted) return;
-            setMedsList(response?.data || []);
+            const apiMedicines = toArray(response?.data || []).map(normalizeMedicine);
+            if (selectedFromState.length === 0) {
+                setMedsList(apiMedicines);
+                return;
+            }
+
+            const selectedById = new Map(selectedFromState.map((item) => [item.id, item]));
+            const merged = apiMedicines.map((med) => {
+                const selected = selectedById.get(med.id);
+                if (!selected) return med;
+                return {
+                    ...med,
+                    ...selected,
+                    selected: true,
+                };
+            });
+
+            const newSelectedNotInSearch = selectedFromState.filter(
+                (selectedMed) => !merged.some((apiMed) => apiMed.id === selectedMed.id)
+            );
+
+            setMedsList([...merged, ...newSelectedNotInSearch]);
         };
         fetchMedicines();
         return () => {
             isMounted = false;
         };
-    }, []);
+    }, [selectedFromState]);
 
     const toggleSelection = (id) => {
         setMedsList(prevList => 
@@ -111,6 +187,16 @@ const MedicineSelector = () => {
         try {
             const selectedMedicines = medsList.filter((med) => med.selected);
             await medicineService.saveSelection(selectedMedicines);
+            if (returnPath) {
+                navigate(returnPath, {
+                    state: {
+                        receptionId,
+                        treatmentSlipId,
+                        selectedMedicines,
+                    },
+                });
+                return;
+            }
             navigate(-1);
         } finally {
             setIsSubmitting(false);
