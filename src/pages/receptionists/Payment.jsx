@@ -22,8 +22,17 @@ const Payment = () => {
     const [paymentMethods, setPaymentMethods] = useState([]);
     const [prepayments, setPrepayments] = useState([]);
     const [cashierInfo, setCashierInfo] = useState({ name: 'Thu ngân', phone: '--' });
+    const [cashierId, setCashierId] = useState(null);
+    const [reloadKey, setReloadKey] = useState(0);
+    const [toast, setToast] = useState(null);
 
     const receptionId = location.state?.receptionId;
+    const receptionStatus = location.state?.receptionStatus;
+
+    const showToast = (type, message) => {
+        setToast({ type, message });
+        setTimeout(() => setToast(null), 2800);
+    };
 
     useEffect(() => {
         let isMounted = true;
@@ -33,29 +42,68 @@ const Payment = () => {
             setPaymentError('');
 
             try {
-                const [previewRes, methodsRes, prepaymentsRes, userRes] = await Promise.allSettled([
-                    receptionId ? paymentService.getInvoicePreview(receptionId) : Promise.resolve(null),
+                const canLoadPaymentData = receptionStatus === 'chờ thanh toán' || receptionStatus === 'đã thanh toán';
+
+                const [methodsRes, userRes] = await Promise.allSettled([
                     paymentService.getPaymentMethods(),
-                    receptionId ? paymentService.getPrePayments({ receptionSlipId: receptionId }) : Promise.resolve(null),
                     userService.getUsers(),
                 ]);
 
+                let previewRes = { status: 'fulfilled', value: { data: null, notFound: false } };
+                let prepaymentsRes = { status: 'fulfilled', value: { data: [] } };
+
+                if (canLoadPaymentData && receptionId) {
+                    previewRes = await Promise.resolve(paymentService.getInvoicePreview(receptionId))
+                        .then((value) => ({ status: 'fulfilled', value }))
+                        .catch((reason) => ({ status: 'rejected', reason }));
+
+                    const previewNotFound = previewRes.status === 'fulfilled' && previewRes.value?.notFound;
+                    if (!previewNotFound) {
+                        prepaymentsRes = await Promise.resolve(paymentService.getPrePayments({ receptionSlipId: receptionId }))
+                            .then((value) => ({ status: 'fulfilled', value }))
+                            .catch((reason) => ({ status: 'rejected', reason }));
+                    }
+                }
+
                 if (!isMounted) return;
 
-                setInvoicePreview(previewRes.status === 'fulfilled' ? previewRes.value?.data?.data || null : null);
-                setPaymentMethods(methodsRes.status === 'fulfilled' ? methodsRes.value?.data?.data || [] : []);
-                setPrepayments(prepaymentsRes.status === 'fulfilled' ? prepaymentsRes.value?.data?.data || [] : []);
+                const failedRequests = [];
+                const previewNotFound = previewRes.status === 'fulfilled' && previewRes.value?.notFound;
+                if (previewRes.status === 'rejected') failedRequests.push('xem trước hóa đơn');
+                if (methodsRes.status === 'rejected') failedRequests.push('phương thức thanh toán');
+                if (prepaymentsRes.status === 'rejected') failedRequests.push('lịch sử tạm ứng');
+                if (userRes.status === 'rejected') failedRequests.push('thông tin thu ngân');
 
-                const user = userRes.status === 'fulfilled' ? userRes.value?.data?.data : null;
+                if (failedRequests.length > 0) {
+                    const message = `Không thể tải đầy đủ dữ liệu: ${failedRequests.join(', ')}.`;
+                    setPaymentError(message);
+                    showToast('error', message);
+                }
+
+                setInvoicePreview(previewRes.status === 'fulfilled' ? previewRes.value?.data || null : null);
+                setPaymentMethods(methodsRes.status === 'fulfilled' ? (methodsRes.value?.data || []).slice(0, 3) : []);
+                setPrepayments(prepaymentsRes.status === 'fulfilled' ? prepaymentsRes.value?.data || [] : []);
+
+                if (previewNotFound) {
+                    showToast('success', 'Phiếu này chưa có dữ liệu hóa đơn, có thể tạo tạm ứng.');
+                }
+
+                if (!canLoadPaymentData) {
+                    setPaymentError('Phiếu này chưa ở trạng thái thanh toán.');
+                }
+
+                const user = userRes.status === 'fulfilled' ? userRes.value?.data : null;
                 if (user) {
                     setCashierInfo({
                         name: user?.fullName || 'Thu ngân',
                         phone: user?.phoneNumber || '--',
                     });
+                    setCashierId(user?.id || null);
                 }
             } catch {
                 if (!isMounted) return;
                 setPaymentError('Không thể tải thông tin thanh toán.');
+                showToast('error', 'Tải dữ liệu thanh toán thất bại.');
             } finally {
                 if (isMounted) {
                     setIsLoading(false);
@@ -68,7 +116,7 @@ const Payment = () => {
         return () => {
             isMounted = false;
         };
-    }, [receptionId]);
+    }, [receptionId, receptionStatus, reloadKey]);
 
     const goToTodayOrders = () => {
         navigate(RECEPTIONIST_PATHS.TODAY_ORDERS);
@@ -105,39 +153,57 @@ const Payment = () => {
         const amountValue = Number(String(amount || '').replace(/\D/g, ''));
         if (!paymentMethodId) {
             setPaymentError('Vui lòng chọn phương thức thanh toán.');
+            showToast('error', 'Thiếu phương thức thanh toán.');
             return;
         }
         if (!amountValue || amountValue <= 0) {
             setPaymentError('Vui lòng nhập số tiền hợp lệ.');
+            showToast('error', 'Số tiền thanh toán không hợp lệ.');
             return;
         }
 
         setIsSubmitting(true);
         setPaymentError('');
         try {
-            if (invoicePreview?.medicalRecord?.id) {
-                await paymentService.createInvoice({
-                    medicalRecord: { id: invoicePreview.medicalRecord.id },
-                    paymentMethod: { id: Number(paymentMethodId) },
-                    totalAmount: amountValue,
-                    note: note || 'Thanh toán tại quầy',
-                    status: 'PAID',
-                });
-            } else {
-                await paymentService.createPrePayment({
-                    receptionRecord: { id: receptionId },
-                    paymentMethod: { id: Number(paymentMethodId) },
-                    amount: amountValue,
-                });
+            const remainAmount = Number(paymentSummary.total || 0);
+            const canCreateInvoice = Boolean(invoicePreview?.medicalRecord?.id);
+
+            if (!canCreateInvoice) {
+                throw new Error('Phiếu hiện chưa đủ dữ liệu để xác nhận thanh toán.');
             }
 
+            if (remainAmount <= 0) {
+                throw new Error('Phiếu này đã được thanh toán đủ.');
+            }
+
+            if (amountValue < remainAmount) {
+                throw new Error('Số tiền xác nhận thanh toán phải lớn hơn hoặc bằng số tiền còn lại.');
+            }
+
+            const invoicePayload = paymentService.buildInvoicePayload({
+                medicalRecordId: invoicePreview.medicalRecord.id,
+                paymentMethodId,
+                totalAmount: remainAmount,
+                receptionistId: cashierId,
+                note,
+            });
+            await paymentService.createInvoice(invoicePayload);
+
             setIsModalOpen(false);
+            showToast('success', 'Ghi nhận thanh toán thành công.');
             goToTodayOrders();
-        } catch {
-            setPaymentError('Không thể ghi nhận thanh toán. Vui lòng thử lại.');
+        } catch (error) {
+            const message = error?.message || 'Không thể ghi nhận thanh toán. Vui lòng thử lại.';
+            setPaymentError(message);
+            showToast('error', message);
         } finally {
             setIsSubmitting(false);
         }
+    };
+
+    const handleRetryPaymentData = () => {
+        setReloadKey((prev) => prev + 1);
+        showToast('success', 'Đang tải lại dữ liệu thanh toán...');
     };
 
     return (
@@ -151,29 +217,51 @@ const Payment = () => {
                     rightNode={<div className="staff-payment-avatar" aria-label="Nhân viên" />}
                 />
 
-                {paymentError && <p className="staff-payment-error">{paymentError}</p>}
-                {isLoading && <p className="staff-payment-error">Đang tải dữ liệu thanh toán...</p>}
+                {paymentError && (
+                    <div className="staff-payment-error-row">
+                        <p className="staff-payment-error">{paymentError}</p>
+                        <button type="button" className="staff-payment-retry-btn" onClick={handleRetryPaymentData}>Thử lại</button>
+                    </div>
+                )}
 
                 <div className="staff-payment-content">
-                    <StaffPaymentInfoCard
-                        time={invoicePreview?.createdAt || 'Chưa có thời gian lập hóa đơn'}
-                        customer={{
-                            name: location.state?.customerName || 'Khách hàng',
-                            phone: location.state?.customerPhone || '--',
-                        }}
-                        cashier={cashierInfo}
-                    />
-                    <StaffCostSummaryCard
-                        petInfo={{
-                            name: 'Thú cưng',
-                            breed: '--',
-                            age: '--',
-                            weight: '--',
-                        }}
-                        feeRows={feeRows}
-                        paymentSummary={paymentSummary}
-                        paymentHistoryAmount={paymentSummary.paidAmount}
-                    />
+                    {isLoading ? (
+                        <>
+                            <div className="staff-payment-skeleton-card" aria-hidden="true">
+                                <div className="staff-payment-skeleton-line staff-payment-skeleton-line-lg"></div>
+                                <div className="staff-payment-skeleton-line"></div>
+                                <div className="staff-payment-skeleton-line staff-payment-skeleton-line-sm"></div>
+                            </div>
+                            <div className="staff-payment-skeleton-card" aria-hidden="true">
+                                <div className="staff-payment-skeleton-line staff-payment-skeleton-line-lg"></div>
+                                <div className="staff-payment-skeleton-line"></div>
+                                <div className="staff-payment-skeleton-line"></div>
+                                <div className="staff-payment-skeleton-line staff-payment-skeleton-line-sm"></div>
+                            </div>
+                        </>
+                    ) : (
+                        <>
+                            <StaffPaymentInfoCard
+                                time={invoicePreview?.createdAt || 'Chưa có thời gian lập hóa đơn'}
+                                customer={{
+                                    name: location.state?.customerName || 'Khách hàng',
+                                    phone: location.state?.customerPhone || '--',
+                                }}
+                                cashier={cashierInfo}
+                            />
+                            <StaffCostSummaryCard
+                                petInfo={{
+                                    name: 'Thú cưng',
+                                    breed: '--',
+                                    age: '--',
+                                    weight: '--',
+                                }}
+                                feeRows={feeRows}
+                                paymentSummary={paymentSummary}
+                                paymentHistoryAmount={paymentSummary.paidAmount}
+                            />
+                        </>
+                    )}
                 </div>
             </div>
 
@@ -191,6 +279,12 @@ const Payment = () => {
                 paymentMethods={paymentMethods}
                 isSubmitting={isSubmitting}
             />
+
+            {toast && (
+                <div className={`staff-payment-toast staff-payment-toast-${toast.type}`} role="status" aria-live="polite">
+                    {toast.message}
+                </div>
+            )}
         </div>
         </ReceptionistLayout>
     );

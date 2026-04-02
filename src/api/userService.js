@@ -1,8 +1,11 @@
 import {authApi} from './baseApi';
 
+const getApiData = (response) => response?.data?.data;
+
 const userService = {
-    getUsers(params) {
-        return authApi.get('/users/me', {params});
+    async getUsers(params) {
+        const response = await authApi.get('/users/me', {params});
+        return { ...response, data: getApiData(response) || null };
     },
     getUserAvatarById(userId) {
         return authApi.get(`/users/avatar/${userId}`);

@@ -1,16 +1,28 @@
 import {authApi} from './baseApi';
 
+const getApiData = (response) => response?.data?.data;
+
+const toArray = (raw) => {
+    if (Array.isArray(raw)) return raw;
+    if (Array.isArray(raw?.items)) return raw.items;
+    if (Array.isArray(raw?.content)) return raw.content;
+    if (Array.isArray(raw?.results)) return raw.results;
+    return [];
+};
+
 const normalizeClientPayload = (payload = {}) => ({
     name: payload?.name || payload?.fullName || '',
     phone: payload?.phone || payload?.phoneNumber || '',
 });
 
 const customerService = {
-    getCustomers(params) {
-        return authApi.get('/clients/search', {params});
+    async getCustomers(params) {
+        const response = await authApi.get('/clients/search', {params});
+        return { ...response, data: toArray(getApiData(response)) };
     },
-    findCustomerByPhone(phone) {
-        return authApi.get('/clients', { params: { phone } });
+    async findCustomerByPhone(phone) {
+        const response = await authApi.get('/clients', { params: { phone } });
+        return { ...response, data: getApiData(response) || null };
     },
     createCustomers(payload) {
         return authApi.post('/clients', normalizeClientPayload(payload));
@@ -18,8 +30,9 @@ const customerService = {
     createCustomer(payload) {
         return authApi.post('/clients', normalizeClientPayload(payload));
     },
-    getCustomerPets(customerId) {
-        return authApi.get(`/clients/${customerId}/pets`);
+    async getCustomerPets(customerId) {
+        const response = await authApi.get(`/clients/${customerId}/pets`);
+        return { ...response, data: toArray(getApiData(response)) };
     }
 }
 

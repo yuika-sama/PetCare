@@ -1,30 +1,76 @@
 import {authApi} from './baseApi';
 
+const getApiData = (response) => response?.data?.data;
+
+const toArray = (raw) => {
+    if (Array.isArray(raw)) return raw;
+    if (Array.isArray(raw?.items)) return raw.items;
+    if (Array.isArray(raw?.content)) return raw.content;
+    if (Array.isArray(raw?.results)) return raw.results;
+    return [];
+};
+
 const paymentService = {
-    getPrePayments(params){
-        return authApi.get('/prepayments', {params});
-    },
-    createPrepPayment(payload){
-        return authApi.post('/prepayments', payload);
+    async getPrePayments(params){
+        try {
+            const response = await authApi.get('/prepayments', {params});
+            return { ...response, data: toArray(getApiData(response)) };
+        } catch (error) {
+            if (error?.response?.status === 500) {
+                return { data: [] };
+            }
+            throw error;
+        }
     },
     createPrePayment(payload){
+        return authApi.post('/prepayments', payload);
+    },
+    createPrepPayment(payload){
         return authApi.post('/prepayments', payload);
     },
     createInvoice(payload){
         return authApi.post('/invoices', payload);
     },
-    getInvoiceById(invoiceId){
-        return authApi.get(`/invoices/${invoiceId}`);
+    async getInvoiceById(invoiceId){
+        const response = await authApi.get(`/invoices/${invoiceId}`);
+        return { ...response, data: getApiData(response) };
     },
     patchInvoiceById(invoiceId, payload){
         return authApi.patch(`/invoices/${invoiceId}`, payload);
     },
-    getInvoicePreview(receptionSlipId){
-        return authApi.get(`/reception-slips/${receptionSlipId}/invoice`);
+    async getInvoicePreview(receptionSlipId){
+        try {
+            const response = await authApi.get(`/reception-slips/${receptionSlipId}/invoice`);
+            return { ...response, data: getApiData(response), notFound: false };
+        } catch (error) {
+            if (error?.response?.status === 404) {
+                return { data: null, notFound: true };
+            }
+            throw error;
+        }
     },
-    getPaymentMethods(){
-        return authApi.get('/payment-methods');
-    }
+    async getPaymentMethods(){
+        const response = await authApi.get('/payment-methods');
+        return { ...response, data: toArray(getApiData(response)) };
+    },
+    buildPrepaymentPayload({ receptionId, paymentMethodId, amount, receptionistId }) {
+        return {
+            receptionRecord: { id: Number(receptionId) },
+            paymentMethod: { id: Number(paymentMethodId) },
+            receptionist: receptionistId ? { id: Number(receptionistId) } : undefined,
+            amount: Number(amount),
+        };
+    },
+    buildInvoicePayload({ medicalRecordId, paymentMethodId, totalAmount, receptionistId, note }) {
+        return {
+            medicalRecord: { id: Number(medicalRecordId) },
+            paymentMethod: { id: Number(paymentMethodId) },
+            receptionist: receptionistId ? { id: Number(receptionistId) } : undefined,
+            totalAmount: Number(totalAmount),
+            status: 'PAID',
+            note: note || 'Thanh toán tại quầy',
+        };
+    },
 }
 
 export default paymentService;

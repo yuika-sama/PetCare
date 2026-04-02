@@ -20,11 +20,14 @@ const authService = {
 
         return response;
     },
-    logout(){
-        localStorage.removeItem('access_token');
-        localStorage.removeItem('user_role');
-        localStorage.removeItem('user_info');
-        return authApi.delete('/auth/logout');
+    async logout(){
+        try {
+            await authApi.delete('/auth/logout');
+        } finally {
+            localStorage.removeItem('access_token');
+            localStorage.removeItem('user_role');
+            localStorage.removeItem('user_info');
+        }
     }   
 }
 

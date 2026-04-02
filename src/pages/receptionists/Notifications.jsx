@@ -10,12 +10,21 @@ const Notifications = () => {
     const navigate = useNavigate();
     const [notifications, setNotifications] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
+    const [errorText, setErrorText] = useState('');
+    const [reloadKey, setReloadKey] = useState(0);
+    const [toast, setToast] = useState(null);
+
+    const showToast = (type, message) => {
+        setToast({ type, message });
+        setTimeout(() => setToast(null), 2800);
+    };
 
     useEffect(() => {
         let isMounted = true;
 
         const fetchNotifications = async () => {
             setIsLoading(true);
+            setErrorText('');
             try {
                 const response = await notificationService.listReceptionistNotifications();
                 if (!isMounted) return;
@@ -23,6 +32,8 @@ const Notifications = () => {
             } catch {
                 if (!isMounted) return;
                 setNotifications([]);
+                setErrorText('Không thể tải thông báo thanh toán. Vui lòng thử lại.');
+                showToast('error', 'Tải thông báo thất bại.');
             } finally {
                 if (isMounted) {
                     setIsLoading(false);
@@ -35,7 +46,12 @@ const Notifications = () => {
         return () => {
             isMounted = false;
         };
-    }, []);
+    }, [reloadKey]);
+
+    const handleRetry = () => {
+        setReloadKey((prev) => prev + 1);
+        showToast('success', 'Đang tải lại thông báo...');
+    };
 
     const handleOpenPayment = (item) => {
         navigate(RECEPTIONIST_PATHS.PAYMENT, {
@@ -54,7 +70,24 @@ const Notifications = () => {
             </header>
 
             <div className="rnotif-list">
-                {isLoading && <p className="rnotif-time">Đang tải thông báo...</p>}
+                {isLoading && (
+                    <div className="rnotif-skeleton-list" aria-hidden="true">
+                        {[1, 2, 3].map((item) => (
+                            <div key={item} className="rnotif-skeleton-card">
+                                <div className="rnotif-skeleton-line rnotif-skeleton-line-lg"></div>
+                                <div className="rnotif-skeleton-line"></div>
+                                <div className="rnotif-skeleton-line rnotif-skeleton-line-sm"></div>
+                            </div>
+                        ))}
+                    </div>
+                )}
+                {!isLoading && errorText && (
+                    <div className="rnotif-error-row">
+                        <p className="rnotif-time">{errorText}</p>
+                        <button type="button" className="rnotif-retry-btn" onClick={handleRetry}>Thử lại</button>
+                    </div>
+                )}
+                {!isLoading && !errorText && notifications.length === 0 && <p className="rnotif-time">Không có thông báo thanh toán mới.</p>}
                 {notifications.map((item) => (
                     <button
                         key={item.id}
@@ -76,6 +109,12 @@ const Notifications = () => {
                         </div>
                     </button>
                 ))}
+
+                {toast && (
+                    <div className={`rnotif-toast rnotif-toast-${toast.type}`} role="status" aria-live="polite">
+                        {toast.message}
+                    </div>
+                )}
             </div>
         </div>
         </ReceptionistLayout>

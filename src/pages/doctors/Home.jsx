@@ -1,16 +1,18 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { CircleArrowRight, Bell } from 'lucide-react';
+import { CircleArrowRight, Bell, LogOut } from 'lucide-react';
 import './Home.css';
 import StatCard from '../../components/doctor/StatCard';
 import DoctorLayout from '../../layouts/DoctorLayout';
 import dashboardService from '../../api/dashboardService';
+import authService from '../../api/authService';
 
 const Home = () => {
     const navigate = useNavigate();
     const [activeTab, setActiveTab] = useState('Workspace');
     const [summary, setSummary] = useState({});
     const [isLoadingSummary, setIsLoadingSummary] = useState(true);
+    const [isLoggingOut, setIsLoggingOut] = useState(false);
 
     useEffect(() => {
         let isMounted = true;
@@ -20,12 +22,13 @@ const Home = () => {
                 const response = await dashboardService.getDoctorSummary();
                 if (!isMounted) return;
                 setSummary(response?.data?.data || {});
-            } catch (error) {
+            } catch {
                 if (!isMounted) return;
                 setSummary({});
             } finally {
-                if (!isMounted) return;
-                setIsLoadingSummary(false);
+                if (isMounted) {
+                    setIsLoadingSummary(false);
+                }
             }
         };
 
@@ -35,13 +38,13 @@ const Home = () => {
         };
     }, []);
 
-    const readMetric = (keys, fallback = 0) => {
+    const readMetric = useCallback((keys, fallback = 0) => {
         for (const key of keys) {
             const value = summary?.[key];
             if (typeof value === 'number') return value;
         }
         return fallback;
-    };
+    }, [summary]);
 
     const statsData = useMemo(() => [
         {
@@ -72,12 +75,25 @@ const Home = () => {
             unit: 'đơn',
             variant: 'success'
         }
-    ], [summary]);
+    ], [readMetric]);
 
     // Icon arrow chung cho StatCard
     const TargetIcon = () => (
         <CircleArrowRight size={24} color="currentColor" strokeWidth={1.5} />
     );
+
+    const handleLogout = async () => {
+        if (isLoggingOut) return;
+        setIsLoggingOut(true);
+        try {
+            await authService.logout();
+        } catch {
+            // Local session is still cleared in authService.logout finally block.
+        } finally {
+            setIsLoggingOut(false);
+            navigate('/login', { replace: true });
+        }
+    };
 
     return (
         <DoctorLayout>
@@ -98,6 +114,15 @@ const Home = () => {
                     <div className="home-quick-actions">
                         <button className="home-quick-btn" type="button" onClick={() => navigate('/doctors/notifications')} aria-label="Thong bao">
                             <Bell size={18} />
+                        </button>
+                        <button
+                            className="home-quick-btn home-quick-btn-logout"
+                            type="button"
+                            onClick={handleLogout}
+                            aria-label="Dang xuat"
+                            disabled={isLoggingOut}
+                        >
+                            <LogOut size={18} />
                         </button>
                     </div>
                 </div>

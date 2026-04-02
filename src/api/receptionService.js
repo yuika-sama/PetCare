@@ -22,27 +22,40 @@ const normalizeParams = (params = {}) => {
     return next;
 };
 
+const getApiData = (response) => response?.data?.data;
+
+const toArray = (raw) => {
+    if (Array.isArray(raw)) return raw;
+    if (Array.isArray(raw?.items)) return raw.items;
+    if (Array.isArray(raw?.content)) return raw.content;
+    if (Array.isArray(raw?.results)) return raw.results;
+    return [];
+};
+
 const receptionService = {
-    getReceptions(params) {
-        return authApi.get('/reception-slips', { params: normalizeParams(params) });
+    async getReceptions(params) {
+        const response = await authApi.get('/reception-slips', { params: normalizeParams(params) });
+        return { ...response, normalizedData: toArray(getApiData(response)) };
     },
-    getReceptionsByStates(states = [], params = {}) {
+    async getReceptionsByStates(states = [], params = {}) {
         const normalizedStates = states
             .filter(Boolean)
             .map((state) => normalizeStatus(state));
 
-        return authApi.get('/reception-slips/by-state', {
+        const response = await authApi.get('/reception-slips/by-state', {
             params: {
                 ...params,
                 states: normalizedStates,
             },
         });
+        return { ...response, normalizedData: toArray(getApiData(response)) };
     },
-    createReception(payload) {
+    async createReception(payload) {
         return authApi.post('/reception-slips', payload);
     },
-    getReceptionById(receptionId) {
-        return authApi.get(`/reception-slips/${receptionId}`);
+    async getReceptionById(receptionId) {
+        const response = await authApi.get(`/reception-slips/${receptionId}`);
+        return { ...response, normalizedData: getApiData(response) };
     },
     patchReceptionById(receptionId, payload) {
         return authApi.patch(`/reception-slips/${receptionId}`, payload);
@@ -63,11 +76,16 @@ const receptionService = {
             },
         });
     },
-    getSelectedParaclinicalServices(receptionId) {
-        return authApi.get(`/reception-slips/${receptionId}/paraclinical-services`);
+    async getSelectedParaclinicalServices(receptionId) {
+        const response = await authApi.get(`/reception-slips/${receptionId}/paraclinical-services`);
+        return { ...response, normalizedData: toArray(getApiData(response)) };
     },
     saveSelectedParaclinicalServices(receptionId, payload) {
         return authApi.post(`/reception-slips/${receptionId}/paraclinical-services`, payload);
+    },
+    async getDoctorsWithWaitingCases() {
+        const response = await authApi.get('/doctors/waiting-cases');
+        return { ...response, normalizedData: toArray(getApiData(response)) };
     }
 }
 

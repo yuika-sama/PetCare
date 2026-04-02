@@ -1,11 +1,12 @@
 import React, { useState, useMemo, useEffect } from 'react';
-import { Search, Bell, ChevronDown, ChevronUp, ChevronLeft, ChevronRight, UserRound, PlusCircle } from 'lucide-react';
+import { Search, Bell, ChevronDown, ChevronUp, ChevronLeft, ChevronRight, UserRound, PlusCircle, LogOut } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import ReceptionistLayout from '../../layouts/ReceptionistLayout';
 import ReceptionCard from '../../components/receptionist/ReceptionCard';
 import ReceivedCard from '../../components/receptionist/ReceivedCard';
 import { RECEPTIONIST_PATHS } from '../../routes/receptionistPaths';
 import receptionService from '../../api/receptionService';
+import authService from '../../api/authService';
 import './TodayOrders.css';
 
 const MONTH_NAMES = [
@@ -19,6 +20,15 @@ const ORDER_STATUS = {
     WAITING_PAYMENT: 'chờ thanh toán',
     PAID: 'đã thanh toán',
     ALL: 'tất cả'
+};
+
+const RECEIVED_GROUP = ['chờ thực hiện'];
+
+const TAB_STATES = {
+    [ORDER_STATUS.RECEIVED]: RECEIVED_GROUP,
+    [ORDER_STATUS.WAITING_PAYMENT]: [ORDER_STATUS.WAITING_PAYMENT],
+    [ORDER_STATUS.PAID]: [ORDER_STATUS.PAID],
+    [ORDER_STATUS.ALL]: [],
 };
 
 const initialOrders = [
@@ -142,7 +152,16 @@ const TodayOrders = () => {
     const [searchTerm, setSearchTerm] = useState('');
     const [orders, setOrders] = useState(initialOrders);
     const [isLoadingOrders, setIsLoadingOrders] = useState(false);
+    const [isLoggingOut, setIsLoggingOut] = useState(false);
     const [ordersError, setOrdersError] = useState('');
+    const [reloadKey, setReloadKey] = useState(0);
+    const [toast, setToast] = useState(null);
+    const [tabCounts, setTabCounts] = useState({
+        [ORDER_STATUS.RECEIVED]: 0,
+        [ORDER_STATUS.WAITING_PAYMENT]: 0,
+        [ORDER_STATUS.PAID]: 0,
+        [ORDER_STATUS.ALL]: 0,
+    });
     const [newCustomer, setNewCustomer] = useState({
         name: '', phone: '', petName: '', species: '', breed: '', appointmentDate: ''
     });
@@ -158,6 +177,11 @@ const TodayOrders = () => {
     const [viewMonth, setViewMonth] = useState(today.getMonth()); // 0-indexed
     const [selectedDate, setSelectedDate] = useState(defaultSelectedDate);
 
+    const showToast = (type, message) => {
+        setToast({ type, message });
+        setTimeout(() => setToast(null), 2800);
+    };
+
     const selectedDateIso = useMemo(() => {
         const date = new Date(viewYear, viewMonth, selectedDate || 1);
         const year = date.getFullYear();
@@ -170,14 +194,14 @@ const TodayOrders = () => {
         let isMounted = true;
 
         const mapStatus = (rawStatus) => {
-            const status = String(rawStatus || '').toLowerCase();
-            if (status.includes('đã thanh toán') || status.includes('paid')) {
+            const status = String(rawStatus || '').trim().toLowerCase();
+            if (status === 'đã thanh toán') {
                 return ORDER_STATUS.PAID;
             }
-            if (status.includes('chờ thanh toán') || status.includes('waiting') || status.includes('payment')) {
+            if (status === 'chờ thanh toán') {
                 return ORDER_STATUS.WAITING_PAYMENT;
             }
-            if (status.includes('đang thực hiện') || status.includes('chờ kết luận')) {
+            if (status === 'đang thực hiện' || status === 'chờ kết luận' || status === 'chờ thực hiện') {
                 return ORDER_STATUS.RECEIVED;
             }
             return ORDER_STATUS.RECEIVED;
@@ -198,6 +222,7 @@ const TodayOrders = () => {
                 .slice(0, 2)
                 .map((part) => part[0]?.toUpperCase())
                 .join('');
+
 
             return {
                 id: record?.id,
@@ -228,25 +253,59 @@ const TodayOrders = () => {
                     },
                 ],
                 sourceOrder: null,
-                paymentEnabled: mappedStatus !== ORDER_STATUS.PAID,
+                paymentEnabled: mappedStatus === ORDER_STATUS.WAITING_PAYMENT,
                 hideSource: false,
                 avatar: `https://placehold.co/80x80/e0f2ef/209D80?text=${initials || 'KH'}`,
                 receptionRecord: record,
             };
         };
 
-        const fetchOrders = async () => {
+        const fetchOrdersByTab = async () => {
             setIsLoadingOrders(true);
             setOrdersError('');
             try {
-                const response = await receptionService.getReceptions({ date: selectedDateIso });
-                const records = response?.data?.data || [];
+                let response;
+                if (activeStatus === ORDER_STATUS.ALL) {
+                    response = await receptionService.getReceptions({ date: selectedDateIso });
+                } else if (activeStatus === ORDER_STATUS.WAITING_PAYMENT || activeStatus === ORDER_STATUS.PAID) {
+                    response = await receptionService.getReceptions({ date: selectedDateIso, status: activeStatus });
+                } else {
+                    const targetStates = TAB_STATES[activeStatus] || [];
+                    response = await receptionService.getReceptionsByStates(targetStates, { date: selectedDateIso });
+                }
+                const records = response?.normalizedData || [];
                 if (!isMounted) return;
-                setOrders(records.map(mapOrder));
+                const mappedOrders = records.map(mapOrder);
+                setOrders(mappedOrders);
+
+                setTabCounts((prev) => {
+                    if (activeStatus === ORDER_STATUS.ALL) {
+                        const next = {
+                            [ORDER_STATUS.RECEIVED]: 0,
+                            [ORDER_STATUS.WAITING_PAYMENT]: 0,
+                            [ORDER_STATUS.PAID]: 0,
+                            [ORDER_STATUS.ALL]: mappedOrders.length,
+                        };
+
+                        mappedOrders.forEach((order) => {
+                            if (order.status === ORDER_STATUS.RECEIVED) next[ORDER_STATUS.RECEIVED] += 1;
+                            if (order.status === ORDER_STATUS.WAITING_PAYMENT) next[ORDER_STATUS.WAITING_PAYMENT] += 1;
+                            if (order.status === ORDER_STATUS.PAID) next[ORDER_STATUS.PAID] += 1;
+                        });
+
+                        return next;
+                    }
+
+                    return {
+                        ...prev,
+                        [activeStatus]: mappedOrders.length,
+                    };
+                });
             } catch {
                 if (!isMounted) return;
                 setOrders([]);
                 setOrdersError('Không thể tải dữ liệu tiếp đón từ hệ thống.');
+                showToast('error', 'Tải danh sách tiếp đón thất bại.');
             } finally {
                 if (isMounted) {
                     setIsLoadingOrders(false);
@@ -254,12 +313,12 @@ const TodayOrders = () => {
             }
         };
 
-        fetchOrders();
+        fetchOrdersByTab();
 
         return () => {
             isMounted = false;
         };
-    }, [selectedDateIso]);
+    }, [selectedDateIso, reloadKey, activeStatus]);
 
     // Build the full month grid
     const monthGrid = useMemo(() => {
@@ -314,38 +373,25 @@ const TodayOrders = () => {
         return map;
     }, [orders]);
 
-    const filteredByDate = useMemo(
-        () => orders.filter((order) => order.date === selectedDate),
-        [orders, selectedDate]
-    );
-
     const filteredBySearchAndFilters = useMemo(() => {
         const keyword = searchTerm.trim().toLowerCase();
-        return filteredByDate.filter((order) => {
+        return orders.filter((order) => {
             const searchable = `${order.customerName} ${order.phone} ${order.ticketId} ${order.pets[0]?.name || ''}`.toLowerCase();
             const matchesKeyword = !keyword || searchable.includes(keyword);
             return matchesKeyword;
         });
-    }, [filteredByDate, searchTerm]);
+    }, [orders, searchTerm]);
 
-    const statusTabs = useMemo(() => {
-        const count = (status) => filteredByDate.filter((item) => item.status === status).length;
-        return [
-            { key: ORDER_STATUS.RECEIVED, label: 'Đã tiếp đón', count: count(ORDER_STATUS.RECEIVED) },
-            { key: ORDER_STATUS.WAITING_PAYMENT, label: 'Chờ thanh toán', count: count(ORDER_STATUS.WAITING_PAYMENT) },
-            { key: ORDER_STATUS.PAID, label: 'Đã thanh toán', count: count(ORDER_STATUS.PAID) },
-            { key: ORDER_STATUS.ALL, label: 'Tất cả', count: filteredByDate.length }
-        ];
-    }, [filteredByDate]);
-
-    const activeOrders = useMemo(() => {
-        if (activeStatus === ORDER_STATUS.ALL) return filteredBySearchAndFilters;
-        return filteredBySearchAndFilters.filter((order) => order.status === activeStatus);
-    }, [activeStatus, filteredBySearchAndFilters]);
+    const statusTabs = useMemo(() => [
+        { key: ORDER_STATUS.RECEIVED, label: 'Đã tiếp đón', count: tabCounts[ORDER_STATUS.RECEIVED] || 0 },
+        { key: ORDER_STATUS.WAITING_PAYMENT, label: 'Chờ thanh toán', count: tabCounts[ORDER_STATUS.WAITING_PAYMENT] || 0 },
+        { key: ORDER_STATUS.PAID, label: 'Đã thanh toán', count: tabCounts[ORDER_STATUS.PAID] || 0 },
+        { key: ORDER_STATUS.ALL, label: 'Tất cả', count: tabCounts[ORDER_STATUS.ALL] || 0 },
+    ], [tabCounts]);
 
     const receivedCustomers = useMemo(
-        () => activeOrders.filter((order) => order.status === ORDER_STATUS.RECEIVED),
-        [activeOrders]
+        () => filteredBySearchAndFilters.filter((order) => order.status === ORDER_STATUS.RECEIVED),
+        [filteredBySearchAndFilters]
     );
 
     const shouldUseSimpleReceptionCard = activeStatus === ORDER_STATUS.RECEIVED;
@@ -358,14 +404,39 @@ const TodayOrders = () => {
         navigate(RECEPTIONIST_PATHS.NOTIFICATIONS);
     };
 
+    const handleLogout = async () => {
+        if (isLoggingOut) return;
+        setIsLoggingOut(true);
+        try {
+            await authService.logout();
+        } catch {
+            // Session data is still cleared in authService.logout finally block.
+        } finally {
+            setIsLoggingOut(false);
+            navigate('/login', { replace: true });
+        }
+    };
+
     const handleGoToPayment = (order) => {
+        const orderStatus = order?.status || order?.receptionRecord?.status;
+        if (orderStatus !== ORDER_STATUS.WAITING_PAYMENT && orderStatus !== ORDER_STATUS.PAID) {
+            showToast('error', 'Chỉ phiếu chờ thanh toán hoặc đã thanh toán mới vào màn này.');
+            return;
+        }
+
         navigate(RECEPTIONIST_PATHS.PAYMENT, {
             state: {
                 receptionId: order?.id,
                 customerName: order?.customerName,
                 customerPhone: order?.phone,
+                receptionStatus: orderStatus,
             },
         });
+    };
+
+    const handleRetryOrders = () => {
+        setReloadKey((prev) => prev + 1);
+        showToast('success', 'Đang tải lại danh sách tiếp đón...');
     };
 
     const handleCreateCustomer = () => {
@@ -429,14 +500,25 @@ const TodayOrders = () => {
                                 <h1 className="to-header-name">Lê tân Thu Trang</h1>
                             </div>
                         </div>
-                        <button
-                            className="to-header-bell-btn"
-                            type="button"
-                            aria-label="Thông báo"
-                            onClick={handleGoToNotifications}
-                        >
-                            <Bell size={20} color="#1a1a1a" strokeWidth={2} />
-                        </button>
+                        <div className="to-header-actions">
+                            <button
+                                className="to-header-bell-btn"
+                                type="button"
+                                aria-label="Thông báo"
+                                onClick={handleGoToNotifications}
+                            >
+                                <Bell size={20} color="#1a1a1a" strokeWidth={2} />
+                            </button>
+                            <button
+                                className="to-header-bell-btn to-header-logout-btn"
+                                type="button"
+                                aria-label="Đăng xuất"
+                                onClick={handleLogout}
+                                disabled={isLoggingOut}
+                            >
+                                <LogOut size={20} color="#b91c1c" strokeWidth={2} />
+                            </button>
+                        </div>
                     </div>
                 </div>
 
@@ -543,8 +625,12 @@ const TodayOrders = () => {
                     </div>
                 </div>
 
-                {ordersError && <p className="to-empty-text">{ordersError}</p>}
-                {isLoadingOrders && <p className="to-empty-text">Đang tải danh sách tiếp đón...</p>}
+                {ordersError && (
+                    <div className="to-error-row">
+                        <p className="to-empty-text">{ordersError}</p>
+                        <button type="button" className="to-retry-btn" onClick={handleRetryOrders}>Thử lại</button>
+                    </div>
+                )}
 
                 {/* Status Tabs */}
                 <div className="to-status-tabs">
@@ -561,9 +647,21 @@ const TodayOrders = () => {
                 </div>
 
                 {/* Content by tab */}
+                {isLoadingOrders && (
+                    <div className="to-customers-list" aria-hidden="true">
+                        {[1, 2, 3].map((item) => (
+                            <div key={item} className="to-skeleton-card">
+                                <div className="to-skeleton-line to-skeleton-line-lg"></div>
+                                <div className="to-skeleton-line"></div>
+                                <div className="to-skeleton-line to-skeleton-line-sm"></div>
+                            </div>
+                        ))}
+                    </div>
+                )}
+
                 {shouldUseSimpleReceptionCard && (
                     <>
-                        {receivedCustomers.length > 0 ? (
+                        {!isLoadingOrders && receivedCustomers.length > 0 ? (
                             <div className="to-customers-list">
                                 {receivedCustomers.map((c) => (
                                     <ReceptionCard
@@ -582,7 +680,7 @@ const TodayOrders = () => {
                                     />
                                 ))}
                             </div>
-                        ) : (
+                        ) : !isLoadingOrders ? (
                             <div className="to-empty-state">
                                 <div className="to-empty-icon">
                                     <UserRound size={32} color="#a1a1aa" />
@@ -595,13 +693,13 @@ const TodayOrders = () => {
                                     <span>Tạo mới khách hàng</span>
                                 </button>
                             </div>
-                        )}
+                        ) : null}
                     </>
                 )}
 
-                {!shouldUseSimpleReceptionCard && activeOrders.length > 0 && (
+                {!shouldUseSimpleReceptionCard && !isLoadingOrders && filteredBySearchAndFilters.length > 0 && (
                     <div className="to-customers-list">
-                        {activeOrders.map((order) => (
+                        {filteredBySearchAndFilters.map((order) => (
                             <ReceivedCard
                                 key={order.id}
                                 customerName={order.customerName}
@@ -624,7 +722,7 @@ const TodayOrders = () => {
                     </div>
                 )}
 
-                {!shouldUseSimpleReceptionCard && activeOrders.length === 0 && (
+                {!shouldUseSimpleReceptionCard && !isLoadingOrders && filteredBySearchAndFilters.length === 0 && (
                     <div className="to-empty-state">
                         <div className="to-empty-icon">
                             <UserRound size={32} color="#a1a1aa" />
@@ -636,6 +734,12 @@ const TodayOrders = () => {
                             </span>
                             <span>Tạo mới khách hàng</span>
                         </button>
+                    </div>
+                )}
+
+                {toast && (
+                    <div className={`to-toast to-toast-${toast.type}`} role="status" aria-live="polite">
+                        {toast.message}
                     </div>
                 )}
             </div>

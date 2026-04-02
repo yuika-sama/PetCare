@@ -1,12 +1,25 @@
-import React, { useEffect, useState } from 'react';
-import { ChevronLeft, ChevronDown, Phone, PawPrint, CirclePlus, Cake, Weight, Mars, PenSquare } from 'lucide-react';
+import React, { useEffect, useMemo, useState } from 'react';
+import { ChevronLeft, ChevronDown, Phone, PawPrint, CirclePlus } from 'lucide-react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import ReceptionistLayout from '../../layouts/ReceptionistLayout';
 import { RECEPTIONIST_PATHS } from '../../routes/receptionistPaths';
 import customerService from '../../api/customerService';
 import petService from '../../api/petService';
 import receptionService from '../../api/receptionService';
+import userService from '../../api/userService';
 import './NewReception.css';
+
+const EXAM_REASON_OPTIONS = {
+    behohap: 'Bệnh hô hấp',
+    tieuhoa: 'Bệnh tiêu hóa',
+    dalieu: 'Bệnh da liễu',
+    khac: 'Khác',
+};
+
+const EXAM_TYPE_OPTIONS = {
+    khammoi: 'lâm sàng',
+    taikham: 'ngoại trú',
+};
 
 const NewReception = () => {
     const navigate = useNavigate();
@@ -29,9 +42,23 @@ const NewReception = () => {
     const [birthDate, setBirthDate] = useState('');
     const [assignedDoctor, setAssignedDoctor] = useState('');
     const [assignedCases, setAssignedCases] = useState('--');
+    const [doctorOptions, setDoctorOptions] = useState([]);
+    const [isLoadingDoctors, setIsLoadingDoctors] = useState(false);
+    const [doctorsError, setDoctorsError] = useState('');
     const [notes, setNotes] = useState('');
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [submitError, setSubmitError] = useState('');
+    const [toast, setToast] = useState(null);
+
+    const selectedDoctorInfo = useMemo(
+        () => doctorOptions.find((item) => String(item?.id) === String(assignedDoctor)),
+        [doctorOptions, assignedDoctor]
+    );
+
+    const showToast = (type, message) => {
+        setToast({ type, message });
+        setTimeout(() => setToast(null), 2800);
+    };
 
     useEffect(() => {
         const customer = location.state?.customer;
@@ -54,9 +81,64 @@ const NewReception = () => {
         }
     }, [location.state]);
 
+    useEffect(() => {
+        let isMounted = true;
+
+        const fetchDoctors = async () => {
+            setIsLoadingDoctors(true);
+            setDoctorsError('');
+            try {
+                const response = await receptionService.getDoctorsWithWaitingCases();
+                if (!isMounted) return;
+                const doctors = (response?.normalizedData || []).map((item) => ({
+                    id: item?.doctorId || item?.id,
+                    fullName: item?.doctorName || item?.fullName || `Bác sĩ #${item?.doctorId || item?.id}`,
+                    waitingCases: Number(item?.waitingCases || item?.waitingCaseCount || 0),
+                })).filter((item) => item?.id);
+                setDoctorOptions(doctors);
+            } catch {
+                if (!isMounted) return;
+                setDoctorOptions([]);
+                setDoctorsError('Không thể tải danh sách bác sĩ.');
+                showToast('error', 'Lỗi tải danh sách bác sĩ.');
+            } finally {
+                if (isMounted) {
+                    setIsLoadingDoctors(false);
+                }
+            }
+        };
+
+        fetchDoctors();
+
+        return () => {
+            isMounted = false;
+        };
+    }, []);
+
+    const handleRetryDoctors = async () => {
+        setIsLoadingDoctors(true);
+        setDoctorsError('');
+        try {
+            const response = await receptionService.getDoctorsWithWaitingCases();
+            const doctors = (response?.normalizedData || []).map((item) => ({
+                id: item?.doctorId || item?.id,
+                fullName: item?.doctorName || item?.fullName || `Bác sĩ #${item?.doctorId || item?.id}`,
+                waitingCases: Number(item?.waitingCases || item?.waitingCaseCount || 0),
+            })).filter((item) => item?.id);
+            setDoctorOptions(doctors);
+            showToast('success', 'Đã tải lại danh sách bác sĩ.');
+        } catch {
+            setDoctorOptions([]);
+            setDoctorsError('Không thể tải danh sách bác sĩ.');
+            showToast('error', 'Thử lại thất bại khi tải bác sĩ.');
+        } finally {
+            setIsLoadingDoctors(false);
+        }
+    };
+
     const hydrateCustomerPets = async (id) => {
         const petsResponse = await customerService.getCustomerPets(id);
-        const petItems = petsResponse?.data?.data || [];
+        const petItems = petsResponse?.data || [];
         const mappedPets = petItems.map((pet) => ({
             id: pet?.id,
             name: pet?.name || 'Thú cưng',
@@ -104,6 +186,7 @@ const NewReception = () => {
                 }
             } catch {
                 setSubmitError('Không thể tạo thú cưng mới. Vui lòng thử lại.');
+                showToast('error', 'Tạo thú cưng thất bại.');
                 return;
             }
         }
@@ -125,7 +208,7 @@ const NewReception = () => {
         }
 
         const foundResponse = await customerService.findCustomerByPhone(phone);
-        const foundCustomer = foundResponse?.data?.data;
+        const foundCustomer = foundResponse?.data;
 
         if (foundCustomer?.id) {
             setCustomerId(foundCustomer.id);
@@ -155,10 +238,22 @@ const NewReception = () => {
         setIsSubmitting(true);
         try {
             const currentUser = JSON.parse(localStorage.getItem('user_info') || '{}');
-            const receptionistId = Number(currentUser?.id) || 1;
+            const currentUserResponse = await userService.getUsers().catch(() => null);
+            const receptionistId = Number(currentUserResponse?.data?.id || currentUser?.id);
             const doctorId = Number(assignedDoctor);
+            const weightValue = Number(weight);
+
+            if (!receptionistId) {
+                throw new Error('Không xác định được thông tin lễ tân hiện tại.');
+            }
             if (!doctorId) {
                 throw new Error('Vui lòng chọn bác sĩ phụ trách.');
+            }
+            if (!weight || Number.isNaN(weightValue) || weightValue <= 0) {
+                throw new Error('Vui lòng nhập cân nặng hợp lệ lớn hơn 0.');
+            }
+            if (!reason) {
+                throw new Error('Vui lòng chọn lý do khám.');
             }
 
             const resolvedCustomerId = customerId || await resolveCustomer();
@@ -186,17 +281,19 @@ const NewReception = () => {
                 petId: Number(finalPetId),
                 receptionistId,
                 doctorId,
-                examReason: reason || '',
+                examReason: EXAM_REASON_OPTIONS[reason] || reason,
                 symptomDescription: description || '',
                 note: notes || '',
-                weight: weight ? Number(weight) : 0,
-                examType: examType === 'taikham' ? 'ngoại trú' : 'lâm sàng',
+                weight: weightValue,
+                examType: EXAM_TYPE_OPTIONS[examType] || 'lâm sàng',
                 emergency: isEmergency,
             });
 
             navigate(RECEPTIONIST_PATHS.TODAY_ORDERS);
+            showToast('success', 'Tạo phiếu tiếp đón thành công.');
         } catch (error) {
             setSubmitError(error?.message || 'Không thể tạo phiếu tiếp đón. Vui lòng thử lại.');
+            showToast('error', error?.message || 'Tạo phiếu tiếp đón thất bại.');
         } finally {
             setIsSubmitting(false);
         }
@@ -372,23 +469,33 @@ const NewReception = () => {
                         <div className="nr-field nr-assigned-field">
                             <label className="nr-field-label">Bác sĩ phụ trách <span className="nr-required">*</span></label>
                             <div className="nr-select-wrapper">
-                                <select
-                                    className="nr-select"
-                                    value={assignedDoctor}
-                                    onChange={(e) => {
-                                        const selectedDoctor = e.target.value;
-                                        setAssignedDoctor(selectedDoctor);
-                                        if (!selectedDoctor) {
-                                            setAssignedCases('--');
-                                        }
-                                    }}
-                                >
-                                    <option value="" disabled></option>
-                                    <option value="4">Bs. Hà Huy An</option>
-                                    <option value="5">Bs. Bình</option>
-                                </select>
+                                {isLoadingDoctors ? (
+                                    <div className="nr-select-skeleton" aria-hidden="true"></div>
+                                ) : (
+                                    <select
+                                        className="nr-select"
+                                        value={assignedDoctor}
+                                        onChange={(e) => {
+                                            const selectedDoctor = e.target.value;
+                                            setAssignedDoctor(selectedDoctor);
+                                            const found = doctorOptions.find((item) => String(item?.id) === String(selectedDoctor));
+                                            setAssignedCases(found ? String(found.waitingCases) : '--');
+                                        }}
+                                    >
+                                        <option value="" disabled></option>
+                                        {doctorOptions.map((doctor) => (
+                                            <option key={doctor.id} value={doctor.id}>{doctor.fullName}</option>
+                                        ))}
+                                    </select>
+                                )}
                                 <ChevronDown size={18} color="#888" className="nr-select-icon" />
                             </div>
+                            {doctorsError && (
+                                <div className="nr-inline-error-row">
+                                    <span className="nr-inline-error">{doctorsError}</span>
+                                    <button type="button" className="nr-inline-retry" onClick={handleRetryDoctors}>Thử lại</button>
+                                </div>
+                            )}
                         </div>
                         <div className={`nr-shift-select-wrapper ${assignedDoctor ? 'active' : ''} ${assignedCases === '--' ? 'is-empty' : 'has-value'}`}>
                             <select
@@ -398,11 +505,9 @@ const NewReception = () => {
                                 disabled={!assignedDoctor}
                             >
                                 <option value="--">--</option>
-                                <option value="01">01 ca</option>
-                                <option value="02">02 ca</option>
-                                <option value="03">03 ca</option>
-                                <option value="04">04 ca</option>
-                                <option value="05">05 ca</option>
+                                {selectedDoctorInfo ? (
+                                    <option value={String(selectedDoctorInfo.waitingCases)}>{selectedDoctorInfo.waitingCases} ca</option>
+                                ) : null}
                             </select>
                             <ChevronDown size={16} className="nr-shift-select-icon" />
                         </div>
@@ -520,6 +625,12 @@ const NewReception = () => {
                         </div>
                     </div>
                 </>
+            )}
+
+            {toast && (
+                <div className={`nr-toast nr-toast-${toast.type}`} role="status" aria-live="polite">
+                    {toast.message}
+                </div>
             )}
         </div>
         </ReceptionistLayout>

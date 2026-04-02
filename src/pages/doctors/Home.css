@@ -75,6 +75,17 @@
     transform: translateY(1px);
 }
 
+.home-quick-btn-logout {
+    color: #b42318;
+    border-color: #f3d1cd;
+    background: #fff7f5;
+}
+
+.home-quick-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
 .home-tabs {
     display: flex;
     background-color: #E8F5F3;
