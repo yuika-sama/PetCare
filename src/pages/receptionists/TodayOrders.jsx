@@ -7,6 +7,7 @@ import ReceivedCard from '../../components/receptionist/ReceivedCard';
 import { RECEPTIONIST_PATHS } from '../../routes/receptionistPaths';
 import receptionService from '../../api/receptionService';
 import authService from '../../api/authService';
+import useHeaderProfile from '../../hooks/useHeaderProfile';
 import './TodayOrders.css';
 
 const MONTH_NAMES = [
@@ -146,6 +147,10 @@ const initialOrders = [
 
 const TodayOrders = () => {
     const navigate = useNavigate();
+    const { profile } = useHeaderProfile({
+        fallbackName: 'Lễ tân',
+        fallbackRoleLabel: 'Lễ tân',
+    });
     const [activeStatus, setActiveStatus] = useState(ORDER_STATUS.RECEIVED);
     const [calendarExpanded, setCalendarExpanded] = useState(false);
     const [showNewCustomerModal, setShowNewCustomerModal] = useState(false);
@@ -493,11 +498,11 @@ const TodayOrders = () => {
                     <div className="to-header">
                         <div className="to-header-user">
                             <div className="to-header-avatar">
-                                <img src="https://placehold.co/80x80/e0f2ef/209D80?text=TT" alt="Thu Trang" />
+                                <img src={profile.avatarUrl} alt={profile.displayName} />
                             </div>
                             <div className="to-header-texts">
                                 <p className="to-header-greeting">Xin chào</p>
-                                <h1 className="to-header-name">Lê tân Thu Trang</h1>
+                                <h1 className="to-header-name">{profile.roleLabel} {profile.displayName}</h1>
                             </div>
                         </div>
                         <div className="to-header-actions">

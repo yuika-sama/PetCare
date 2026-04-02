@@ -6,9 +6,14 @@ import StatCard from '../../components/doctor/StatCard';
 import DoctorLayout from '../../layouts/DoctorLayout';
 import dashboardService from '../../api/dashboardService';
 import authService from '../../api/authService';
+import useHeaderProfile from '../../hooks/useHeaderProfile';
 
 const Home = () => {
     const navigate = useNavigate();
+    const { profile } = useHeaderProfile({
+        fallbackName: 'Bác sĩ',
+        fallbackRoleLabel: 'Bác sĩ',
+    });
     const [activeTab, setActiveTab] = useState('Workspace');
     const [summary, setSummary] = useState({});
     const [isLoadingSummary, setIsLoadingSummary] = useState(true);
@@ -102,13 +107,13 @@ const Home = () => {
                 <div className="home-header">
                     <div className="home-profile">
                         <img
-                            src="https://randomuser.me/api/portraits/men/32.jpg"
-                            alt="Doctor Avatar"
+                            src={profile.avatarUrl}
+                            alt={profile.displayName}
                             className="home-avatar"
                         />
                         <div className="home-greeting">
                             <span className="greeting-text">Xin chào</span>
-                            <span className="doctor-name">Bác sĩ Huy Đức</span>
+                            <span className="doctor-name">{profile.roleLabel} {profile.displayName}</span>
                         </div>
                     </div>
                     <div className="home-quick-actions">

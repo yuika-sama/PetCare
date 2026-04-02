@@ -8,6 +8,7 @@ import "@fontsource/roboto/500.css";
 
 import { Search, Bell, ChevronLeft } from 'lucide-react';
 import receptionService from '../../api/receptionService';
+import useHeaderProfile from '../../hooks/useHeaderProfile';
 
 const SearchIcon = () => <Search size={20} color="#209D80" />;
 const BellIcon = () => <Bell size={24} color="#111827" />;
@@ -15,6 +16,10 @@ const BackIcon = () => <ChevronLeft size={22} color="#111827" />;
 
 const Tickets = () => {
     const navigate = useNavigate();
+    const { profile } = useHeaderProfile({
+        fallbackName: 'Bác sĩ',
+        fallbackRoleLabel: 'Bác sĩ',
+    });
     const [activeTab, setActiveTab] = useState('pending');
     const [searchTerm, setSearchTerm] = useState('');
     const [tickets, setTickets] = useState([]);
@@ -137,7 +142,10 @@ const Tickets = () => {
                             <button className="tickets-back-btn" type="button" onClick={() => navigate('/doctors/home')} aria-label="Ve trang chu">
                                 <BackIcon />
                             </button>
-                            <h1 className="tickets-title">Phiếu khám</h1>
+                            <div className="tickets-page-title-group">
+                                <h1 className="tickets-title">Phiếu khám</h1>
+                                <span className="tickets-subtitle">{profile.roleLabel} {profile.displayName}</span>
+                            </div>
                         </div>
                         <button
                             className="notification-btn"
